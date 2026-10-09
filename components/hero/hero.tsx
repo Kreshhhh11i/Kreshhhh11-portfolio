@@ -1,0 +1,352 @@
+"use client";
+
+import React, { useState, useRef, useEffect } from "react";
+import { MagnetLines } from "@/components/ui/magnet-lines";
+
+const playgroundData = [
+  { id: "about", title: "About", content: "Final-year B.Tech Information Technology student and Full Stack Developer.", pos: { top: "20%", left: "20%" }, delay: "0s" },
+  { id: "stack", title: "Tech Stack", content: "JavaScript, React, Tailwind CSS, Node.js, Express, and PostgreSQL.", pos: { top: "20%", left: "80%" }, delay: "0.5s" },
+  { id: "projects", title: "Projects", content: "HelpDeskr and other database-backed web applications.", pos: { top: "80%", left: "20%" }, delay: "1s" },
+  { id: "edu", title: "Education", content: "B.Tech in Information Technology.", pos: { top: "80%", left: "80%" }, delay: "1.5s" },
+  { id: "exp", title: "Experience", content: "Full Stack Developer intern. Building real products and solving algorithmic challenges.", pos: { top: "10%", left: "50%" }, delay: "2s" },
+];
+
+export function Hero() {
+  const [isPlaygroundActive, setIsPlaygroundActive] = useState(false);
+  const [activeCard, setActiveCard] = useState<string | null>(null);
+  const [isHeroExpanded, setIsHeroExpanded] = useState(false);
+
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
+  const linesRef = useRef<(SVGLineElement | null)[]>([]);
+
+  const dragState = useRef(playgroundData.map(() => ({
+    isDragging: false,
+    isHovered: false,
+    dragX: 0,
+    dragY: 0,
+    startX: 0,
+    startY: 0,
+    initialMouseX: 0,
+    initialMouseY: 0
+  })));
+  const isDraggingClickRef = useRef(false);
+  const activeCardRef = useRef<string | null>(null);
+
+  // Sync activeCard to ref for rAF loop
+  useEffect(() => {
+    activeCardRef.current = activeCard;
+  }, [activeCard]);
+
+  // Pre-calculate percentage multipliers for fast line updates
+  const anchorPercentages = useRef(playgroundData.map(c => ({
+    x: parseFloat(c.pos.left) / 100,
+    y: parseFloat(c.pos.top) / 100
+  })));
+
+  useEffect(() => {
+    if (!isPlaygroundActive) return;
+
+    let animationFrameId: number;
+    const start = Date.now();
+
+    const animate = () => {
+      const elapsed = Date.now() - start;
+      const container = containerRef.current;
+      const w = container ? container.clientWidth : 0;
+      const h = container ? container.clientHeight : 0;
+
+      cardsRef.current.forEach((el, i) => {
+        if (!el) return;
+
+        const state = dragState.current[i];
+        const card = playgroundData[i];
+
+        // Slowed down: Independent X and Y sine waves for organic Lissajous curves (Zero Gravity effect)
+        const timeX = (elapsed * 0.0003) + (i * 2.1);
+        const timeY = (elapsed * 0.00025) + (i * 1.5);
+
+        const floatX = Math.sin(timeX) * 12;
+        const floatY = Math.cos(timeY) * 16;
+        const rotate = Math.sin(timeX * 0.5) * 2;
+
+        if (!state.isDragging) {
+          // Smooth rubber-band return to origin
+          state.dragX += (0 - state.dragX) * 0.06;
+          state.dragY += (0 - state.dragY) * 0.06;
+        }
+
+        const totalX = floatX + state.dragX;
+        const totalY = floatY + state.dragY;
+
+        el.style.transform = `translate(${totalX}px, ${totalY}px) rotate(${rotate}deg)`;
+
+        // Update connecting SVG line
+        const lineEl = linesRef.current[i];
+        if (lineEl && w && h) {
+          const anchorX = w * anchorPercentages.current[i].x;
+          const anchorY = h * anchorPercentages.current[i].y;
+          lineEl.setAttribute("x2", (anchorX + totalX).toString());
+          lineEl.setAttribute("y2", (anchorY + totalY).toString());
+
+          // Glow effect on interaction
+          const isHighlighted = state.isDragging || state.isHovered || activeCardRef.current === card.id;
+          if (isHighlighted) {
+            lineEl.setAttribute("stroke", "var(--primary-text)");
+            lineEl.style.filter = "drop-shadow(0 0 6px var(--primary-text))";
+          } else {
+            lineEl.setAttribute("stroke", "var(--dashed-borders)");
+            lineEl.style.filter = "none";
+          }
+        }
+      });
+      animationFrameId = requestAnimationFrame(animate);
+    };
+
+    animate();
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+      cardsRef.current.forEach((el, i) => {
+        if (el) el.style.transform = 'translate(0px, 0px) rotate(0deg)';
+        // Reset drag states on close
+        const state = dragState.current[i];
+        state.dragX = 0;
+        state.dragY = 0;
+        state.isDragging = false;
+        state.isHovered = false;
+
+        // Reset SVG lines to default
+        const lineEl = linesRef.current[i];
+        if (lineEl) {
+          lineEl.setAttribute("x2", playgroundData[i].pos.left);
+          lineEl.setAttribute("y2", playgroundData[i].pos.top);
+          lineEl.setAttribute("stroke", "var(--dashed-borders)");
+          lineEl.style.filter = "none";
+        }
+      });
+    };
+  }, [isPlaygroundActive]);
+
+  const activeCardData = playgroundData.find((c) => c.id === activeCard);
+
+  const togglePlayground = () => {
+    setIsPlaygroundActive((prev) => {
+      const next = !prev;
+      if (!next) setActiveCard(null); // Close panel when playground closes
+      return next;
+    });
+  };
+
+  const handlePointerDown = (e: React.PointerEvent<HTMLButtonElement>, i: number) => {
+    e.currentTarget.setPointerCapture(e.pointerId);
+    const state = dragState.current[i];
+    state.isDragging = true;
+    state.initialMouseX = e.clientX;
+    state.initialMouseY = e.clientY;
+    state.startX = state.dragX;
+    state.startY = state.dragY;
+    isDraggingClickRef.current = false;
+  };
+
+  const handlePointerMove = (e: React.PointerEvent<HTMLButtonElement>, i: number) => {
+    const state = dragState.current[i];
+    if (state.isDragging) {
+      const dx = e.clientX - state.initialMouseX;
+      const dy = e.clientY - state.initialMouseY;
+      state.dragX = state.startX + dx;
+      state.dragY = state.startY + dy;
+
+      if (Math.hypot(dx, dy) > 5) {
+        isDraggingClickRef.current = true;
+      }
+    }
+  };
+
+  const handlePointerUp = (e: React.PointerEvent<HTMLButtonElement>, i: number) => {
+    e.currentTarget.releasePointerCapture(e.pointerId);
+    const state = dragState.current[i];
+    state.isDragging = false;
+  };
+
+  return (
+    <section className="w-full relative flex flex-col pt-12 md:pt-20">
+      {/* Main Content Split */}
+      <div className="relative z-10 flex-1 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        {/* Left Column */}
+        <div className={`flex flex-col items-start gap-6 pt-10 pb-20 transition-transform duration-[1200ms] ease-[cubic-bezier(0.23,1,0.32,1)] will-change-transform ${isHeroExpanded ? "translate-y-0" : "translate-y-36 md:translate-y-48"}`}>
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[var(--background)] border border-[var(--dashed-borders)] text-xs text-[var(--secondary-text)] font-mono shadow-sm">
+            <span>FullStack / SDE Developer</span>
+          </div>
+
+          <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold font-sans tracking-tight text-[var(--primary-text)] leading-[1.1]">
+            Breaking systems to <em className="italic font-normal">understand</em><br />
+            <span className="inline-flex items-center gap-4">
+              systems.
+              <button
+                onClick={() => setIsHeroExpanded(!isHeroExpanded)}
+                className="p-2 md:p-3 rounded-full border border-[var(--dashed-borders)] text-[var(--primary-text)] hover:bg-[var(--card-tint)] transition-all duration-500 cursor-pointer flex items-center justify-center group"
+                aria-label="Toggle details"
+              >
+                <svg
+                  className={`transition-transform duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] ${isHeroExpanded ? "rotate-180" : "rotate-0 group-hover:translate-y-1"}`}
+                  width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                >
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <polyline points="19 12 12 19 5 12"></polyline>
+                </svg>
+              </button>
+            </span>
+          </h1>
+
+          <div className={`flex flex-col gap-3 pt-2 transition-all duration-[1200ms] ease-[cubic-bezier(0.23,1,0.32,1)] will-change-transform ${isHeroExpanded ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-8 pointer-events-none"}`}>
+            <p className="text-[var(--secondary-text)] text-sm md:text-base max-w-lg leading-relaxed">
+              Heyy folks, this is Kresh. I'm a Full Stack Developer / aspiring SDE with a curiosity to learn something new, and that's what got me into programming. Now, I'm capable of building end-to-end web applications using the modern PERN stack.
+            </p>
+            <p className="text-[var(--secondary-text)] text-sm md:text-base max-w-lg leading-relaxed">
+              I discovered problem solving and thought, <em className="italic text-[var(--primary-text)]">"Why am I doing this to myself?"</em> ...just kidding.
+            </p>
+            <p className="text-[var(--secondary-text)] text-sm md:text-base max-w-lg leading-relaxed">
+              Honestly, nothing beats the dopamine hit of watching all the test cases turn green on LeetCode.
+            </p>
+            <p className="text-[var(--secondary-text)] text-sm md:text-base max-w-lg leading-relaxed">
+              When I'm away from the keyboard, you'll usually find me behind a camera capturing moments, exploring new places, or playing games.
+            </p>
+          </div>
+        </div>
+
+        {/* Right Column (Photo, Grid, Playground & Buttons) */}
+        <div className="relative w-full flex justify-center lg:justify-end items-center pb-20 lg:pb-0">
+          <div className="flex flex-col items-center gap-8 w-full max-w-[500px]">
+            {/* Grid and Photo Container (Playground Bounds) */}
+            <div ref={containerRef} className="relative flex justify-center items-center w-full aspect-square">
+              {/* Magnetic Lines behind the photo */}
+              <div className="absolute inset-0 flex justify-center items-center pointer-events-none z-10">
+                <MagnetLines
+                  rows={15}
+                  columns={15}
+                  lineColor="#ffffff"
+                  lineWidth="2px"
+                  lineHeight="16px"
+                  containerSize="100%"
+                  className="opacity-40"
+                />
+              </div>
+
+              {/* Connecting SVG Lines (Visible when active) */}
+              <div className={`absolute inset-0 z-10 pointer-events-none transition-opacity ${isPlaygroundActive ? "duration-1000 delay-300 opacity-100" : "duration-1000 opacity-0"}`}>
+                <svg className="w-full h-full overflow-visible">
+                  {playgroundData.map((card, i) => (
+                    <line
+                      key={`line-${card.id}`}
+                      ref={(el) => { linesRef.current[i] = el; }}
+                      x1="50%" y1="50%" x2={card.pos.left} y2={card.pos.top}
+                      stroke="var(--dashed-borders)" strokeWidth="1" strokeDasharray="4 4"
+                    />
+                  ))}
+                </svg>
+              </div>
+
+              {/* Floating Cards */}
+              {playgroundData.map((card, i) => (
+                <div
+                  key={`card-${card.id}`}
+                  className={`absolute z-20 transition-all ${isPlaygroundActive ? "duration-[1200ms] ease-[cubic-bezier(0.23,1,0.32,1)]" : "duration-1000 ease-in-out"}`}
+                  style={{
+                    top: isPlaygroundActive ? card.pos.top : "50%",
+                    left: isPlaygroundActive ? card.pos.left : "50%",
+                    opacity: isPlaygroundActive ? 1 : 0,
+                    transform: isPlaygroundActive ? "translate(-50%, -50%) scale(1)" : "translate(-50%, -50%) scale(0)",
+                    pointerEvents: isPlaygroundActive ? "auto" : "none"
+                  }}
+                >
+                  <div
+                    ref={(el) => { cardsRef.current[i] = el; }}
+                    className="will-change-transform"
+                  >
+                    <button
+                      onPointerDown={(e) => handlePointerDown(e, i)}
+                      onPointerMove={(e) => handlePointerMove(e, i)}
+                      onPointerUp={(e) => handlePointerUp(e, i)}
+                      onPointerCancel={(e) => handlePointerUp(e, i)}
+                      onPointerEnter={() => { dragState.current[i].isHovered = true; }}
+                      onPointerLeave={() => { dragState.current[i].isHovered = false; }}
+                      onClick={(e) => {
+                        if (isDraggingClickRef.current) {
+                          e.preventDefault();
+                          return;
+                        }
+                        setActiveCard(activeCard === card.id ? null : card.id);
+                      }}
+                      className={`px-3 py-1.5 rounded-full border bg-[var(--background)] text-[10px] sm:text-xs font-mono whitespace-nowrap transition-colors duration-300 touch-none cursor-grab active:cursor-grabbing ${activeCard === card.id
+                        ? "border-[var(--primary-text)] shadow-md text-[var(--primary-text)]"
+                        : "border-[var(--dashed-borders)] text-[var(--secondary-text)] hover:text-[var(--primary-text)]"
+                        }`}
+                    >
+                      {card.title}
+                    </button>
+                  </div>
+                </div>
+              ))}
+
+              {/* Detail Panel */}
+              <div className={`absolute bottom-4 left-1/2 -translate-x-1/2 w-[90%] max-w-sm z-40 bg-[var(--background)] border border-[var(--dashed-borders)] p-4 rounded-lg shadow-xl pointer-events-auto transition-all duration-300 ${activeCard ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 pointer-events-none"}`}>
+                <div className="flex justify-between items-start mb-2">
+                  <h3 className="text-[var(--primary-text)] font-mono text-xs uppercase tracking-wider">{activeCardData?.title}</h3>
+                  <button onClick={() => setActiveCard(null)} className="text-[var(--secondary-text)] hover:text-[var(--primary-text)]" aria-label="Close detail panel">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                  </button>
+                </div>
+                <p className="text-[var(--secondary-text)] text-xs sm:text-sm leading-relaxed font-sans">{activeCardData?.content}</p>
+              </div>
+
+              {/* Profile Image Group */}
+              <div className="relative w-64 h-64 md:w-72 md:h-72 z-30">
+                <button
+                  onClick={togglePlayground}
+                  className={`w-full h-full relative transition-all duration-700 ease-in-out cursor-pointer group ${isPlaygroundActive ? "scale-90 md:scale-[0.85]" : "hover:scale-[1.02]"}`}
+                  aria-label={isPlaygroundActive ? "Close interactive playground" : "Open interactive playground"}
+                >
+                  {/* Image Container */}
+                  <div
+                    className="w-full h-full overflow-hidden bg-[#2a201c] transition-shadow duration-700"
+                    style={{
+                      borderRadius: "70px",
+                      boxShadow: isPlaygroundActive ? "0 0 20px rgba(0,0,0,0.4)" : "0 0 40px rgba(0,0,0,0.5)"
+                    }}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src="/images/profile/srikesh.jpg"
+                      alt="Srikesh TR"
+                      className={`w-full h-full object-cover transition-all duration-700 ease-in-out ${isPlaygroundActive ? "blur-md scale-110 opacity-50" : "blur-0 scale-100 opacity-100"
+                        }`}
+                    />
+                  </div>
+                </button>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex flex-wrap justify-center items-center gap-4 z-20">
+              <button className="group px-6 py-3 rounded-full bg-[var(--primary-text)] text-[var(--background)] font-mono text-xs uppercase tracking-wider font-semibold hover:opacity-90 transition-opacity flex items-center gap-2 shadow-md">
+                View Projects
+                <svg className="transition-transform duration-300 group-hover:rotate-45" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="5" y1="19" x2="17" y2="7"></line>
+                  <polyline points="7 7 17 7 17 17"></polyline>
+                </svg>
+              </button>
+              <button className="group px-6 py-3 rounded-full bg-transparent border border-[var(--dashed-borders)] text-[var(--primary-text)] font-mono text-xs uppercase tracking-wider font-semibold hover:bg-[var(--card-tint)] transition-colors flex items-center gap-2">
+                Let's talk
+                <svg className="transition-transform duration-300 group-hover:rotate-45" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="5" y1="19" x2="17" y2="7"></line>
+                  <polyline points="7 7 17 7 17 17"></polyline>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}

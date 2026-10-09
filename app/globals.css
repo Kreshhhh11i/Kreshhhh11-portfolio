@@ -1,0 +1,156 @@
+@import "tailwindcss";
+
+:root {
+  --background: #0b0a09;
+  --primary-text: #f6eddc;
+  --secondary-text: #9d978c;
+  --card-tint: #1b1a18;
+  --dashed-borders: #3a3733;
+  --background-dots: #2e2c29;
+  --accent: #f5643e;
+  --accent-secondary: #f5643e;
+  /* graphic accent in light, same in dark */
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --background: #f6eddc;
+    --primary-text: #1a1511;
+    --secondary-text: #655f56;
+    --card-tint: #e7dece;
+    --dashed-borders: #bfb7a9;
+    --background-dots: #d3cabc;
+    --accent: #bf3a12;
+    --accent-secondary: #f5643e;
+  }
+}
+
+@theme inline {
+  --color-bg: var(--background);
+  --color-primary: var(--primary-text);
+  --color-secondary: var(--secondary-text);
+  --color-card: var(--card-tint);
+  --color-border-dashed: var(--dashed-borders);
+  --color-dots: var(--background-dots);
+  --color-accent: var(--accent);
+  --color-accent-graphic: var(--accent-secondary);
+
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, monospace;
+}
+
+/* Global CSS foundation as requested */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--background);
+}
+
+:root {
+  --dot: rgba(255, 255, 255, 0.34);
+  --dot-gap: 30px;  
+  --dot-r: 0.6px;
+  --reveal: 160px;  
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --dot: rgba(26, 21, 17, 0.30);
+  } 
+}  
+
+:root[data-theme="dark"] {
+  --dot: rgba(255, 166, 0, 0.34);
+}
+
+:root[data-theme="light"] {
+  --dot: rgba(26, 21, 17, 0.30);
+}
+
+.dot-grid {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0;
+  background-image: radial-gradient(circle, var(--dot) var(--dot-r), transparent calc(var(--dot-r) + 0.3px));
+  background-size: var(--dot-gap) var(--dot-gap);
+  -webkit-mask-image: radial-gradient(var(--reveal) circle at var(--mx, 50vw) var(--my, 30vh), #000 0, rgba(0, 0, 0, .4) 40%, transparent 100%);
+  mask-image: radial-gradient(var(--reveal) circle at var(--mx, 50vw) var(--my, 30vh), #000 0, rgba(0, 0, 0, .4) 40%, transparent 100%);
+}
+
+@media (hover: none) {
+  .dot-grid {
+    opacity: 0.06;
+  }
+}
+
+::selection {
+  background-color: var(--accent);
+  color: var(--background);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Custom Scrollbar for Heatmap */
+::-webkit-scrollbar {
+  height: 4px;
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--dashed-borders);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--secondary-text);
+}
+
+@keyframes gentle-float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-5px); }
+}
+
+.animate-gentle-float {
+  animation: gentle-float 4s ease-in-out infinite;
+}
+
+@keyframes zero-gravity-1 {
+  0%, 100% { transform: translate(0px, 0px) rotate(0deg); }
+  33% { transform: translate(12px, -18px) rotate(2deg); }
+  66% { transform: translate(-10px, 12px) rotate(-1deg); }
+}
+
+@keyframes zero-gravity-2 {
+  0%, 100% { transform: translate(0px, 0px) rotate(0deg); }
+  33% { transform: translate(-15px, -10px) rotate(-2deg); }
+  66% { transform: translate(14px, 15px) rotate(1deg); }
+}
+
+@keyframes zero-gravity-3 {
+  0%, 100% { transform: translate(0px, 0px) rotate(0deg); }
+  33% { transform: translate(15px, 12px) rotate(1.5deg); }
+  66% { transform: translate(-12px, -15px) rotate(-1.5deg); }
+}
+
+.animate-zero-gravity-1 { animation: zero-gravity-1 12s ease-in-out infinite; }
+.animate-zero-gravity-2 { animation: zero-gravity-2 14s ease-in-out infinite; }
+.animate-zero-gravity-3 { animation: zero-gravity-3 16s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-gentle-float, .animate-zero-gravity-1, .animate-zero-gravity-2, .animate-zero-gravity-3 {
+    animation: none;
+  }
+}
