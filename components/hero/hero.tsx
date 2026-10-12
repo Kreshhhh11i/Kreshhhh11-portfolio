@@ -4,11 +4,12 @@ import React, { useState, useRef, useEffect } from "react";
 import { MagnetLines } from "@/components/ui/magnet-lines";
 
 const playgroundData = [
-  { id: "about", title: "About", content: "Final-year B.Tech Information Technology student and Full Stack Developer.", pos: { top: "20%", left: "20%" }, delay: "0s" },
-  { id: "stack", title: "Tech Stack", content: "JavaScript, React, Tailwind CSS, Node.js, Express, and PostgreSQL.", pos: { top: "20%", left: "80%" }, delay: "0.5s" },
-  { id: "projects", title: "Projects", content: "HelpDeskr and other database-backed web applications.", pos: { top: "80%", left: "20%" }, delay: "1s" },
-  { id: "edu", title: "Education", content: "B.Tech in Information Technology.", pos: { top: "80%", left: "80%" }, delay: "1.5s" },
-  { id: "exp", title: "Experience", content: "Full Stack Developer intern. Building real products and solving algorithmic challenges.", pos: { top: "10%", left: "50%" }, delay: "2s" },
+  { id: "about", title: "About", content: "Final-year B.Tech Information Technology student and Full Stack Developer passionate about building high-impact web apps.", pos: { top: "34%", left: "12%" }, delay: "0s" },
+  { id: "exp", title: "Experience", content: "Full Stack Developer intern. Building scalable products, modern architectures, and solving algorithmic problems.", pos: { top: "9%", left: "50%" }, delay: "0.3s" },
+  { id: "stack", title: "Tech Stack", content: "JavaScript, React, Next.js, Tailwind CSS, Node.js, Express, and PostgreSQL.", pos: { top: "34%", left: "88%" }, delay: "0.6s" },
+  { id: "edu", title: "Education", content: "B.Tech in Information Technology with a strong foundation in core computer science and software development.", pos: { top: "66%", left: "88%" }, delay: "0.9s" },
+  { id: "contact", title: "Contact", content: "Available for full-time SDE roles, collaborations, and projects. Let's connect and build together!", pos: { top: "91%", left: "50%" }, delay: "1.2s" },
+  { id: "projects", title: "Projects", content: "HelpDeskr and other production-ready applications with responsive modern UX and robust backends.", pos: { top: "66%", left: "12%" }, delay: "1.5s" },
 ];
 
 export function Hero() {
@@ -49,6 +50,11 @@ export function Hero() {
 
     let animationFrameId: number;
     const start = Date.now();
+
+    // Disable CSS transition on inner cards during active floating so rAF updates have 0ms latency
+    cardsRef.current.forEach((el) => {
+      if (el) el.style.transition = "none";
+    });
 
     const animate = () => {
       const elapsed = Date.now() - start;
@@ -108,21 +114,18 @@ export function Hero() {
     return () => {
       cancelAnimationFrame(animationFrameId);
       cardsRef.current.forEach((el, i) => {
-        if (el) el.style.transform = 'translate(0px, 0px) rotate(0deg)';
+        if (!el) return;
+        // Match the 1200ms cubic-bezier transition of opening animation on close
+        el.style.transition = "transform 1200ms cubic-bezier(0.23, 1, 0.32, 1)";
+        el.style.transform = "translate(0px, 0px) rotate(0deg)";
+
         // Reset drag states on close
         const state = dragState.current[i];
-        state.dragX = 0;
-        state.dragY = 0;
-        state.isDragging = false;
-        state.isHovered = false;
-
-        // Reset SVG lines to default
-        const lineEl = linesRef.current[i];
-        if (lineEl) {
-          lineEl.setAttribute("x2", playgroundData[i].pos.left);
-          lineEl.setAttribute("y2", playgroundData[i].pos.top);
-          lineEl.setAttribute("stroke", "var(--dashed-borders)");
-          lineEl.style.filter = "none";
+        if (state) {
+          state.dragX = 0;
+          state.dragY = 0;
+          state.isDragging = false;
+          state.isHovered = false;
         }
       });
     };
@@ -173,23 +176,34 @@ export function Hero() {
     <section className="w-full relative flex flex-col pt-12 md:pt-20">
       {/* Main Content Split */}
       <div className="relative z-10 flex-1 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-        {/* Left Column */}
-        <div className={`flex flex-col items-start gap-6 pt-10 pb-20 transition-transform duration-[1200ms] ease-[cubic-bezier(0.23,1,0.32,1)] will-change-transform ${isHeroExpanded ? "translate-y-0" : "translate-y-36 md:translate-y-48"}`}>
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[var(--background)] border border-[var(--dashed-borders)] text-xs text-[var(--secondary-text)] font-mono shadow-sm">
-            <span>FullStack / SDE Developer</span>
+        {/* Left Column (Tagline & Bio) */}
+        <div className={`w-full order-2 lg:order-1 flex flex-col items-center lg:items-start text-center lg:text-left gap-6 pt-4 lg:pt-10 pb-4 lg:pb-20 transition-transform duration-[1200ms] ease-[cubic-bezier(0.23,1,0.32,1)] will-change-transform ${isHeroExpanded ? "translate-y-0" : "translate-y-0 lg:translate-y-36 xl:translate-y-48"}`}>
+          <div className="flex items-center justify-center lg:justify-start gap-2 sm:gap-2.5 flex-nowrap max-w-full">
+            <div className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full bg-[var(--background)] border border-[var(--dashed-borders)] text-[11px] sm:text-xs text-[var(--secondary-text)] font-mono shadow-sm shrink-0 whitespace-nowrap">
+              <span className="h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-[#f5643e] animate-fade-in-out shrink-0" />
+              <span>Available for work</span>
+            </div>
+            <div className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full bg-[var(--background)] border border-[var(--dashed-borders)] text-[11px] sm:text-xs text-[var(--secondary-text)] font-mono shadow-sm shrink-0 whitespace-nowrap">
+              <span className="lg:hidden">FullStack / SDE Dev</span>
+              <span className="hidden lg:inline">FullStack / SDE Developer</span>
+            </div>
           </div>
 
-          <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold font-sans tracking-tight text-[var(--primary-text)] leading-[1.1]">
-            Breaking systems to <em className="italic font-normal">understand</em><br />
-            <span className="inline-flex items-center gap-4">
-              systems.
+          <h1 className="w-full text-center lg:text-left text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold font-sans tracking-tight text-[var(--primary-text)] leading-[1.1]">
+            <span className="block lg:inline">Breaking systems to</span>{" "}
+            <span className="inline-block lg:inline">
+              <em className="italic font-normal">understand</em>{" "}
+              <br className="hidden lg:inline" />
+              <span>systems.</span>
+            </span>
+            <span className="flex lg:inline-flex items-center justify-center lg:justify-start mt-3 lg:mt-0 lg:ml-4 align-middle">
               <button
                 onClick={() => setIsHeroExpanded(!isHeroExpanded)}
-                className="p-2 md:p-3 rounded-full border border-[var(--dashed-borders)] text-[var(--primary-text)] hover:bg-[var(--card-tint)] transition-all duration-500 cursor-pointer flex items-center justify-center group"
+                className="p-2 md:p-3 rounded-full border border-[var(--dashed-borders)] text-[var(--primary-text)] hover:bg-[var(--card-tint)] transition-all duration-500 cursor-pointer flex items-center justify-center group shrink-0"
                 aria-label="Toggle details"
               >
                 <svg
-                  className={`transition-transform duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] ${isHeroExpanded ? "rotate-180" : "rotate-0 group-hover:translate-y-1"}`}
+                  className={`transition-transform duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] ${isHeroExpanded ? "rotate-180 group-hover:translate-y-1" : "rotate-0 group-hover:translate-y-1"}`}
                   width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
                 >
                   <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -199,24 +213,29 @@ export function Hero() {
             </span>
           </h1>
 
-          <div className={`flex flex-col gap-3 pt-2 transition-all duration-[1200ms] ease-[cubic-bezier(0.23,1,0.32,1)] will-change-transform ${isHeroExpanded ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-8 pointer-events-none"}`}>
-            <p className="text-[var(--secondary-text)] text-sm md:text-base max-w-lg leading-relaxed">
-              Heyy folks, this is Kresh. I'm a Full Stack Developer / aspiring SDE with a curiosity to learn something new, and that's what got me into programming. Now, I'm capable of building end-to-end web applications using the modern PERN stack.
-            </p>
-            <p className="text-[var(--secondary-text)] text-sm md:text-base max-w-lg leading-relaxed">
-              I discovered problem solving and thought, <em className="italic text-[var(--primary-text)]">"Why am I doing this to myself?"</em> ...just kidding.
-            </p>
-            <p className="text-[var(--secondary-text)] text-sm md:text-base max-w-lg leading-relaxed">
-              Honestly, nothing beats the dopamine hit of watching all the test cases turn green on LeetCode.
-            </p>
-            <p className="text-[var(--secondary-text)] text-sm md:text-base max-w-lg leading-relaxed">
-              When I'm away from the keyboard, you'll usually find me behind a camera capturing moments, exploring new places, or playing games.
-            </p>
+          {/* Smooth Collapsible Bio Section */}
+          <div className={`w-full grid transition-[grid-template-rows] duration-[1200ms] ease-[cubic-bezier(0.23,1,0.32,1)] ${isHeroExpanded ? "grid-rows-[1fr]" : "grid-rows-[0fr] lg:grid-rows-[1fr]"}`}>
+            <div className="overflow-hidden">
+              <div className={`w-full flex flex-col items-center lg:items-start text-center lg:text-left gap-3 pt-2 transition-all duration-[1200ms] ease-[cubic-bezier(0.23,1,0.32,1)] will-change-transform ${isHeroExpanded ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4 lg:-translate-y-8 pointer-events-none"}`}>
+                <p className="text-[var(--secondary-text)] text-sm md:text-base w-full max-w-full lg:max-w-lg leading-relaxed text-center lg:text-left">
+                  Heyy folks, this is Kresh. I'm a Full Stack Developer / aspiring SDE with a curiosity to learn something new, and that's what got me into programming. Now, I'm capable of building end-to-end web applications using the modern PERN stack.
+                </p>
+                <p className="text-[var(--secondary-text)] text-sm md:text-base w-full max-w-full lg:max-w-lg leading-relaxed text-center lg:text-left">
+                  I discovered problem solving and thought, <em className="italic text-[var(--primary-text)]">"Why am I doing this to myself?"</em> ...just kidding.
+                </p>
+                <p className="text-[var(--secondary-text)] text-sm md:text-base w-full max-w-full lg:max-w-lg leading-relaxed text-center lg:text-left">
+                  Honestly, nothing beats the dopamine hit of watching all the test cases turn green on LeetCode.
+                </p>
+                <p className="text-[var(--secondary-text)] text-sm md:text-base w-full max-w-full lg:max-w-lg leading-relaxed text-center lg:text-left">
+                  When I'm away from the keyboard, you'll usually find me behind a camera capturing moments, exploring new places, or playing games.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
 
         {/* Right Column (Photo, Grid, Playground & Buttons) */}
-        <div className="relative w-full flex justify-center lg:justify-end items-center pb-20 lg:pb-0">
+        <div className="order-1 lg:order-2 relative w-full flex justify-center lg:justify-end items-center pb-8 lg:pb-0">
           <div className="flex flex-col items-center gap-8 w-full max-w-[500px]">
             {/* Grid and Photo Container (Playground Bounds) */}
             <div ref={containerRef} className="relative flex justify-center items-center w-full aspect-square">
@@ -234,7 +253,7 @@ export function Hero() {
               </div>
 
               {/* Connecting SVG Lines (Visible when active) */}
-              <div className={`absolute inset-0 z-10 pointer-events-none transition-opacity ${isPlaygroundActive ? "duration-1000 delay-300 opacity-100" : "duration-1000 opacity-0"}`}>
+              <div className={`absolute inset-0 z-10 pointer-events-none transition-opacity duration-[1200ms] ease-[cubic-bezier(0.23,1,0.32,1)] ${isPlaygroundActive ? "delay-300 opacity-100" : "opacity-0"}`}>
                 <svg className="w-full h-full overflow-visible">
                   {playgroundData.map((card, i) => (
                     <line
@@ -251,7 +270,7 @@ export function Hero() {
               {playgroundData.map((card, i) => (
                 <div
                   key={`card-${card.id}`}
-                  className={`absolute z-20 transition-all ${isPlaygroundActive ? "duration-[1200ms] ease-[cubic-bezier(0.23,1,0.32,1)]" : "duration-1000 ease-in-out"}`}
+                  className="absolute z-20 transition-all duration-[1200ms] ease-[cubic-bezier(0.23,1,0.32,1)]"
                   style={{
                     top: isPlaygroundActive ? card.pos.top : "50%",
                     left: isPlaygroundActive ? card.pos.left : "50%",
@@ -304,12 +323,12 @@ export function Hero() {
               <div className="relative w-64 h-64 md:w-72 md:h-72 z-30">
                 <button
                   onClick={togglePlayground}
-                  className={`w-full h-full relative transition-all duration-700 ease-in-out cursor-pointer group ${isPlaygroundActive ? "scale-90 md:scale-[0.85]" : "hover:scale-[1.02]"}`}
+                  className={`w-full h-full relative transition-all duration-[1200ms] ease-[cubic-bezier(0.23,1,0.32,1)] cursor-pointer group ${isPlaygroundActive ? "scale-[0.72] sm:scale-[0.78] md:scale-[0.85]" : "hover:scale-[1.02]"}`}
                   aria-label={isPlaygroundActive ? "Close interactive playground" : "Open interactive playground"}
                 >
                   {/* Image Container */}
                   <div
-                    className="w-full h-full overflow-hidden bg-[#2a201c] transition-shadow duration-700"
+                    className="w-full h-full overflow-hidden bg-[#2a201c] transition-shadow duration-[1200ms] ease-[cubic-bezier(0.23,1,0.32,1)]"
                     style={{
                       borderRadius: "70px",
                       boxShadow: isPlaygroundActive ? "0 0 20px rgba(0,0,0,0.4)" : "0 0 40px rgba(0,0,0,0.5)"
@@ -319,7 +338,7 @@ export function Hero() {
                     <img
                       src="/images/profile/srikesh.jpg"
                       alt="Srikesh TR"
-                      className={`w-full h-full object-cover transition-all duration-700 ease-in-out ${isPlaygroundActive ? "blur-md scale-110 opacity-50" : "blur-0 scale-100 opacity-100"
+                      className={`w-full h-full object-cover transition-all duration-[1200ms] ease-[cubic-bezier(0.23,1,0.32,1)] ${isPlaygroundActive ? "blur-md scale-110 opacity-50" : "blur-0 scale-100 opacity-100"
                         }`}
                     />
                   </div>

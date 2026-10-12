@@ -52,16 +52,16 @@ body {
 
 :root {
   --dot: rgba(255, 255, 255, 0.34);
-  --dot-gap: 30px;  
+  --dot-gap: 30px;
   --dot-r: 0.6px;
-  --reveal: 160px;  
+  --reveal: 160px;
 }
 
 @media (prefers-color-scheme: light) {
   :root {
     --dot: rgba(26, 21, 17, 0.30);
-  } 
-}  
+  }
+}
 
 :root[data-theme="dark"] {
   --dot: rgba(255, 166, 0, 0.34);
@@ -119,8 +119,15 @@ body {
 }
 
 @keyframes gentle-float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-5px); }
+
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-5px);
+  }
 }
 
 .animate-gentle-float {
@@ -128,29 +135,98 @@ body {
 }
 
 @keyframes zero-gravity-1 {
-  0%, 100% { transform: translate(0px, 0px) rotate(0deg); }
-  33% { transform: translate(12px, -18px) rotate(2deg); }
-  66% { transform: translate(-10px, 12px) rotate(-1deg); }
+
+  0%,
+  100% {
+    transform: translate(0px, 0px) rotate(0deg);
+  }
+
+  33% {
+    transform: translate(12px, -18px) rotate(2deg);
+  }
+
+  66% {
+    transform: translate(-10px, 12px) rotate(-1deg);
+  }
 }
 
 @keyframes zero-gravity-2 {
-  0%, 100% { transform: translate(0px, 0px) rotate(0deg); }
-  33% { transform: translate(-15px, -10px) rotate(-2deg); }
-  66% { transform: translate(14px, 15px) rotate(1deg); }
+
+  0%,
+  100% {
+    transform: translate(0px, 0px) rotate(0deg);
+  }
+
+  33% {
+    transform: translate(-15px, -10px) rotate(-2deg);
+  }
+
+  66% {
+    transform: translate(14px, 15px) rotate(1deg);
+  }
 }
 
 @keyframes zero-gravity-3 {
-  0%, 100% { transform: translate(0px, 0px) rotate(0deg); }
-  33% { transform: translate(15px, 12px) rotate(1.5deg); }
-  66% { transform: translate(-12px, -15px) rotate(-1.5deg); }
+
+  0%,
+  100% {
+    transform: translate(0px, 0px) rotate(0deg);
+  }
+
+  33% {
+    transform: translate(15px, 12px) rotate(1.5deg);
+  }
+
+  66% {
+    transform: translate(-12px, -15px) rotate(-1.5deg);
+  }
 }
 
-.animate-zero-gravity-1 { animation: zero-gravity-1 12s ease-in-out infinite; }
-.animate-zero-gravity-2 { animation: zero-gravity-2 14s ease-in-out infinite; }
-.animate-zero-gravity-3 { animation: zero-gravity-3 16s ease-in-out infinite; }
+.animate-zero-gravity-1 {
+  animation: zero-gravity-1 12s ease-in-out infinite;
+}
+
+.animate-zero-gravity-2 {
+  animation: zero-gravity-2 14s ease-in-out infinite;
+}
+
+.animate-zero-gravity-3 {
+  animation: zero-gravity-3 16s ease-in-out infinite;
+}
+
+@keyframes fade-in-out {
+
+  0%,
+  100% {
+    opacity: 0.2;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+.animate-fade-in-out {
+  animation: fade-in-out 2s ease-in-out infinite;
+}
 
 @media (prefers-reduced-motion: reduce) {
-  .animate-gentle-float, .animate-zero-gravity-1, .animate-zero-gravity-2, .animate-zero-gravity-3 {
+  .animate-gentle-float,
+  .animate-zero-gravity-1,
+  .animate-zero-gravity-2,
+  .animate-zero-gravity-3,
+  .animate-fade-in-out {
     animation: none;
   }
+}
+
+/* Corner bracket accents and interactive hover glow */
+.corner-accent {
+  transition: opacity 0.3s ease, filter 0.3s ease;
+}
+
+.group:hover .corner-accent,
+.corner-accent-active {
+  opacity: 1 !important;
+  filter: drop-shadow(0 0 6px var(--primary-text)) drop-shadow(0 0 12px var(--primary-text)) !important;
 }

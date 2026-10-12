@@ -42,7 +42,16 @@ export function GitHubHeatmap() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [activeCell, setActiveCell] = useState<{ count: number; date: string; x: number; y: number } | null>(null);
+  const [isHovered, setIsHovered] = useState(false);
   const tooltipRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll to the latest weeks (right side) on load for mobile/narrow viewports
+  useEffect(() => {
+    if (data && scrollContainerRef.current) {
+      scrollContainerRef.current.scrollLeft = scrollContainerRef.current.scrollWidth;
+    }
+  }, [data]);
 
   useEffect(() => {
     async function fetchData() {
@@ -169,91 +178,124 @@ export function GitHubHeatmap() {
 
   return (
     <>
-      <div className="group relative w-fit mx-auto p-6 sm:p-8 border border-[var(--dashed-borders)] border-dashed bg-transparent rounded-sm font-mono text-[var(--secondary-text)] flex flex-col gap-6 transition-colors duration-300 hover:border-[var(--secondary-text)]">
+      <div 
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => {
+          setIsHovered(false);
+          setActiveCell(null);
+        }}
+        className={`group relative w-full max-w-full mx-auto p-4 sm:p-6 md:p-8 border border-dashed rounded-sm font-mono text-[var(--secondary-text)] flex flex-col gap-5 sm:gap-6 transition-all duration-300 ${
+          isHovered
+            ? "border-[var(--primary-text)] shadow-[0_0_24px_rgba(246,237,220,0.12)]"
+            : "border-[var(--dashed-borders)] hover:border-[var(--primary-text)] hover:shadow-[0_0_24px_rgba(246,237,220,0.12)]"
+        }`}
+      >
         
         {/* Corner Accents with Glow */}
-        <div className="absolute top-[-2px] left-[-2px] w-3 h-3 border-t-2 border-l-2 border-[var(--primary-text)] opacity-40 group-hover:opacity-100 transition-all duration-300 pointer-events-none z-10 group-hover:drop-shadow-[0_0_8px_var(--primary-text)]" />
-        <div className="absolute top-[-2px] right-[-2px] w-3 h-3 border-t-2 border-r-2 border-[var(--primary-text)] opacity-40 group-hover:opacity-100 transition-all duration-300 pointer-events-none z-10 group-hover:drop-shadow-[0_0_8px_var(--primary-text)]" />
-        <div className="absolute bottom-[-2px] left-[-2px] w-3 h-3 border-b-2 border-l-2 border-[var(--primary-text)] opacity-40 group-hover:opacity-100 transition-all duration-300 pointer-events-none z-10 group-hover:drop-shadow-[0_0_8px_var(--primary-text)]" />
-        <div className="absolute bottom-[-2px] right-[-2px] w-3 h-3 border-b-2 border-r-2 border-[var(--primary-text)] opacity-40 group-hover:opacity-100 transition-all duration-300 pointer-events-none z-10 group-hover:drop-shadow-[0_0_8px_var(--primary-text)]" />
+        <div className={`corner-accent absolute top-[-2px] left-[-2px] w-3 h-3 border-t-2 border-l-2 border-[var(--primary-text)] transition-all duration-300 pointer-events-none z-10 ${
+          isHovered ? "corner-accent-active opacity-100" : "opacity-40 group-hover:opacity-100 group-hover:drop-shadow-[0_0_8px_var(--primary-text)]"
+        }`} />
+        <div className={`corner-accent absolute top-[-2px] right-[-2px] w-3 h-3 border-t-2 border-r-2 border-[var(--primary-text)] transition-all duration-300 pointer-events-none z-10 ${
+          isHovered ? "corner-accent-active opacity-100" : "opacity-40 group-hover:opacity-100 group-hover:drop-shadow-[0_0_8px_var(--primary-text)]"
+        }`} />
+        <div className={`corner-accent absolute bottom-[-2px] left-[-2px] w-3 h-3 border-b-2 border-l-2 border-[var(--primary-text)] transition-all duration-300 pointer-events-none z-10 ${
+          isHovered ? "corner-accent-active opacity-100" : "opacity-40 group-hover:opacity-100 group-hover:drop-shadow-[0_0_8px_var(--primary-text)]"
+        }`} />
+        <div className={`corner-accent absolute bottom-[-2px] right-[-2px] w-3 h-3 border-b-2 border-r-2 border-[var(--primary-text)] transition-all duration-300 pointer-events-none z-10 ${
+          isHovered ? "corner-accent-active opacity-100" : "opacity-40 group-hover:opacity-100 group-hover:drop-shadow-[0_0_8px_var(--primary-text)]"
+        }`} />
 
         {/* Header */}
-        <div className="relative z-10 flex justify-between items-center text-xs uppercase tracking-widest">
+        <div className="relative z-10 flex justify-between items-center text-xs uppercase tracking-widest flex-wrap gap-2">
           <div className="flex items-center gap-2">
             <span className="text-[var(--primary-text)] font-bold text-base md:text-lg">
               {data.totalContributions.toLocaleString()}
             </span>
             <span>Contributions</span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 text-[10px] sm:text-xs">
             <CalendarIcon />
             <span>Last Year</span>
           </div>
         </div>
 
-        {/* Grid Container */}
+        {/* Scrollable Grid Container */}
         <div 
-          className="flex flex-col gap-2"
+          ref={scrollContainerRef}
+          className="w-full overflow-x-auto overflow-y-hidden pb-2 pt-1 select-none"
           onMouseLeave={() => setActiveCell(null)}
+          onScroll={() => setActiveCell(null)}
+          style={{ WebkitOverflowScrolling: "touch" }}
         >
-          {/* Month Labels Row */}
-          <div className="relative h-4 text-[10px] uppercase tracking-wider min-w-max">
-            {filteredMonthLabels.map((label, i) => (
-              <div 
-                key={i} 
-                className="absolute" 
-                style={{ left: `${label.colIndex * 14}px` }}
-              >
-                {label.name}
-              </div>
-            ))}
-          </div>
+          <div className="flex flex-col gap-2 min-w-max w-fit">
+            {/* Month Labels Row */}
+            <div className="relative h-4 text-[10px] uppercase tracking-wider min-w-max">
+              {filteredMonthLabels.map((label, i) => (
+                <div 
+                  key={i} 
+                  className="absolute" 
+                  style={{ left: `${label.colIndex * 14}px` }}
+                >
+                  {label.name}
+                </div>
+              ))}
+            </div>
 
-          {/* Heatmap Grid */}
-          <div className="flex gap-[2px] min-w-max">
-            {processedWeeks.map((week, wIdx) => (
-              <div key={wIdx} className="flex flex-col gap-[2px]">
-                {week.contributionDays.map((day, dIdx) => {
-                  if (day === null) {
-                    return <div key={`empty-${dIdx}`} className="w-[12px] h-[12px] rounded-[1px] bg-transparent pointer-events-none" />;
-                  }
+            {/* Heatmap Grid */}
+            <div className="flex gap-[2px] min-w-max">
+              {processedWeeks.map((week, wIdx) => (
+                <div key={wIdx} className="flex flex-col gap-[2px]">
+                  {week.contributionDays.map((day, dIdx) => {
+                    if (day === null) {
+                      return <div key={`empty-${dIdx}`} className="w-[12px] h-[12px] rounded-[1px] bg-transparent pointer-events-none" />;
+                    }
 
-                  const isActive = activeCell?.date === day.date;
-                  
-                  return (
-                    <div
-                      key={day.date}
-                      tabIndex={0}
-                      className={`relative w-[12px] h-[12px] rounded-[1px] transition-all cursor-pointer focus:outline-none ${getLevelColor(day.contributionLevel)} ${
-                        isActive 
-                          ? "outline outline-1 outline-[var(--primary-text)] outline-offset-[-1px] z-10 dark:outline-white" 
-                          : "hover:outline hover:outline-1 hover:outline-[var(--primary-text)] hover:outline-offset-[-1px] hover:z-10 dark:hover:outline-white"
-                      }`}
-                      onPointerEnter={(e) => {
-                        const rect = e.currentTarget.getBoundingClientRect();
-                        setActiveCell({
-                          count: day.contributionCount,
-                          date: day.date,
-                          x: rect.left + rect.width / 2,
-                          y: rect.top
-                        });
-                      }}
-                      onFocus={(e) => {
-                        const rect = e.currentTarget.getBoundingClientRect();
-                        setActiveCell({
-                          count: day.contributionCount,
-                          date: day.date,
-                          x: rect.left + rect.width / 2,
-                          y: rect.top
-                        });
-                      }}
-                      onBlur={() => setActiveCell(null)}
-                      aria-label={`${day.contributionCount} contributions on ${day.date}`}
-                    />
-                  );
-                })}
-              </div>
-            ))}
+                    const isActive = activeCell?.date === day.date;
+                    
+                    return (
+                      <div
+                        key={day.date}
+                        tabIndex={0}
+                        className={`relative w-[12px] h-[12px] rounded-[1px] transition-all cursor-pointer focus:outline-none ${getLevelColor(day.contributionLevel)} ${
+                          isActive 
+                            ? "outline outline-1 outline-[var(--primary-text)] outline-offset-[-1px] z-10 dark:outline-white" 
+                            : "hover:outline hover:outline-1 hover:outline-[var(--primary-text)] hover:outline-offset-[-1px] hover:z-10 dark:hover:outline-white"
+                        }`}
+                        onPointerEnter={(e) => {
+                          const rect = e.currentTarget.getBoundingClientRect();
+                          setActiveCell({
+                            count: day.contributionCount,
+                            date: day.date,
+                            x: rect.left + rect.width / 2,
+                            y: rect.top
+                          });
+                        }}
+                        onPointerDown={(e) => {
+                          const rect = e.currentTarget.getBoundingClientRect();
+                          setActiveCell({
+                            count: day.contributionCount,
+                            date: day.date,
+                            x: rect.left + rect.width / 2,
+                            y: rect.top
+                          });
+                        }}
+                        onFocus={(e) => {
+                          const rect = e.currentTarget.getBoundingClientRect();
+                          setActiveCell({
+                            count: day.contributionCount,
+                            date: day.date,
+                            x: rect.left + rect.width / 2,
+                            y: rect.top
+                          });
+                        }}
+                        onBlur={() => setActiveCell(null)}
+                        aria-label={`${day.contributionCount} contributions on ${day.date}`}
+                      />
+                    );
+                  })}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
@@ -261,7 +303,7 @@ export function GitHubHeatmap() {
         <div className="w-full h-px border-b border-dashed border-[var(--dashed-borders)] opacity-50" />
 
         {/* Footer */}
-        <div className="flex justify-between items-center text-[10px] sm:text-xs tracking-widest uppercase">
+        <div className="flex flex-wrap justify-between items-center gap-3 text-[10px] sm:text-xs tracking-widest uppercase">
           <a 
             href={`https://github.com/${siteConfig.githubUsername}`} 
             target="_blank" 
