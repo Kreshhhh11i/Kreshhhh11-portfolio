@@ -18,6 +18,7 @@ export const metadata: Metadata = {
 };
 
 import DotGrid from "@/components/shared/DotGrid";
+import { Navbar } from "@/components/Navbar/Navbar";
 
 export default function RootLayout({
   children,
@@ -27,11 +28,20 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={`${geistSans.variable} ${jetBrainsMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col text-[var(--primary-text)] font-sans">
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem("portfolio-theme")||(window.matchMedia("(prefers-color-scheme: light)").matches?"light":"dark");document.documentElement.setAttribute("data-theme",t);if(t==="light")document.documentElement.classList.add("light");else document.documentElement.classList.remove("light");}catch(e){}})();`,
+          }}
+        />
+      </head>
+      <body className="min-h-full flex flex-col text-[var(--ink)] bg-[var(--bg)] font-sans">
         <DotGrid />
-        <div className="relative z-10 flex-1">{children}</div>
+        <Navbar />
+        <div className="relative z-10 flex-1 pt-14 sm:pt-16 pb-32 sm:pb-24">{children}</div>
       </body>
     </html>
   );

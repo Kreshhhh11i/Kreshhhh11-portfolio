@@ -1,28 +1,97 @@
 @import "tailwindcss";
 
 :root {
-  --background: #0b0a09;
-  --primary-text: #f6eddc;
-  --secondary-text: #9d978c;
-  --card-tint: #1b1a18;
-  --dashed-borders: #3a3733;
-  --background-dots: #2e2c29;
+  --bg: #0e0d0b;
+  --panel: #17150f;
+  --line: #2c2921;
+  --muted: #8d8573;
+  --ink: #f6eddc;
   --accent: #f5643e;
   --accent-secondary: #f5643e;
-  /* graphic accent in light, same in dark */
+  --nav-bg: rgba(23, 21, 15, 0.8);
+  --glow: rgba(245, 100, 62, 0.45);
+
+  /* Compatibility aliases */
+  --background: var(--bg);
+  --primary-text: var(--ink);
+  --secondary-text: var(--muted);
+  --card-tint: var(--panel);
+  --dashed-borders: var(--line);
+  --background-dots: #2e2c29;
 }
 
 @media (prefers-color-scheme: light) {
-  :root {
-    --background: #f6eddc;
-    --primary-text: #1a1511;
-    --secondary-text: #655f56;
-    --card-tint: #e7dece;
-    --dashed-borders: #bfb7a9;
-    --background-dots: #d3cabc;
+  :root:not(.dark):not([data-theme="dark"]) {
+    --bg: #f6eddc;
+    --panel: #efe3cb;
+    --line: #d8c9a8;
+    --muted: #6f6550;
+    --ink: #1a1712;
     --accent: #bf3a12;
     --accent-secondary: #f5643e;
+    --nav-bg: rgba(246, 237, 220, 0.85);
+    --glow: rgba(245, 100, 62, 0.35);
+
+    --background: var(--bg);
+    --primary-text: var(--ink);
+    --secondary-text: var(--muted);
+    --card-tint: var(--panel);
+    --dashed-borders: var(--line);
+    --background-dots: #d3cabc;
   }
+}
+
+:root[data-theme="light"],
+html.light {
+  --bg: #f6eddc;
+  --panel: #efe3cb;
+  --line: #d8c9a8;
+  --muted: #6f6550;
+  --ink: #1a1712;
+  --accent: #bf3a12;
+  --accent-secondary: #f5643e;
+  --nav-bg: rgba(246, 237, 220, 0.85);
+  --glow: rgba(245, 100, 62, 0.35);
+
+  --background: var(--bg);
+  --primary-text: var(--ink);
+  --secondary-text: var(--muted);
+  --card-tint: var(--panel);
+  --dashed-borders: var(--line);
+  --background-dots: #d3cabc;
+}
+
+:root[data-theme="dark"],
+html.dark {
+  --bg: #0e0d0b;
+  --panel: #17150f;
+  --line: #2c2921;
+  --muted: #8d8573;
+  --ink: #f6eddc;
+  --accent: #f5643e;
+  --accent-secondary: #f5643e;
+  --nav-bg: rgba(23, 21, 15, 0.8);
+  --glow: rgba(245, 100, 62, 0.45);
+
+  --background: var(--bg);
+  --primary-text: var(--ink);
+  --secondary-text: var(--muted);
+  --card-tint: var(--panel);
+  --dashed-borders: var(--line);
+  --background-dots: #2e2c29;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 96px;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 @theme inline {
