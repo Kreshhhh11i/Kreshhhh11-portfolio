@@ -1,5 +1,20 @@
 @import "tailwindcss";
 
+/* View Transitions API - Circular theme ripple */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-old(root) {
+  z-index: 1;
+}
+
+::view-transition-new(root) {
+  z-index: 99999;
+}
+
 :root {
   --bg: #0e0d0b;
   --panel: #17150f;

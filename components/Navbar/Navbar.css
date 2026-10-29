@@ -288,6 +288,7 @@ html {
   display: flex;
   align-items: center;
   gap: 10px;
+  flex-shrink: 0;
 }
 
 .clock {
@@ -298,6 +299,8 @@ html {
   user-select: none;
   min-width: 104px;
   text-align: center;
+  display: inline-block;
+  flex-shrink: 0;
 }
 
 .theme {

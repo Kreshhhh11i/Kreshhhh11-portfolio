@@ -15,11 +15,24 @@ const DEFAULT_BRANCH_WIDTH = 36;
 export function Navbar() {
   const [currentIdx, setCurrentIdx] = useState<number>(0);
   const [timeString, setTimeString] = useState<string>("");
-  const [theme, setTheme] = useState<"dark" | "light">("dark");
+  const [theme, setTheme] = useState<"dark" | "light">(() => {
+    if (typeof document !== "undefined") {
+      return (
+        (document.documentElement.getAttribute("data-theme") as "dark" | "light") ||
+        (document.documentElement.classList.contains("light") ? "light" : "dark")
+      );
+    }
+    return "dark";
+  });
   const [mounted, setMounted] = useState<boolean>(false);
   const [toastItem, setToastItem] = useState<NavItem | null>(null);
   const [showToast, setShowToast] = useState<boolean>(false);
-  const [isCompact, setIsCompact] = useState<boolean>(false);
+  const [isCompact, setIsCompact] = useState<boolean>(() => {
+    if (typeof window !== "undefined") {
+      return window.scrollY > 80;
+    }
+    return false;
+  });
   const [isHoverExpanded, setIsHoverExpanded] = useState<boolean>(false);
 
   // Exact measured widths for 100% continuous, zero-snap numeric animations
@@ -54,10 +67,14 @@ export function Navbar() {
         if (!el) return DEFAULT_LABEL_WIDTHS[i];
         return Math.ceil(el.getBoundingClientRect().width);
       });
-      setLabelWidths(measured);
+      setLabelWidths((prev) => {
+        const changed = measured.some((w, i) => Math.abs(w - prev[i]) > 1);
+        return changed ? measured : prev;
+      });
 
       if (branchTextRef.current) {
-        setBranchWidth(Math.ceil(branchTextRef.current.getBoundingClientRect().width));
+        const bw = Math.ceil(branchTextRef.current.getBoundingClientRect().width);
+        setBranchWidth((prev) => (Math.abs(bw - prev) > 1 ? bw : prev));
       }
     };
 
@@ -101,17 +118,64 @@ export function Navbar() {
     };
   }, []);
 
-  const toggleTheme = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const toggleTheme = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.currentTarget.blur();
     const nextTheme = theme === "dark" ? "light" : "dark";
-    setTheme(nextTheme);
-    document.documentElement.setAttribute("data-theme", nextTheme);
-    if (nextTheme === "light") {
-      document.documentElement.classList.add("light");
-    } else {
-      document.documentElement.classList.remove("light");
+
+    const updateDOM = () => {
+      setTheme(nextTheme);
+      document.documentElement.setAttribute("data-theme", nextTheme);
+      if (nextTheme === "light") {
+        document.documentElement.classList.add("light");
+        document.documentElement.classList.remove("dark");
+      } else {
+        document.documentElement.classList.remove("light");
+        document.documentElement.classList.add("dark");
+      }
+      localStorage.setItem("portfolio-theme", nextTheme);
+    };
+
+    // View Transitions API circular expanding wipe (Magic UI style)
+    if (
+      typeof document === "undefined" ||
+      !("startViewTransition" in document) ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      updateDOM();
+      return;
     }
-    localStorage.setItem("portfolio-theme", nextTheme);
+
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX || rect.left + rect.width / 2;
+    const y = e.clientY || rect.top + rect.height / 2;
+
+    const endRadius = Math.hypot(
+      Math.max(x, window.innerWidth - x),
+      Math.max(y, window.innerHeight - y)
+    );
+
+    const transition = document.startViewTransition(() => {
+      updateDOM();
+    });
+
+    try {
+      await transition.ready;
+      document.documentElement.animate(
+        {
+          clipPath: [
+            `circle(0px at ${x}px ${y}px)`,
+            `circle(${endRadius}px at ${x}px ${y}px)`,
+          ],
+        },
+        {
+          duration: 450,
+          easing: "cubic-bezier(0.22, 1, 0.36, 1)",
+          pseudoElement: "::view-transition-new(root)",
+        }
+      );
+    } catch {
+      // Fallback
+    }
   };
 
   // Scroll logic with cached layout tops and rAF throttling
@@ -358,12 +422,16 @@ export function Navbar() {
                 width: isExpanded ? branchWidth : 0,
                 opacity: isExpanded ? 0.55 : 0,
               }}
-              transition={{
-                width: { duration: OPEN_CLOSE_DURATION, ease: OPEN_CLOSE_EASE },
-                opacity: isExpanded
-                  ? { duration: 0.3, delay: 0.05, ease: "easeOut" }
-                  : { duration: 0.2, ease: "easeIn" },
-              }}
+              transition={
+                mounted
+                  ? {
+                      width: { duration: OPEN_CLOSE_DURATION, ease: OPEN_CLOSE_EASE },
+                      opacity: isExpanded
+                        ? { duration: 0.3, delay: 0.05, ease: "easeOut" }
+                        : { duration: 0.2, ease: "easeIn" },
+                    }
+                  : { duration: 0 }
+              }
             >
               <span className="brand-branch-text" ref={branchTextRef}>
                 main
@@ -413,12 +481,16 @@ export function Navbar() {
                         width: showLabel ? targetWidth : 0,
                         opacity: showLabel ? 1 : 0,
                       }}
-                      transition={{
-                        width: { duration: OPEN_CLOSE_DURATION, ease: OPEN_CLOSE_EASE },
-                        opacity: showLabel
-                          ? { duration: 0.3, delay: 0.05, ease: "easeOut" }
-                          : { duration: 0.2, ease: "easeIn" },
-                      }}
+                      transition={
+                        mounted
+                          ? {
+                              width: { duration: OPEN_CLOSE_DURATION, ease: OPEN_CLOSE_EASE },
+                              opacity: showLabel
+                                ? { duration: 0.3, delay: 0.05, ease: "easeOut" }
+                                : { duration: 0.2, ease: "easeIn" },
+                            }
+                          : { duration: 0 }
+                      }
                     >
                       <span
                         className="label-text"
@@ -440,10 +512,14 @@ export function Navbar() {
                     <motion.span
                       className="seg"
                       animate={{ width: isExpanded ? 28 : 14 }}
-                      transition={{
-                        duration: OPEN_CLOSE_DURATION,
-                        ease: OPEN_CLOSE_EASE,
-                      }}
+                      transition={
+                        mounted
+                          ? {
+                              duration: OPEN_CLOSE_DURATION,
+                              ease: OPEN_CLOSE_EASE,
+                            }
+                          : { duration: 0 }
+                      }
                       ref={(el) => {
                         segRefs.current[index] = el;
                       }}
@@ -465,13 +541,20 @@ export function Navbar() {
 
           {/* Tools: Clock + Theme Switcher */}
           <div className="tools">
-            {mounted && timeString && <span className="clock">{timeString}</span>}
+            <span
+              className="clock"
+              suppressHydrationWarning
+              style={{ visibility: timeString ? "visible" : "hidden" }}
+            >
+              {timeString || "00:00:00 IST"}
+            </span>
             <button
               className="theme"
               onClick={toggleTheme}
               aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
+              suppressHydrationWarning
             >
-              {mounted && theme === "dark" ? (
+              {theme === "dark" ? (
                 <svg
                   width="16"
                   height="16"
