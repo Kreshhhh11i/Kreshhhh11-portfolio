@@ -134,8 +134,9 @@ html {
 }
 
 .node {
-  min-height: 44px;
+  height: 26px;
   padding: 0 6px;
+  border-radius: 9999px;
   font-size: 14px;
   font-weight: 500;
   color: var(--muted);
@@ -326,7 +327,7 @@ html {
 /* Tooltip */
 .tip {
   position: absolute;
-  top: calc(100% + 8px);
+  top: calc(100% + 17px);
   left: 50%;
   transform: translateX(-50%) translateY(4px);
   font-family: var(--font-jetbrains-mono), monospace;
@@ -370,7 +371,7 @@ html {
   opacity: 1;
   visibility: visible;
   transform: translateX(-50%) translateY(0);
-  transition-delay:250ms;
+  transition-delay: 600ms;
 }
 
 /* Compact Mode (Desktop & Tablet screens > 760px) */

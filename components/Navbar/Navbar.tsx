@@ -36,6 +36,7 @@ export function Navbar() {
   const branchTextRef = useRef<HTMLSpanElement | null>(null);
 
   const topsRef = useRef<number[]>([]);
+  const targetsRef = useRef<number[]>([]);
   const lastPRef = useRef<number[]>(new Array(NAV.length - 1).fill(-1));
   const lastIdxRef = useRef<number>(0);
   const rafIdRef = useRef<number | null>(null);
@@ -117,18 +118,36 @@ export function Navbar() {
   useEffect(() => {
     const measureTops = () => {
       const currentScrollY = window.scrollY;
-      topsRef.current = NAV.map((item) => {
+      const innerHeight = window.innerHeight;
+      const scrollHeight = document.documentElement.scrollHeight;
+      const maxScroll = Math.max(0, scrollHeight - innerHeight);
+      const offset = 96;
+
+      const rawTops = NAV.map((item) => {
         const el = document.getElementById(item.id);
         if (!el) return 0;
         return el.getBoundingClientRect().top + currentScrollY;
+      });
+      topsRef.current = rawTops;
+
+      targetsRef.current = rawTops.map((top, i) => {
+        if (i === 0) return 0;
+        if (i === rawTops.length - 1) {
+          return Math.min(Math.max(0, top - offset), maxScroll);
+        }
+        return Math.min(
+          Math.max(0, top - offset),
+          Math.max(0, maxScroll - (rawTops.length - 1 - i) * 60)
+        );
       });
     };
 
     const updateScroll = () => {
       const scrollY = window.scrollY || document.documentElement.scrollTop || 0;
       const innerHeight = window.innerHeight;
-      const probeY = scrollY + innerHeight * 0.35;
-      const tops = topsRef.current;
+      const scrollHeight = document.documentElement.scrollHeight;
+      const maxScroll = Math.max(0, scrollHeight - innerHeight);
+      const targets = targetsRef.current;
 
       // Hysteresis for compact mode: compact when scrolling past 80px, expand when scrolling above 40px
       const currentCompact = isCompactRef.current;
@@ -141,23 +160,33 @@ export function Navbar() {
         }
       }
 
-      if (!tops.length) return;
+      if (!targets.length) return;
 
-      // Determine active index based on probe line
       let idx = 0;
-      for (let i = 0; i < tops.length; i++) {
-        if (probeY >= tops[i]) {
-          idx = i;
-        } else {
-          break;
+      let frac = 0;
+
+      if (scrollY <= 0) {
+        idx = 0;
+        frac = 0;
+      } else if (maxScroll > 0 && scrollY >= maxScroll - 15) {
+        idx = targets.length - 1;
+        frac = 0;
+      } else {
+        for (let i = 0; i < targets.length - 1; i++) {
+          if (scrollY >= targets[i]) {
+            idx = i;
+          } else {
+            break;
+          }
+        }
+        if (idx < targets.length - 1) {
+          const span = targets[idx + 1] - targets[idx];
+          if (span > 0) {
+            frac = Math.min(1, Math.max(0, (scrollY - targets[idx]) / span));
+          }
         }
       }
 
-      // Calculate fraction for continuous segment line progress
-      let frac = 0;
-      if (idx < tops.length - 1 && tops[idx + 1] > tops[idx]) {
-        frac = Math.min(1, Math.max(0, (probeY - tops[idx]) / (tops[idx + 1] - tops[idx])));
-      }
       const progress = idx + frac;
 
       // Update segment lines and HEAD dots with direct DOM properties (no React re-renders per frame)
@@ -440,9 +469,9 @@ export function Navbar() {
             <button
               className="theme"
               onClick={toggleTheme}
-              aria-label="Toggle light and dark theme"
+              aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
             >
-              {mounted && theme === "light" ? (
+              {mounted && theme === "dark" ? (
                 <svg
                   width="16"
                   height="16"
