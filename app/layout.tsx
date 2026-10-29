@@ -38,7 +38,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="min-h-full flex flex-col text-[var(--ink)] bg-[var(--bg)] font-sans">
+      <body className="min-h-full flex flex-col text-[var(--ink)] bg-[var(--bg)] font-sans overflow-x-hidden">
         <DotGrid />
         <Navbar />
         <div className="relative z-10 flex-1 pt-14 sm:pt-16 pb-32 sm:pb-24">{children}</div>
