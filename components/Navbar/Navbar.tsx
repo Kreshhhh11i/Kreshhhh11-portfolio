@@ -1,8 +1,16 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
+import { motion } from "framer-motion";
 import { NAV, NavItem } from "@/lib/nav-config";
 import "./Navbar.css";
+
+const OPEN_CLOSE_EASE = [0.22, 1, 0.36, 1] as const;
+const OPEN_CLOSE_DURATION = 0.4;
+
+// Default pre-computed intrinsic widths (px) including padding
+const DEFAULT_LABEL_WIDTHS = [48, 36, 74, 50, 98, 66];
+const DEFAULT_BRANCH_WIDTH = 36;
 
 export function Navbar() {
   const [currentIdx, setCurrentIdx] = useState<number>(0);
@@ -11,11 +19,21 @@ export function Navbar() {
   const [mounted, setMounted] = useState<boolean>(false);
   const [toastItem, setToastItem] = useState<NavItem | null>(null);
   const [showToast, setShowToast] = useState<boolean>(false);
+  const [isCompact, setIsCompact] = useState<boolean>(false);
+  const [isHoverExpanded, setIsHoverExpanded] = useState<boolean>(false);
+
+  // Exact measured widths for 100% continuous, zero-snap numeric animations
+  const [labelWidths, setLabelWidths] = useState<number[]>(DEFAULT_LABEL_WIDTHS);
+  const [branchWidth, setBranchWidth] = useState<number>(DEFAULT_BRANCH_WIDTH);
+
+  const isExpanded = !isCompact || isHoverExpanded;
 
   const navRef = useRef<HTMLElement | null>(null);
   const dotRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const segRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const headRefs = useRef<(HTMLElement | null)[]>([]);
+  const textRefs = useRef<(HTMLSpanElement | null)[]>([]);
+  const branchTextRef = useRef<HTMLSpanElement | null>(null);
 
   const topsRef = useRef<number[]>([]);
   const lastPRef = useRef<number[]>(new Array(NAV.length - 1).fill(-1));
@@ -24,10 +42,30 @@ export function Navbar() {
   const isCompactRef = useRef<boolean>(false);
   const hasMountedRef = useRef<boolean>(false);
   const toastTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Initialize theme, clock and mounted state
+  // Measure exact rendered widths once DOM is mounted
   useEffect(() => {
     setMounted(true);
+
+    const measureWidths = () => {
+      const measured = textRefs.current.map((el, i) => {
+        if (!el) return DEFAULT_LABEL_WIDTHS[i];
+        return Math.ceil(el.getBoundingClientRect().width);
+      });
+      setLabelWidths(measured);
+
+      if (branchTextRef.current) {
+        setBranchWidth(Math.ceil(branchTextRef.current.getBoundingClientRect().width));
+      }
+    };
+
+    // Measure after fonts are loaded
+    if (document.fonts) {
+      document.fonts.ready.then(measureWidths);
+    } else {
+      measureWidths();
+    }
 
     // Initial theme sync
     const currentTheme =
@@ -58,10 +96,12 @@ export function Navbar() {
     return () => {
       clearInterval(clockInterval);
       if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+      if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
     };
   }, []);
 
-  const toggleTheme = () => {
+  const toggleTheme = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.currentTarget.blur();
     const nextTheme = theme === "dark" ? "light" : "dark";
     setTheme(nextTheme);
     document.documentElement.setAttribute("data-theme", nextTheme);
@@ -85,16 +125,20 @@ export function Navbar() {
     };
 
     const updateScroll = () => {
-      const scrollY = window.scrollY;
+      const scrollY = window.scrollY || document.documentElement.scrollTop || 0;
       const innerHeight = window.innerHeight;
       const probeY = scrollY + innerHeight * 0.35;
       const tops = topsRef.current;
 
-      // Toggle compact mode (>80px)
-      const shouldCompact = scrollY > 80;
-      if (shouldCompact !== isCompactRef.current) {
+      // Hysteresis for compact mode: compact when scrolling past 80px, expand when scrolling above 40px
+      const currentCompact = isCompactRef.current;
+      const shouldCompact = currentCompact ? scrollY > 40 : scrollY > 80;
+      if (shouldCompact !== currentCompact) {
         isCompactRef.current = shouldCompact;
-        navRef.current?.classList.toggle("compact", shouldCompact);
+        setIsCompact(shouldCompact);
+        if (!shouldCompact) {
+          setIsHoverExpanded(false);
+        }
       }
 
       if (!tops.length) return;
@@ -140,24 +184,31 @@ export function Navbar() {
 
         // One-shot animations if not initial page load
         if (hasMountedRef.current) {
-          // Newly passed steps trigger burst
+          // Off-thread compositor animation (no synchronous offsetWidth reflows!)
           if (idx > prevIdx) {
             for (let k = prevIdx; k < idx; k++) {
               const dotEl = dotRefs.current[k];
               if (dotEl) {
-                dotEl.classList.remove("burst");
-                void dotEl.offsetWidth; // Force reflow
-                dotEl.classList.add("burst");
+                dotEl.animate(
+                  [
+                    { boxShadow: "0 0 0 0 var(--accent)" },
+                    { boxShadow: "0 0 0 14px transparent" },
+                  ],
+                  { duration: 650, easing: "ease-out" }
+                );
               }
             }
           }
 
-          // Newly current step triggers pop
           const currentDotEl = dotRefs.current[idx];
           if (currentDotEl) {
-            currentDotEl.classList.remove("pop");
-            void currentDotEl.offsetWidth; // Force reflow
-            currentDotEl.classList.add("pop");
+            currentDotEl.animate(
+              [
+                { boxShadow: "0 0 0 0 var(--glow)" },
+                { boxShadow: "0 0 0 13px transparent" },
+              ],
+              { duration: 550, easing: "ease-out" }
+            );
           }
 
           // Phone toast
@@ -220,10 +271,34 @@ export function Navbar() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  const handleMouseEnterGraph = () => {
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+      hoverTimeoutRef.current = null;
+    }
+    if (isCompactRef.current) {
+      setIsHoverExpanded(true);
+    }
+  };
+
+  const handleMouseLeaveNav = () => {
+    if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
+    hoverTimeoutRef.current = setTimeout(() => {
+      if (isCompactRef.current) {
+        setIsHoverExpanded(false);
+      }
+    }, 140);
+  };
+
   return (
     <>
       <div className="nav-wrap">
-        <nav className="nav" aria-label="Main" ref={navRef}>
+        <nav
+          className={`nav ${!isExpanded ? "compact" : ""}`}
+          aria-label="Main"
+          ref={navRef}
+          onMouseLeave={handleMouseLeaveNav}
+        >
           {/* Brand */}
           <a
             className="brand"
@@ -247,15 +322,37 @@ export function Navbar() {
               <path d="M160 144v224M352 208c0 96-192 112-192 160" />
             </svg>
             <span>Kresh11</span>
-            <span className="brand-branch">main</span>
+            <motion.span
+              className="brand-branch-wrap"
+              initial={false}
+              animate={{
+                width: isExpanded ? branchWidth : 0,
+                opacity: isExpanded ? 0.55 : 0,
+              }}
+              transition={{
+                width: { duration: OPEN_CLOSE_DURATION, ease: OPEN_CLOSE_EASE },
+                opacity: isExpanded
+                  ? { duration: 0.3, delay: 0.05, ease: "easeOut" }
+                  : { duration: 0.2, ease: "easeIn" },
+              }}
+            >
+              <span className="brand-branch-text" ref={branchTextRef}>
+                main
+              </span>
+            </motion.span>
           </a>
 
-          {/* Graph Steps */}
-          <ul className="graph">
+          {/* Graph Steps (hover zone between brand and time) */}
+          <ul
+            className="graph"
+            onMouseEnter={handleMouseEnterGraph}
+          >
             {NAV.map((item, index) => {
               const isCurrent = currentIdx === index;
               const isPassed = currentIdx > index;
               const isLast = index === NAV.length - 1;
+              const showLabel = isExpanded || isCurrent;
+              const targetWidth = labelWidths[index] ?? DEFAULT_LABEL_WIDTHS[index];
 
               return (
                 <li
@@ -279,7 +376,31 @@ export function Navbar() {
                         <path d="M3.2 6.3l2 2 3.6-4.2" />
                       </svg>
                     </span>
-                    <span className="label">{item.label}</span>
+
+                    <motion.span
+                      className="label-wrap"
+                      initial={false}
+                      animate={{
+                        width: showLabel ? targetWidth : 0,
+                        opacity: showLabel ? 1 : 0,
+                      }}
+                      transition={{
+                        width: { duration: OPEN_CLOSE_DURATION, ease: OPEN_CLOSE_EASE },
+                        opacity: showLabel
+                          ? { duration: 0.3, delay: 0.05, ease: "easeOut" }
+                          : { duration: 0.2, ease: "easeIn" },
+                      }}
+                    >
+                      <span
+                        className="label-text"
+                        ref={(el) => {
+                          textRefs.current[index] = el;
+                        }}
+                      >
+                        {item.label}
+                      </span>
+                    </motion.span>
+
                     <span className="tip" role="tooltip">
                       <b>{item.hash}</b>
                       {item.msg}
@@ -287,8 +408,13 @@ export function Navbar() {
                   </a>
 
                   {!isLast && (
-                    <span
+                    <motion.span
                       className="seg"
+                      animate={{ width: isExpanded ? 28 : 14 }}
+                      transition={{
+                        duration: OPEN_CLOSE_DURATION,
+                        ease: OPEN_CLOSE_EASE,
+                      }}
                       ref={(el) => {
                         segRefs.current[index] = el;
                       }}
@@ -301,7 +427,7 @@ export function Navbar() {
                           headRefs.current[index] = el;
                         }}
                       />
-                    </span>
+                    </motion.span>
                   )}
                 </li>
               );

@@ -11,11 +11,44 @@ export default function Home() {
           <Hero />
         </section>
 
-        {/* Section: Work */}
-        <section id="work" className="scroll-mt-24 w-full flex flex-col gap-6">
+        {/* Section: Exp */}
+        <section id="exp" className="scroll-mt-24 w-full flex flex-col gap-6">
           <div className="flex items-center justify-between border-b border-[var(--line)] border-dashed pb-3">
             <div className="flex items-center gap-3">
-              <span className="font-mono text-xs text-[var(--accent)] font-semibold">02 / WORK</span>
+              <span className="font-mono text-xs text-[var(--accent)] font-semibold">02 / EXP</span>
+              <h2 className="font-sans font-bold text-xl md:text-2xl text-[var(--ink)] tracking-tight">
+                Experience & Journey
+              </h2>
+            </div>
+            <span className="font-mono text-xs text-[var(--muted)] hidden sm:inline">work: where I worked</span>
+          </div>
+
+          <div className="flex flex-col gap-4">
+            <div className="p-6 border border-[var(--line)] border-dashed rounded-sm bg-[var(--panel)]/40 hover:border-[var(--muted)] transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex flex-col gap-1">
+                <div className="flex items-center gap-2 text-xs font-mono text-[var(--muted)]">
+                  <span className="text-[var(--accent)] font-semibold">INTERNSHIP</span>
+                  <span>&bull;</span>
+                  <span>SDE Intern</span>
+                </div>
+                <h3 className="text-lg font-bold text-[var(--ink)]">Full Stack Developer Intern</h3>
+                <p className="text-sm text-[var(--muted)] leading-relaxed">
+                  Building scalable products, modern architectures, and solving algorithmic problems with the PERN stack.
+                </p>
+              </div>
+              <span className="text-xs font-mono text-[var(--muted)] shrink-0 self-start sm:self-auto px-2.5 py-1 border border-[var(--line)] rounded">
+                2024 &mdash; Present
+              </span>
+            </div>
+          </div>
+        </section>
+
+        {/* Section: Projects (also aliased as work) */}
+        <section id="projects" className="scroll-mt-24 w-full flex flex-col gap-6 relative">
+          <div id="work" className="absolute -top-24 pointer-events-none" />
+          <div className="flex items-center justify-between border-b border-[var(--line)] border-dashed pb-3">
+            <div className="flex items-center gap-3">
+              <span className="font-mono text-xs text-[var(--accent)] font-semibold">03 / PROJECTS</span>
               <h2 className="font-sans font-bold text-xl md:text-2xl text-[var(--ink)] tracking-tight">
                 Things I Shipped
               </h2>
@@ -62,11 +95,12 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Section: Stack */}
-        <section id="stack" className="scroll-mt-24 w-full flex flex-col gap-6">
+        {/* Section: Skills (also aliased as stack) */}
+        <section id="skills" className="scroll-mt-24 w-full flex flex-col gap-6 relative">
+          <div id="stack" className="absolute -top-24 pointer-events-none" />
           <div className="flex items-center justify-between border-b border-[var(--line)] border-dashed pb-3">
             <div className="flex items-center gap-3">
-              <span className="font-mono text-xs text-[var(--accent)] font-semibold">03 / STACK</span>
+              <span className="font-mono text-xs text-[var(--accent)] font-semibold">04 / SKILLS</span>
               <h2 className="font-sans font-bold text-xl md:text-2xl text-[var(--ink)] tracking-tight">
                 Tools I Reach For
               </h2>
@@ -87,16 +121,17 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Section: Log */}
-        <section id="log" className="scroll-mt-24 w-full flex flex-col gap-6">
+        {/* Section: Playground (also aliased as log) */}
+        <section id="playground" className="scroll-mt-24 w-full flex flex-col gap-6 relative">
+          <div id="log" className="absolute -top-24 pointer-events-none" />
           <div className="flex items-center justify-between border-b border-[var(--line)] border-dashed pb-3">
             <div className="flex items-center gap-3">
-              <span className="font-mono text-xs text-[var(--accent)] font-semibold">04 / LOG</span>
+              <span className="font-mono text-xs text-[var(--accent)] font-semibold">05 / PLAYGROUND</span>
               <h2 className="font-sans font-bold text-xl md:text-2xl text-[var(--ink)] tracking-tight">
                 Activity & Visual Log
               </h2>
             </div>
-            <span className="font-mono text-xs text-[var(--muted)] hidden sm:inline">docs: what I am learning</span>
+            <span className="font-mono text-xs text-[var(--muted)] hidden sm:inline">lab: interactive space</span>
           </div>
 
           <div className="w-full grid grid-cols-1 xl:grid-cols-2 gap-8 items-start">
@@ -109,7 +144,7 @@ export default function Home() {
         <section id="contact" className="scroll-mt-24 w-full flex flex-col gap-6 pb-12">
           <div className="flex items-center justify-between border-b border-[var(--line)] border-dashed pb-3">
             <div className="flex items-center gap-3">
-              <span className="font-mono text-xs text-[var(--accent)] font-semibold">05 / CONTACT</span>
+              <span className="font-mono text-xs text-[var(--accent)] font-semibold">06 / CONTACT</span>
               <h2 className="font-sans font-bold text-xl md:text-2xl text-[var(--ink)] tracking-tight">
                 Let&apos;s Build
               </h2>

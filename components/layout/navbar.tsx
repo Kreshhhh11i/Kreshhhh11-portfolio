@@ -9,13 +9,12 @@ export interface NavItem {
 }
 
 const DEFAULT_NAV_ITEMS: NavItem[] = [
-  { id: "index", label: "Index", href: "#index" },
-  { id: "work", label: "Work", href: "#work" },
-  { id: "stack", label: "Stack", href: "#stack" },
-  { id: "log", label: "Log", href: "#log" },
-  { id: "words", label: "Words", href: "#words" },
+  { id: "home", label: "Home", href: "#home" },
+  { id: "exp", label: "Exp", href: "#exp" },
+  { id: "projects", label: "Projects", href: "#projects" },
+  { id: "skills", label: "Skills", href: "#skills" },
+  { id: "playground", label: "Playground", href: "#playground" },
   { id: "contact", label: "Contact", href: "#contact" },
-  { id: "design", label: "Design", href: "#design" },
 ];
 
 export function Navbar({

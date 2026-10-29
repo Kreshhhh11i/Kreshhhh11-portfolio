@@ -47,8 +47,8 @@ html {
 /* Nav Pill Container */
 .nav {
   height: 56px;
-  padding: 0 10px 0 8px;
-  gap: 16px;
+  padding: 0 12px 0 8px;
+  gap: 12px;
   border-radius: 9999px;
   border: 1px solid var(--line);
   backdrop-filter: blur(16px) saturate(1.2);
@@ -58,7 +58,11 @@ html {
   display: flex;
   align-items: center;
   pointer-events: auto;
-  transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  isolation: isolate;
+  will-change: width;
+  transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 /* Brand */
@@ -71,12 +75,12 @@ html {
   font-weight: 700;
   display: flex;
   align-items: center;
-  gap: 7px;
   padding: 0 12px;
   text-decoration: none;
   flex-shrink: 0;
   cursor: pointer;
   user-select: none;
+  transform: translateZ(0);
   transition: opacity 0.2s;
 }
 
@@ -93,16 +97,25 @@ html {
   width: 14px;
   height: 14px;
   flex-shrink: 0;
+  margin-right: 7px;
 }
 
-.brand-branch {
+.brand-branch-wrap {
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  vertical-align: middle;
+  will-change: width, opacity;
+  transform: translateZ(0);
+}
+
+.brand-branch-text {
+  display: inline-block;
+  padding-left: 7px;
   font-family: var(--font-jetbrains-mono), monospace;
   font-size: 11px;
   font-weight: 500;
-  opacity: 0.55;
-  transition: max-width 0.35s ease, opacity 0.25s, margin 0.35s ease;
   white-space: nowrap;
-  max-width: 40px;
 }
 
 /* Graph & Steps */
@@ -123,7 +136,6 @@ html {
 .node {
   min-height: 44px;
   padding: 0 6px;
-  gap: 9px;
   font-size: 14px;
   font-weight: 500;
   color: var(--muted);
@@ -132,8 +144,9 @@ html {
   text-decoration: none;
   position: relative;
   cursor: pointer;
-  transition: color 0.2s;
+  transition: color 0.2s ease;
   user-select: none;
+  transform: translateZ(0);
 }
 
 .node:hover,
@@ -151,13 +164,20 @@ html {
   border-radius: 6px;
 }
 
-.label {
-  max-width: 84px;
-  opacity: 1;
-  overflow: hidden;
-  text-overflow: ellipsis;
+.label-wrap {
+  display: inline-block;
   white-space: nowrap;
-  transition: max-width 0.35s ease, opacity 0.25s;
+  overflow: hidden;
+  vertical-align: middle;
+  will-change: width, opacity;
+  transform: translateZ(0);
+}
+
+.label-text {
+  display: inline-block;
+  padding-left: 8px;
+  white-space: nowrap;
+  font-size: 14px;
 }
 
 /* Dots */
@@ -172,11 +192,12 @@ html {
   justify-content: center;
   position: relative;
   flex-shrink: 0;
-  transition: background 0.25s, border-color 0.25s, box-shadow 0.25s, transform 0.35s cubic-bezier(0.3, 1.5, 0.5, 1);
+  transform: translateZ(0);
+  transition: background 0.2s, border-color 0.2s, box-shadow 0.2s, transform 0.2s ease-out;
 }
 
 .node:hover .dot {
-  transform: scale(1.25);
+  transform: scale(1.22);
   border-color: var(--ink);
 }
 
@@ -189,11 +210,11 @@ html {
 .step.is-passed .dot {
   background: var(--accent);
   border-color: var(--accent);
-  transform: scale(1.4);
+  transform: scale(1.35);
 }
 
 .step.is-passed:hover .dot {
-  transform: scale(1.55);
+  transform: scale(1.45);
 }
 
 /* Tick SVG */
@@ -220,34 +241,6 @@ html {
   transition-delay: 0.18s;
 }
 
-/* Burst Keyframes */
-@keyframes burst {
-  0% {
-    box-shadow: 0 0 0 0 var(--accent);
-  }
-  100% {
-    box-shadow: 0 0 0 14px transparent;
-  }
-}
-
-.dot.burst {
-  animation: burst 0.7s ease-out forwards;
-}
-
-/* Pop Keyframes */
-@keyframes pop {
-  0% {
-    box-shadow: 0 0 0 0 var(--glow);
-  }
-  100% {
-    box-shadow: 0 0 0 13px transparent;
-  }
-}
-
-.dot.pop {
-  animation: pop 0.6s ease-out forwards;
-}
-
 /* Segment branch lines */
 .seg {
   width: 28px;
@@ -257,7 +250,8 @@ html {
   position: relative;
   overflow: visible;
   flex-shrink: 0;
-  transition: width 0.35s ease;
+  will-change: width;
+  transform: translateZ(0);
 }
 
 .seg i {
@@ -301,7 +295,7 @@ html {
   font-variant-numeric: tabular-nums;
   color: var(--muted);
   user-select: none;
-  min-width: 90px;
+  min-width: 104px;
   text-align: center;
 }
 
@@ -332,21 +326,26 @@ html {
 /* Tooltip */
 .tip {
   position: absolute;
-  top: calc(100% + 6px);
+  top: calc(100% + 8px);
   left: 50%;
-  transform: translateX(-50%) translateY(-4px);
+  transform: translateX(-50%) translateY(4px);
   font-family: var(--font-jetbrains-mono), monospace;
   font-size: 12px;
+  line-height: 1.4;
   background: var(--ink);
   color: var(--bg);
-  border-radius: 10px;
-  padding: 7px 11px;
+  border-radius: 9px;
+  padding: 6px 12px;
   white-space: nowrap;
   pointer-events: none;
   opacity: 0;
-  transition: opacity 0.18s, transform 0.18s;
+  visibility: hidden;
+  transition: opacity 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+              visibility 0.28s;
+  transition-delay: 0s;
   z-index: 30;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
 }
 
 .tip::before {
@@ -369,27 +368,15 @@ html {
 .node:hover .tip,
 .node:focus-visible .tip {
   opacity: 1;
+  visibility: visible;
   transform: translateX(-50%) translateY(0);
+  transition-delay:250ms;
 }
 
-/* Compact Mode (hover:hover) */
-@media (hover: hover) {
-  .nav.compact:not(:hover):not(:focus-within) .brand-branch {
-    max-width: 0;
-    opacity: 0;
-    margin: 0;
-    overflow: hidden;
-  }
-  .nav.compact:not(:hover):not(:focus-within) .seg {
-    width: 16px;
-  }
-  .nav.compact:not(:hover):not(:focus-within) .step:not(.is-current) .label {
-    max-width: 0;
-    opacity: 0;
-    overflow: hidden;
-  }
-  .nav.compact:not(:hover):not(:focus-within) .step:not(.is-current) .node {
-    gap: 0;
+/* Compact Mode (Desktop & Tablet screens > 760px) */
+@media (min-width: 761px) {
+  .nav.compact {
+    padding: 0 12px 0 8px;
   }
 }
 
@@ -476,13 +463,14 @@ html {
     min-width: 4px;
   }
 
-  .step:not(.is-current) .label {
-    display: none;
+  .step:not(.is-current) .label-wrap {
+    display: none !important;
   }
 
-  .step.is-current .label {
-    display: inline-block;
-    max-width: 72px;
+  .step.is-current .label-wrap {
+    display: inline-block !important;
+    width: auto !important;
+    opacity: 1 !important;
     font-size: 13px;
   }
 
@@ -510,8 +498,8 @@ html {
   .seg,
   .seg i,
   .seg b,
-  .label,
-  .brand-branch,
+  .label-wrap,
+  .brand-branch-wrap,
   .tip,
   .toast {
     transition: none !important;
