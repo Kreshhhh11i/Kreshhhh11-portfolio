@@ -14,25 +14,12 @@ const DEFAULT_BRANCH_WIDTH = 36;
 
 export function Navbar() {
   const [currentIdx, setCurrentIdx] = useState<number>(0);
-  const [timeString, setTimeString] = useState<string>("");
-  const [theme, setTheme] = useState<"dark" | "light">(() => {
-    if (typeof document !== "undefined") {
-      return (
-        (document.documentElement.getAttribute("data-theme") as "dark" | "light") ||
-        (document.documentElement.classList.contains("light") ? "light" : "dark")
-      );
-    }
-    return "dark";
-  });
+  const [timeString, setTimeString] = useState<string>("00:00:00 IST");
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
   const [mounted, setMounted] = useState<boolean>(false);
   const [toastItem, setToastItem] = useState<NavItem | null>(null);
   const [showToast, setShowToast] = useState<boolean>(false);
-  const [isCompact, setIsCompact] = useState<boolean>(() => {
-    if (typeof window !== "undefined") {
-      return window.scrollY > 80;
-    }
-    return false;
-  });
+  const [isCompact, setIsCompact] = useState<boolean>(false);
   const [isHoverExpanded, setIsHoverExpanded] = useState<boolean>(false);
 
   // Exact measured widths for 100% continuous, zero-snap numeric animations
@@ -541,20 +528,16 @@ export function Navbar() {
 
           {/* Tools: Clock + Theme Switcher */}
           <div className="tools">
-            <span
-              className="clock"
-              suppressHydrationWarning
-              style={{ visibility: timeString ? "visible" : "hidden" }}
-            >
-              {timeString || "00:00:00 IST"}
+            <span className="clock" suppressHydrationWarning>
+              {timeString}
             </span>
             <button
               className="theme"
               onClick={toggleTheme}
-              aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
+              aria-label={(mounted ? theme : "dark") === "dark" ? "Switch to light theme" : "Switch to dark theme"}
               suppressHydrationWarning
             >
-              {theme === "dark" ? (
+              {(mounted ? theme : "dark") === "dark" ? (
                 <svg
                   width="16"
                   height="16"

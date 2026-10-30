@@ -35,27 +35,6 @@
   --background-dots: #2e2c29;
 }
 
-@media (prefers-color-scheme: light) {
-  :root:not(.dark):not([data-theme="dark"]) {
-    --bg: #f6eddc;
-    --panel: #efe3cb;
-    --line: #d8c9a8;
-    --muted: #6f6550;
-    --ink: #1a1712;
-    --accent: #bf3a12;
-    --accent-secondary: #f5643e;
-    --nav-bg: rgba(246, 237, 220, 0.85);
-    --glow: rgba(245, 100, 62, 0.35);
-
-    --background: var(--bg);
-    --primary-text: var(--ink);
-    --secondary-text: var(--muted);
-    --card-tint: var(--panel);
-    --dashed-borders: var(--line);
-    --background-dots: #d3cabc;
-  }
-}
-
 :root[data-theme="light"],
 html.light {
   --bg: #f6eddc;

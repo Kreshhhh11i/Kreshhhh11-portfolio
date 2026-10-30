@@ -441,6 +441,80 @@ const drawSpacedText = (ctx, text, x, y, spacing = 0, align = 'left') => {
   ctx.restore();
 };
 
+const drawRoundedRectPath = (ctx, x, y, width, height, radius) => {
+  ctx.beginPath();
+  ctx.moveTo(x + radius, y);
+  ctx.lineTo(x + width - radius, y);
+  ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+  ctx.lineTo(x + width, y + height - radius);
+  ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+  ctx.lineTo(x + radius, y + height);
+  ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+  ctx.lineTo(x, y + radius);
+  ctx.quadraticCurveTo(x, y, x + radius, y);
+  ctx.closePath();
+};
+
+const GITHUB_SVG = 'M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z';
+const LINKEDIN_SVG = 'M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z';
+const LEETCODE_SVG1 = 'M13.483 0a1.374 1.374 0 0 0-.961.438L7.116 6.226l-3.854 4.126a5.266 5.266 0 0 0-1.209 2.104 5.35 5.35 0 0 0-.125.513 5.527 5.527 0 0 0 .062 2.362 5.874 5.874 0 0 0 .349 1.017 5.938 5.938 0 0 0 4.858 3.57 5.961 5.961 0 0 0 3.811-1.151l4.128-4.41a1.369 1.369 0 0 0 0-1.94 1.374 1.374 0 0 0-1.94 0l-4.128 4.41a3.218 3.218 0 0 1-2.057.622 3.208 3.208 0 0 1-2.628-1.93 3.003 3.003 0 0 1-.189-.55 2.986 2.986 0 0 1-.033-1.277 2.85 2.85 0 0 1 .654-1.137l3.854-4.126 5.406-5.788A1.374 1.374 0 0 0 13.483 0z';
+const LEETCODE_SVG2 = 'M9.865 11.062a1.374 1.374 0 0 0-1.374 1.374v.054a1.374 1.374 0 0 0 1.374 1.374h9.191a1.374 1.374 0 0 0 1.374-1.374v-.054a1.374 1.374 0 0 0-1.374-1.374H9.865z';
+
+let brandPaths = null;
+const getBrandPaths = () => {
+  if (!brandPaths && typeof Path2D !== 'undefined') {
+    try {
+      brandPaths = {
+        github: new Path2D(GITHUB_SVG),
+        linkedin: new Path2D(LINKEDIN_SVG),
+        leetcode1: new Path2D(LEETCODE_SVG1),
+        leetcode2: new Path2D(LEETCODE_SVG2)
+      };
+    } catch {
+      brandPaths = null;
+    }
+  }
+  return brandPaths;
+};
+
+const drawBrandIcon = (ctx, id) => {
+  const paths = getBrandPaths();
+  const size = 44;
+  const scale = size / 24;
+  if (id === 'github' && paths?.github) {
+    ctx.save();
+    ctx.translate(-12 * scale, -12 * scale);
+    ctx.scale(scale, scale);
+    ctx.fill(paths.github);
+    ctx.restore();
+  } else if (id === 'linkedin' && paths?.linkedin) {
+    ctx.save();
+    ctx.translate(-12 * scale, -12 * scale);
+    ctx.scale(scale, scale);
+    ctx.fill(paths.linkedin);
+    ctx.restore();
+  } else if (id === 'leetcode' && paths?.leetcode1 && paths?.leetcode2) {
+    ctx.save();
+    ctx.translate(-12 * scale, -12 * scale);
+    ctx.scale(scale, scale);
+    ctx.fill(paths.leetcode1);
+    ctx.fill(paths.leetcode2);
+    ctx.restore();
+  } else if (id === 'instagram') {
+    ctx.save();
+    ctx.lineWidth = 3;
+    drawRoundedRectPath(ctx, -20, -20, 40, 40, 10);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(0, 0, 9.5, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(10.5, -10.5, 2.5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+};
+
 const paintFace = (canvas, image, color, fit, isFront = false) => {
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
@@ -451,13 +525,13 @@ const paintFace = (canvas, image, color, fit, isFront = false) => {
   if (isFront) {
     ctx.save();
     ctx.fillStyle = '#222222';
-    ctx.font = '600 20px "JetBrains Mono", Consolas, monospace';
-    drawSpacedText(ctx, 'DEV ID / 0011', 88, 112, 3.5, 'left');
-    drawSpacedText(ctx, 'FRONT', canvas.width - 88, 112, 3.5, 'right');
+    ctx.font = '600 22px "JetBrains Mono", Consolas, monospace';
+    drawSpacedText(ctx, 'DEV ID // 0011', 88, 88, 3.5, 'left');
+    drawSpacedText(ctx, 'FRONT', canvas.width - 88, 88, 3.5, 'right');
 
     ctx.fillStyle = '#555555';
-    ctx.font = '500 18px "JetBrains Mono", Consolas, monospace';
-    drawSpacedText(ctx, 'kresh11', canvas.width - 88, canvas.height - 105, 2, 'right');
+    ctx.font = '500 20px "JetBrains Mono", Consolas, monospace';
+    drawSpacedText(ctx, 'kresh11', canvas.width - 88, canvas.height - 85, 2, 'right');
     ctx.restore();
   }
 };
@@ -913,7 +987,147 @@ const Lanyard = ({
     let hovering = false;
     let press = null;
     let imageToken = 0;
+    let hoveredTarget = null;
+    let shakeStartTime = 0;
     const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+
+    const BACK_INTERACTIVE_TARGETS = [
+      {
+        id: 'github',
+        name: 'GitHub',
+        url: 'https://github.com/Kreshhhh11i',
+        x: 88,
+        y: 154,
+        w: 408,
+        h: 246,
+        iconX: 88 + 30,
+        iconY: 154 + 30,
+        iconSize: 82
+      },
+      {
+        id: 'linkedin',
+        name: 'LinkedIn',
+        url: 'https://www.linkedin.com/in/srikesh-tr/',
+        x: 528,
+        y: 154,
+        w: 408,
+        h: 246,
+        iconX: 528 + 30,
+        iconY: 154 + 30,
+        iconSize: 82
+      },
+      {
+        id: 'leetcode',
+        name: 'LeetCode',
+        url: 'https://leetcode.com/u/Kreshhhh11i/',
+        x: 88,
+        y: 432,
+        w: 408,
+        h: 246,
+        iconX: 88 + 30,
+        iconY: 432 + 30,
+        iconSize: 82
+      },
+      {
+        id: 'instagram',
+        name: 'Instagram',
+        url: 'https://instagram.com/srikesh_tr',
+        x: 528,
+        y: 432,
+        w: 408,
+        h: 246,
+        iconX: 528 + 30,
+        iconY: 432 + 30,
+        iconSize: 82
+      },
+      {
+        id: 'spotify',
+        name: 'Spotify',
+        url: 'https://open.spotify.com',
+        x: 88,
+        y: 710,
+        w: 848,
+        h: 460,
+        isButton: true
+      }
+    ];
+
+    const getBackTarget = hit => {
+      if (!hit || hit.object !== backMesh || !hit.uv) return null;
+      const bw = backCanvas.width || 1024;
+      const bh = backCanvas.height || 1440;
+      const cx = (1 - hit.uv.x) * bw;
+      const cy = (1 - hit.uv.y) * bh;
+      for (const item of BACK_INTERACTIVE_TARGETS) {
+        if (cx >= item.x && cx <= item.x + item.w && cy >= item.y && cy <= item.y + item.h) {
+          return item;
+        }
+      }
+      return null;
+    };
+
+    const updateBackCanvas = () => {
+      if (!images.back || !backCanvas) return;
+      const ctx = backCanvas.getContext('2d');
+      if (!ctx) return;
+      const w = backCanvas.width;
+      const h = backCanvas.height;
+
+      ctx.drawImage(images.back, 0, 0, w, h);
+
+      if (hoveredTarget && !hoveredTarget.isButton) {
+        const elapsed = (performance.now() - shakeStartTime) / 1000;
+        const isShaking = elapsed < 0.65;
+        const angle = isShaking ? Math.sin(elapsed * 32) * Math.exp(-elapsed * 4.8) * 0.18 : 0;
+        const scale = isShaking ? 1 + 0.10 * Math.sin(elapsed * 16) * Math.exp(-elapsed * 4) : 1;
+
+        ctx.save();
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.04)';
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.28)';
+        ctx.lineWidth = 2;
+        drawRoundedRectPath(ctx, hoveredTarget.x, hoveredTarget.y, hoveredTarget.w, hoveredTarget.h, 28);
+        ctx.fill();
+        ctx.stroke();
+        ctx.restore();
+
+        const cx = hoveredTarget.iconX + hoveredTarget.iconSize / 2;
+        const cy = hoveredTarget.iconY + hoveredTarget.iconSize / 2;
+        const s = hoveredTarget.iconSize;
+
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(angle);
+        ctx.scale(scale, scale);
+
+        ctx.fillStyle = '#26262c';
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.28)';
+        ctx.lineWidth = 1.5;
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
+        ctx.shadowBlur = 14;
+        ctx.shadowOffsetY = 4;
+        drawRoundedRectPath(ctx, -s / 2, -s / 2, s, s, 22);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.shadowColor = 'transparent';
+        ctx.fillStyle = '#ffffff';
+        ctx.strokeStyle = '#ffffff';
+        drawBrandIcon(ctx, hoveredTarget.id);
+
+        ctx.restore();
+      } else if (hoveredTarget && hoveredTarget.isButton) {
+        ctx.save();
+        ctx.fillStyle = 'rgba(30, 215, 96, 0.12)';
+        ctx.strokeStyle = 'rgba(30, 215, 96, 0.55)';
+        ctx.lineWidth = 2;
+        drawRoundedRectPath(ctx, 88, 1045, 848, 94, 47);
+        ctx.fill();
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      backTexture.needsUpdate = true;
+    };
 
     const paintFaces = () => {
       const s = settingsRef.current;
@@ -1186,7 +1400,11 @@ const Lanyard = ({
         placeHanging(sim, layout, false);
       }
       render();
-      const resting = sim.calm > 1.2 && !sim.grab && current.breeze === 0;
+      const isShaking = hoveredTarget && !hoveredTarget.isButton && (performance.now() - shakeStartTime < 650);
+      if (isShaking) {
+        updateBackCanvas();
+      }
+      const resting = sim.calm > 1.2 && !sim.grab && current.breeze === 0 && !isShaking;
       if (visible && !resting) raf = requestAnimationFrame(tick);
     };
 
@@ -1207,24 +1425,6 @@ const Lanyard = ({
         -((event.clientY - rect.top) / rect.height) * 2 + 1
       );
       raycaster.setFromCamera(pointer, camera);
-    };
-
-    const SOCIAL_LINKS = [
-      { name: 'GitHub', url: 'https://github.com/Kreshhhh11i', uMin: 0.80, uMax: 0.93, vMin: 0.79, vMax: 0.89 },
-      { name: 'LinkedIn', url: 'https://www.linkedin.com/in/srikesh-tr/', uMin: 0.66, uMax: 0.79, vMin: 0.79, vMax: 0.89 },
-      { name: 'LeetCode', url: 'https://leetcode.com/u/Kreshhhh11i/', uMin: 0.52, uMax: 0.64, vMin: 0.79, vMax: 0.89 },
-      { name: 'Instagram', url: 'https://instagram.com/srikesh_tr', uMin: 0.37, uMax: 0.50, vMin: 0.79, vMax: 0.89 }
-    ];
-
-    const getBackLink = hit => {
-      if (!hit || hit.object !== backMesh || !hit.uv) return null;
-      const { x: u, y: v } = hit.uv;
-      for (const item of SOCIAL_LINKS) {
-        if (u >= item.uMin && u <= item.uMax && v >= item.vMin && v <= item.vMax) {
-          return item;
-        }
-      }
-      return null;
     };
 
     const pickCard = () => {
@@ -1273,18 +1473,26 @@ const Lanyard = ({
       if (!settingsRef.current.interactive) return;
       toPointer(event);
       if (sim.grab) {
-        if (press && Math.hypot(event.clientX - press.x, event.clientY - press.y) > 6) press = null;
+        if (press && Math.hypot(event.clientX - press.x, event.clientY - press.y) > 16) press = null;
         raycaster.ray.at(sim.grab.reach, sim.grab.target);
         start();
         return;
       }
       if (event.pointerType === 'touch') return;
       const hit = pickCard();
-      const link = hit ? getBackLink(hit) : null;
+      const target = hit ? getBackTarget(hit) : null;
+      if (target?.id !== hoveredTarget?.id) {
+        hoveredTarget = target;
+        if (target && !target.isButton) {
+          shakeStartTime = performance.now();
+        }
+        updateBackCanvas();
+        start();
+      }
       hovering = !!hit;
       if (hovering) {
         canvas.style.pointerEvents = 'auto';
-        setCursor(link ? 'pointer' : 'grab');
+        setCursor(target ? 'pointer' : 'grab');
       } else {
         canvas.style.pointerEvents = 'none';
         setCursor('');
@@ -1294,10 +1502,10 @@ const Lanyard = ({
     const onPointerUp = event => {
       if (!sim.grab) return;
       sim.grab = null;
-      if (press && event.type === 'pointerup' && performance.now() - press.time < 450) {
-        const link = getBackLink(press.hit);
-        if (link) {
-          window.open(link.url, '_blank', 'noopener,noreferrer');
+      if (press && event.type === 'pointerup' && performance.now() - press.time < 500) {
+        const target = getBackTarget(press.hit);
+        if (target) {
+          window.open(target.url, '_blank', 'noopener,noreferrer');
         } else {
           flip(press.point);
         }
@@ -1328,10 +1536,18 @@ const Lanyard = ({
       toPointer(event);
       const hit = pickCard();
       hovering = !!hit;
-      const link = hit ? getBackLink(hit) : null;
+      const target = hit ? getBackTarget(hit) : null;
+      if (target?.id !== hoveredTarget?.id) {
+        hoveredTarget = target;
+        if (target && !target.isButton) {
+          shakeStartTime = performance.now();
+        }
+        updateBackCanvas();
+        start();
+      }
       if (hovering) {
         canvas.style.pointerEvents = 'auto';
-        setCursor(link ? 'pointer' : 'grab');
+        setCursor(target ? 'pointer' : 'grab');
       } else {
         canvas.style.pointerEvents = 'none';
         setCursor('');
