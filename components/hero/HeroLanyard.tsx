@@ -7,7 +7,7 @@ const Lanyard = dynamic(() => import("@/components/Lanyard/Lanyard"), {
   ssr: false,
   loading: () => (
     <div
-      className="w-full h-full border border-dashed border-[#2c2c2c] bg-transparent"
+      className="w-full h-full bg-transparent"
       aria-hidden="true"
     />
   ),

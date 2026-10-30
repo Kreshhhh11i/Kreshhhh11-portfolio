@@ -1,16 +1,19 @@
 import type { Metadata } from "next";
 import { Geist, JetBrains_Mono } from "next/font/google";
-import Script from "next/script";
 import "./globals.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
+  display: "block",
+  preload: true,
 });
 
 const jetBrainsMono = JetBrains_Mono({
   variable: "--font-jetbrains-mono",
   subsets: ["latin"],
+  display: "block",
+  preload: true,
 });
 
 export const metadata: Metadata = {
@@ -34,11 +37,9 @@ export default function RootLayout({
       className={`${geistSans.variable} ${jetBrainsMono.variable} h-full antialiased`}
     >
       <head>
-        <Script
-          id="theme-init"
-          strategy="beforeInteractive"
+        <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem("portfolio-theme")||"dark";document.documentElement.setAttribute("data-theme",t);if(t==="light")document.documentElement.classList.add("light");else document.documentElement.classList.remove("light");}catch(e){}})();`,
+            __html: `(function(){try{var t=localStorage.getItem("portfolio-theme")||"dark";document.documentElement.setAttribute("data-theme",t);if(t==="light")document.documentElement.classList.add("light");else document.documentElement.classList.remove("light");var c=sessionStorage.getItem("nav:compact");var isCompact=c!==null?(c==="true"||c==="1"):(window.scrollY>80);document.documentElement.setAttribute("data-nav",isCompact?"compact":"expanded");var a=sessionStorage.getItem("nav:active");document.documentElement.setAttribute("data-nav-active",a||"home");}catch(e){}})();`,
           }}
         />
       </head>

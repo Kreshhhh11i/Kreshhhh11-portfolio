@@ -109,6 +109,10 @@ html {
   transform: translateZ(0);
 }
 
+html:not([data-nav-ready]) .brand-branch-wrap {
+  width: 34px;
+}
+
 .brand-branch-text {
   display: inline-block;
   padding-left: 7px;
@@ -173,6 +177,13 @@ html {
   will-change: width, opacity;
   transform: translateZ(0);
 }
+
+html:not([data-nav-ready]) .step[data-id="home"] .label-wrap { width: 47px; }
+html:not([data-nav-ready]) .step[data-id="exp"] .label-wrap { width: 33px; }
+html:not([data-nav-ready]) .step[data-id="projects"] .label-wrap { width: 63px; }
+html:not([data-nav-ready]) .step[data-id="skills"] .label-wrap { width: 44px; }
+html:not([data-nav-ready]) .step[data-id="playground"] .label-wrap { width: 83px; }
+html:not([data-nav-ready]) .step[data-id="contact"] .label-wrap { width: 61px; }
 
 .label-text {
   display: inline-block;
@@ -297,10 +308,15 @@ html {
   font-variant-numeric: tabular-nums;
   color: var(--muted);
   user-select: none;
-  min-width: 104px;
+  width: 13ch;
+  min-width: 13ch;
   text-align: center;
   display: inline-block;
   flex-shrink: 0;
+}
+
+html:not([data-nav-ready]) .clock {
+  visibility: hidden;
 }
 
 .theme {
@@ -377,11 +393,105 @@ html {
   transition-delay: 600ms;
 }
 
+/* First-load animation suppressor & connector line hide until ready */
+html:not([data-nav-ready]) {
+  scroll-behavior: auto !important;
+}
+
+html:not([data-nav-ready]) .nav,
+html:not([data-nav-ready]) .nav * {
+  transition: none !important;
+  animation: none !important;
+}
+
+html:not([data-nav-ready]) .seg {
+  opacity: 0 !important;
+}
+
 /* Compact Mode (Desktop & Tablet screens > 760px) */
 @media (min-width: 761px) {
-  .nav.compact {
+  .nav.compact,
+  html:not([data-nav-ready])[data-nav="compact"] .nav {
     padding: 0 12px 0 8px;
   }
+}
+
+/* Attributes-driven compact visuals (ONLY for first paint & pre-hydration before ready) */
+html:not([data-nav-ready])[data-nav="compact"] .nav .brand-branch-wrap {
+  width: 0px !important;
+  opacity: 0 !important;
+}
+
+html:not([data-nav-ready])[data-nav="compact"] .nav .step .label-wrap {
+  width: 0px !important;
+  opacity: 0 !important;
+}
+
+html:not([data-nav-ready])[data-nav="compact"] .nav .seg {
+  width: 14px !important;
+}
+
+html:not([data-nav-ready])[data-nav="expanded"] .nav .seg {
+  width: 28px !important;
+}
+
+/* Active item label in compact mode (first paint only) */
+html:not([data-nav-ready])[data-nav="compact"][data-nav-active="home"] .nav .step[data-id="home"] .label-wrap { width: 47px !important; opacity: 1 !important; }
+html:not([data-nav-ready])[data-nav="compact"][data-nav-active="exp"] .nav .step[data-id="exp"] .label-wrap { width: 34px !important; opacity: 1 !important; }
+html:not([data-nav-ready])[data-nav="compact"][data-nav-active="projects"] .nav .step[data-id="projects"] .label-wrap { width: 64px !important; opacity: 1 !important; }
+html:not([data-nav-ready])[data-nav="compact"][data-nav-active="skills"] .nav .step[data-id="skills"] .label-wrap { width: 46px !important; opacity: 1 !important; }
+html:not([data-nav-ready])[data-nav="compact"][data-nav-active="playground"] .nav .step[data-id="playground"] .label-wrap { width: 85px !important; opacity: 1 !important; }
+html:not([data-nav-ready])[data-nav="compact"][data-nav-active="contact"] .nav .step[data-id="contact"] .label-wrap { width: 62px !important; opacity: 1 !important; }
+
+/* Active dot based on data-nav-active (first paint only) */
+html:not([data-nav-ready])[data-nav-active="home"] .step[data-id="home"] .dot,
+html:not([data-nav-ready])[data-nav-active="exp"] .step[data-id="exp"] .dot,
+html:not([data-nav-ready])[data-nav-active="projects"] .step[data-id="projects"] .dot,
+html:not([data-nav-ready])[data-nav-active="skills"] .step[data-id="skills"] .dot,
+html:not([data-nav-ready])[data-nav-active="playground"] .step[data-id="playground"] .dot,
+html:not([data-nav-ready])[data-nav-active="contact"] .step[data-id="contact"] .dot {
+  background: var(--ink);
+  border-color: var(--ink);
+  box-shadow: 0 0 0 4px var(--glow);
+}
+
+/* Passed dots based on data-nav-active (first paint only) */
+html:not([data-nav-ready])[data-nav-active="exp"] .step[data-id="home"] .dot,
+html:not([data-nav-ready])[data-nav-active="projects"] .step[data-id="home"] .dot,
+html:not([data-nav-ready])[data-nav-active="projects"] .step[data-id="exp"] .dot,
+html:not([data-nav-ready])[data-nav-active="skills"] .step[data-id="home"] .dot,
+html:not([data-nav-ready])[data-nav-active="skills"] .step[data-id="exp"] .dot,
+html:not([data-nav-ready])[data-nav-active="skills"] .step[data-id="projects"] .dot,
+html:not([data-nav-ready])[data-nav-active="playground"] .step[data-id="home"] .dot,
+html:not([data-nav-ready])[data-nav-active="playground"] .step[data-id="exp"] .dot,
+html:not([data-nav-ready])[data-nav-active="playground"] .step[data-id="projects"] .dot,
+html:not([data-nav-ready])[data-nav-active="playground"] .step[data-id="skills"] .dot,
+html:not([data-nav-ready])[data-nav-active="contact"] .step[data-id="home"] .dot,
+html:not([data-nav-ready])[data-nav-active="contact"] .step[data-id="exp"] .dot,
+html:not([data-nav-ready])[data-nav-active="contact"] .step[data-id="projects"] .dot,
+html:not([data-nav-ready])[data-nav-active="contact"] .step[data-id="skills"] .dot,
+html:not([data-nav-ready])[data-nav-active="contact"] .step[data-id="playground"] .dot {
+  background: var(--accent);
+  border-color: var(--accent);
+  transform: scale(1.35);
+}
+
+html:not([data-nav-ready])[data-nav-active="exp"] .step[data-id="home"] .tick path,
+html:not([data-nav-ready])[data-nav-active="projects"] .step[data-id="home"] .tick path,
+html:not([data-nav-ready])[data-nav-active="projects"] .step[data-id="exp"] .tick path,
+html:not([data-nav-ready])[data-nav-active="skills"] .step[data-id="home"] .tick path,
+html:not([data-nav-ready])[data-nav-active="skills"] .step[data-id="exp"] .tick path,
+html:not([data-nav-ready])[data-nav-active="skills"] .step[data-id="projects"] .tick path,
+html:not([data-nav-ready])[data-nav-active="playground"] .step[data-id="home"] .tick path,
+html:not([data-nav-ready])[data-nav-active="playground"] .step[data-id="exp"] .tick path,
+html:not([data-nav-ready])[data-nav-active="playground"] .step[data-id="projects"] .tick path,
+html:not([data-nav-ready])[data-nav-active="playground"] .step[data-id="skills"] .tick path,
+html:not([data-nav-ready])[data-nav-active="contact"] .step[data-id="home"] .tick path,
+html:not([data-nav-ready])[data-nav-active="contact"] .step[data-id="exp"] .tick path,
+html:not([data-nav-ready])[data-nav-active="contact"] .step[data-id="projects"] .tick path,
+html:not([data-nav-ready])[data-nav-active="contact"] .step[data-id="skills"] .tick path,
+html:not([data-nav-ready])[data-nav-active="contact"] .step[data-id="playground"] .tick path {
+  stroke-dashoffset: 0;
 }
 
 /* Toast (Phone) */
