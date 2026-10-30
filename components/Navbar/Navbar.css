@@ -178,12 +178,14 @@ html:not([data-nav-ready]) .brand-branch-wrap {
   transform: translateZ(0);
 }
 
-html:not([data-nav-ready]) .step[data-id="home"] .label-wrap { width: 47px; }
-html:not([data-nav-ready]) .step[data-id="exp"] .label-wrap { width: 33px; }
-html:not([data-nav-ready]) .step[data-id="projects"] .label-wrap { width: 63px; }
-html:not([data-nav-ready]) .step[data-id="skills"] .label-wrap { width: 44px; }
-html:not([data-nav-ready]) .step[data-id="playground"] .label-wrap { width: 83px; }
-html:not([data-nav-ready]) .step[data-id="contact"] .label-wrap { width: 61px; }
+@media (min-width: 761px) {
+  html:not([data-nav-ready]) .step[data-id="home"] .label-wrap { width: 47px; }
+  html:not([data-nav-ready]) .step[data-id="exp"] .label-wrap { width: 33px; }
+  html:not([data-nav-ready]) .step[data-id="projects"] .label-wrap { width: 63px; }
+  html:not([data-nav-ready]) .step[data-id="skills"] .label-wrap { width: 44px; }
+  html:not([data-nav-ready]) .step[data-id="playground"] .label-wrap { width: 83px; }
+  html:not([data-nav-ready]) .step[data-id="contact"] .label-wrap { width: 61px; }
+}
 
 .label-text {
   display: inline-block;
@@ -533,6 +535,29 @@ html:not([data-nav-ready])[data-nav-active="contact"] .step[data-id="playground"
 
 /* Phone Layout (<= 760px) */
 @media (max-width: 760px) {
+  /* Pre-hydration & first paint rules for mobile (<= 760px) */
+  html:not([data-nav-ready]) .nav .step .label-wrap {
+    width: 0px !important;
+    opacity: 0 !important;
+  }
+
+  html:not([data-nav-ready])[data-nav-active="home"] .nav .step[data-id="home"] .label-wrap { width: 47px !important; opacity: 1 !important; }
+  html:not([data-nav-ready])[data-nav-active="exp"] .nav .step[data-id="exp"] .label-wrap { width: 34px !important; opacity: 1 !important; }
+  html:not([data-nav-ready])[data-nav-active="projects"] .nav .step[data-id="projects"] .label-wrap { width: 64px !important; opacity: 1 !important; }
+  html:not([data-nav-ready])[data-nav-active="skills"] .nav .step[data-id="skills"] .label-wrap { width: 46px !important; opacity: 1 !important; }
+  html:not([data-nav-ready])[data-nav-active="playground"] .nav .step[data-id="playground"] .label-wrap { width: 85px !important; opacity: 1 !important; }
+  html:not([data-nav-ready])[data-nav-active="contact"] .nav .step[data-id="contact"] .label-wrap { width: 62px !important; opacity: 1 !important; }
+
+  html:not([data-nav-ready]) .nav .brand-branch-wrap,
+  html:not([data-nav-ready]) .nav .clock,
+  html:not([data-nav-ready]) .nav .tip {
+    display: none !important;
+  }
+
+  html:not([data-nav-ready]) .nav .seg {
+    width: 12px !important;
+  }
+
   .nav-wrap {
     top: max(14px, env(safe-area-inset-top));
     bottom: auto;

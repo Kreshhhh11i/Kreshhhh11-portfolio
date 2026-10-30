@@ -179,10 +179,10 @@ export function Hero() {
   return (
     <section className="w-full relative flex flex-col pt-0 lg:pt-20">
       {/* Main Content Split */}
-      <div className="relative z-10 flex-1 grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-12 items-center">
+      <div className="relative z-10 flex-1 grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-12 items-center lg:items-start">
         {/* Left Column (Tagline & Bio) */}
-        <div className={`w-full ${SHOW_LANYARD ? "order-2 lg:order-1" : "order-2 lg:order-1"} flex flex-col items-center lg:items-start text-center lg:text-left gap-4 lg:gap-6 pt-0 lg:pt-10 pb-8 lg:pb-20 transition-transform duration-[1200ms] ease-[cubic-bezier(0.23,1,0.32,1)] will-change-transform ${isHeroExpanded ? "translate-y-0" : "translate-y-0 lg:translate-y-36 xl:translate-y-48"}`}>
-          <div className="flex items-center justify-center lg:justify-start gap-2 sm:gap-2.5 flex-nowrap max-w-full">
+        <div className={`w-full ${SHOW_LANYARD ? "order-2 lg:order-1" : "order-2 lg:order-1"} relative z-10 lg:z-auto flex flex-col items-center lg:items-start text-center lg:text-left gap-6 sm:gap-7 lg:gap-4 pt-6 sm:pt-8 lg:pt-10 pb-8 lg:pb-8 transition-transform duration-[1200ms] ease-[cubic-bezier(0.23,1,0.32,1)] will-change-transform ${isHeroExpanded ? "translate-y-0" : "translate-y-0 lg:translate-y-28 xl:translate-y-32"}`}>
+          <div className="flex items-center justify-center lg:justify-start gap-2 sm:gap-2.5 flex-nowrap max-w-full max-lg:mb-3 sm:max-lg:mb-4 lg:mb-0">
             <div className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full bg-[var(--background)] border border-[var(--dashed-borders)] text-[11px] sm:text-xs text-[var(--secondary-text)] font-mono shadow-sm shrink-0 whitespace-nowrap">
               <span className="h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-[#f5643e] animate-fade-in-out shrink-0" />
               <span>Available for work</span>
@@ -218,7 +218,7 @@ export function Hero() {
           </h1>
 
           {/* Smooth Collapsible Bio Section */}
-          <div className={`w-full grid transition-[grid-template-rows] duration-[1200ms] ease-[cubic-bezier(0.23,1,0.32,1)] ${isHeroExpanded ? "grid-rows-[1fr]" : "grid-rows-[0fr] lg:grid-rows-[1fr]"}`}>
+          <div className={`w-full grid transition-[grid-template-rows] duration-[1200ms] ease-[cubic-bezier(0.23,1,0.32,1)] ${isHeroExpanded ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}>
             <div className="overflow-hidden">
               <div className={`w-full flex flex-col items-center lg:items-start text-center lg:text-left gap-3 pt-2 transition-all duration-[1200ms] ease-[cubic-bezier(0.23,1,0.32,1)] will-change-transform ${isHeroExpanded ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4 lg:-translate-y-8 pointer-events-none"}`}>
                 <p className="text-[var(--secondary-text)] text-sm md:text-base w-full max-w-full lg:max-w-lg leading-relaxed text-center lg:text-left">
@@ -266,8 +266,8 @@ export function Hero() {
 
         {/* Right Column (Interactive 3D Lanyard or Original Photo & Orbit Effect) */}
         {SHOW_LANYARD ? (
-          <div className="order-1 lg:order-2 relative w-full h-[390px] sm:h-[430px] lg:h-full lg:min-h-[640px] flex items-start justify-center pt-0 overflow-visible lg:-mt-20">
-            <div className="absolute -top-[36px] sm:-top-[38px] lg:-top-[132px] left-0 w-full h-[140%] lg:h-[160%] pointer-events-none overflow-visible">
+          <div className="order-1 lg:order-2 relative z-30 lg:z-auto w-full h-[440px] sm:h-[460px] lg:h-[720px] flex items-start justify-center pt-0 overflow-visible lg:-mt-20">
+            <div className="absolute z-30 lg:z-auto -top-[76px] sm:-top-[80px] lg:-top-[132px] left-0 w-full h-[140%] lg:h-[1312px] pointer-events-none overflow-visible">
               <HeroLanyard />
             </div>
           </div>

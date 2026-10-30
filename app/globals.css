@@ -10,6 +10,9 @@
   animation: none;
   mix-blend-mode: normal;
   pointer-events: none !important;
+  will-change: clip-path;
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
 
 ::view-transition-old(root) {

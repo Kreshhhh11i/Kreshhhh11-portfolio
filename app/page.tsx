@@ -6,14 +6,14 @@ import { WorkExperience } from "@/components/WorkExperience";
 export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center">
-      <div className="w-full mx-auto flex flex-col gap-12 md:gap-20 lg:gap-28 pb-36 sm:pb-24 px-4 md:px-12 lg:px-24 xl:px-32">
+      <div className="w-full mx-auto flex flex-col gap-12 md:gap-20 lg:gap-8 pb-36 sm:pb-24 px-4 md:px-12 lg:px-24 xl:px-32">
         {/* Section: Home */}
-        <section id="home" className="scroll-mt-24">
+        <section id="home" className="scroll-mt-24 relative z-30 lg:z-auto">
           <Hero />
         </section>
 
         {/* Section: Experience */}
-        <section id="experience" className="scroll-mt-24 w-full relative">
+        <section id="experience" className="scroll-mt-24 w-full relative z-10">
           <div id="exp" className="absolute -top-24 pointer-events-none" />
           <WorkExperience />
         </section>

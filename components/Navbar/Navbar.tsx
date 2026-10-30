@@ -40,7 +40,12 @@ export function Navbar() {
   const [showToast, setShowToast] = useState<boolean>(false);
   const [isCompact, setIsCompact] = useState<boolean>(false);
   const [isHoverExpanded, setIsHoverExpanded] = useState<boolean>(false);
-  const [isMobile, setIsMobile] = useState<boolean>(false);
+  const [isMobile, setIsMobile] = useState<boolean>(() => {
+    if (typeof window !== "undefined") {
+      return window.innerWidth <= 760;
+    }
+    return false;
+  });
 
   // Exact measured widths for continuous, zero-snap animations
   const [labelWidths, setLabelWidths] = useState<number[]>(DEFAULT_LABEL_WIDTHS);
@@ -418,8 +423,8 @@ export function Navbar() {
           ],
         },
         {
-          duration: 450,
-          easing: "cubic-bezier(0.22, 1, 0.36, 1)",
+          duration: 750,
+          easing: "cubic-bezier(0.25, 1, 0.4, 1)",
           pseudoElement: "::view-transition-new(root)",
         }
       );

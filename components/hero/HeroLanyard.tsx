@@ -15,8 +15,18 @@ const Lanyard = dynamic(() => import("@/components/Lanyard/Lanyard"), {
 
 export function HeroLanyard() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [isDesktop, setIsDesktop] = useState(true);
-  const [anchor, setAnchor] = useState<number>(0.73);
+  const [isDesktop, setIsDesktop] = useState<boolean>(() => {
+    if (typeof window !== "undefined") {
+      return window.innerWidth >= 1024;
+    }
+    return true;
+  });
+  const [anchor, setAnchor] = useState<number>(() => {
+    if (typeof window !== "undefined" && window.innerWidth < 1024) {
+      return 0.5;
+    }
+    return 0.73;
+  });
   const [containerStyle, setContainerStyle] = useState<React.CSSProperties>({
     position: "relative",
     width: "100%",
@@ -86,13 +96,13 @@ export function HeroLanyard() {
         orientation="portrait"
         finish="matte"
         cornerRadius={0.3}
-        size={isDesktop ? 0.38 : 0.42}
+        size={isDesktop ? 0.38 : 0.66}
         anchor={anchor}
-        strapLength={isDesktop ? 0.42 : 0.38}
+        strapLength={isDesktop ? 0.42 : 0.25}
         strapColor="#f5643e"
         strapWidth={0.65}
         metal="silver"
-        gravity={1}
+        gravity={isDesktop ? 1 : 1.35}
         damping={0.5}
         elasticity={0.5}
         breeze={0.35}

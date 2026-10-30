@@ -558,52 +558,57 @@ const drawViewProjectArrow = (ctx, cx, cy, size = 32, rotation = 0) => {
 
 const drawBackFace = (ctx, w, h, hoveredTarget = null, animElapsed = 0, arrowRot = 0, spotifyCodeImg = null) => {
   ctx.save();
+  // Dynamic scaling factors based on canvas width and height (base: 1024x1440)
+  const sx = w / 1024;
+  const sy = h / 1440;
+  const s = Math.min(sx, sy);
+
   // Background: Deep dark premium obsidian
   ctx.fillStyle = '#0e0e11';
   ctx.fillRect(0, 0, w, h);
 
   // Subtle vignette / radial depth
-  const grad = ctx.createRadialGradient(w / 2, h / 2, 100, w / 2, h / 2, 900);
+  const grad = ctx.createRadialGradient(w / 2, h / 2, 100 * s, w / 2, h / 2, 900 * s);
   grad.addColorStop(0, 'rgba(255, 255, 255, 0.03)');
   grad.addColorStop(1, 'rgba(0, 0, 0, 0.45)');
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, w, h);
 
   // 1. Top Slot Cutout
-  const slotW = 184;
-  const slotH = 44;
+  const slotW = 184 * sx;
+  const slotH = 44 * sy;
   const slotX = (w - slotW) / 2;
-  const slotY = 62;
+  const slotY = 62 * sy;
   ctx.fillStyle = '#050507';
-  drawRoundedRectPath(ctx, slotX, slotY, slotW, slotH, 22);
+  drawRoundedRectPath(ctx, slotX, slotY, slotW, slotH, 22 * s);
   ctx.fill();
   ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
-  ctx.lineWidth = 1.5;
+  ctx.lineWidth = 1.5 * s;
   ctx.stroke();
 
-  // 2. "BACK" Label (top right, flush with right tiles edge at x = 968)
-  ctx.font = '500 24px "JetBrains Mono", Consolas, monospace';
+  // 2. "BACK" Label (top right, flush with right tiles edge at x = 968 * sx)
+  ctx.font = `500 ${Math.round(24 * s)}px "JetBrains Mono", Consolas, monospace`;
   ctx.letterSpacing = '0.12em';
   ctx.fillStyle = '#8a857b';
   ctx.textBaseline = 'middle';
   const mBack = ctx.measureText('BACK');
   const backInkRight = mBack.actualBoundingBoxRight ?? mBack.width;
-  const backX = 968 - backInkRight;
-  ctx.fillText('BACK', backX, 84);
+  const backX = 968 * sx - backInkRight;
+  ctx.fillText('BACK', backX, 84 * sy);
 
-  // 3. "FIND ME ON" Label (aligned with "BACK" at y = 84)
+  // 3. "FIND ME ON" Label (aligned with "BACK" at y = 84 * sy)
   const mFind = ctx.measureText('FIND ME ON');
   const findInkLeft = mFind.actualBoundingBoxLeft ?? 0;
-  ctx.fillText('FIND ME ON', 56 + findInkLeft, 84);
+  ctx.fillText('FIND ME ON', 56 * sx + findInkLeft, 84 * sy);
 
   // 4. 2x2 Grid of Social Cards (comfortably sized h=220, box=80x80)
-  const cardH = 220;
-  const rowGap = 28;
+  const cardH = 220 * sy;
+  const rowGap = 28 * sy;
   const TILES = [
-    { id: 'github', name: 'GitHub', x: 56, y: 136, w: 440, h: cardH },
-    { id: 'linkedin', name: 'LinkedIn', x: 528, y: 136, w: 440, h: cardH },
-    { id: 'leetcode', name: 'LeetCode', x: 56, y: 136 + cardH + rowGap, w: 440, h: cardH },
-    { id: 'instagram', name: 'Instagram', x: 528, y: 136 + cardH + rowGap, w: 440, h: cardH }
+    { id: 'github', name: 'GitHub', x: 56 * sx, y: 136 * sy, w: 440 * sx, h: cardH },
+    { id: 'linkedin', name: 'LinkedIn', x: 528 * sx, y: 136 * sy, w: 440 * sx, h: cardH },
+    { id: 'leetcode', name: 'LeetCode', x: 56 * sx, y: (136 + 220 + 28) * sy, w: 440 * sx, h: cardH },
+    { id: 'instagram', name: 'Instagram', x: 528 * sx, y: (136 + 220 + 28) * sy, w: 440 * sx, h: cardH }
   ];
 
   for (const tile of TILES) {
@@ -612,19 +617,19 @@ const drawBackFace = (ctx, w, h, hoveredTarget = null, animElapsed = 0, arrowRot
 
     // Card Container Background
     ctx.fillStyle = isHovered ? 'rgba(255, 255, 255, 0.05)' : '#151519';
-    drawRoundedRectPath(ctx, tile.x, tile.y, tile.w, tile.h, 24);
+    drawRoundedRectPath(ctx, tile.x, tile.y, tile.w, tile.h, 24 * s);
     ctx.fill();
 
     // Card Border
-    ctx.lineWidth = 1.5;
+    ctx.lineWidth = 1.5 * s;
     ctx.strokeStyle = isHovered ? 'rgba(255, 255, 255, 0.32)' : 'rgba(255, 255, 255, 0.08)';
     ctx.stroke();
 
     // Inner Icon Box
-    const boxW = 80;
-    const boxH = 80;
-    const boxX = tile.x + 28;
-    const boxY = tile.y + 24;
+    const boxW = 80 * sx;
+    const boxH = 80 * sy;
+    const boxX = tile.x + 28 * sx;
+    const boxY = tile.y + 24 * sy;
     const boxCx = boxX + boxW / 2;
     const boxCy = boxY + boxH / 2;
 
@@ -643,47 +648,47 @@ const drawBackFace = (ctx, w, h, hoveredTarget = null, animElapsed = 0, arrowRot
     // Box background & border
     ctx.fillStyle = isHovered ? '#26262e' : '#1e1e24';
     ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
-    ctx.shadowBlur = isHovered ? 16 : 12;
-    ctx.shadowOffsetY = 4;
-    drawRoundedRectPath(ctx, -boxW / 2, -boxH / 2, boxW, boxH, 20);
+    ctx.shadowBlur = (isHovered ? 16 : 12) * s;
+    ctx.shadowOffsetY = 4 * sy;
+    drawRoundedRectPath(ctx, -boxW / 2, -boxH / 2, boxW, boxH, 20 * s);
     ctx.fill();
 
     ctx.shadowColor = 'transparent';
     ctx.strokeStyle = isHovered ? 'rgba(255, 255, 255, 0.28)' : 'rgba(255, 255, 255, 0.10)';
-    ctx.lineWidth = 1;
+    ctx.lineWidth = 1 * s;
     ctx.stroke();
 
     // Center Icon inside box
     ctx.fillStyle = '#ffffff';
-    drawBrandIcon(ctx, tile.id, 46);
+    drawBrandIcon(ctx, tile.id, 46 * s);
     ctx.restore();
 
     // Social Name Label below box
-    ctx.font = '700 32px "Geist", "Inter", -apple-system, sans-serif';
+    ctx.font = `700 ${Math.round(32 * s)}px "Geist", "Inter", -apple-system, sans-serif`;
     ctx.letterSpacing = '0px';
     ctx.fillStyle = '#ffffff';
     ctx.textBaseline = 'alphabetic';
-    ctx.fillText(tile.name, tile.x + 28, tile.y + 176);
+    ctx.fillText(tile.name, tile.x + 28 * sx, tile.y + 176 * sy);
 
     ctx.restore();
   }
 
   // 5. "SCAN IN SPOTIFY" Label
-  ctx.font = '500 24px "JetBrains Mono", Consolas, monospace';
+  ctx.font = `500 ${Math.round(24 * s)}px "JetBrains Mono", Consolas, monospace`;
   ctx.letterSpacing = '0.12em';
   ctx.fillStyle = '#8a857b';
   ctx.textBaseline = 'alphabetic';
   const mScan = ctx.measureText('SCAN IN SPOTIFY');
   const scanInkLeft = mScan.actualBoundingBoxLeft ?? 0;
-  const scanX = 56 + scanInkLeft;
-  ctx.fillText('SCAN IN SPOTIFY', scanX, 650);
+  const scanX = 56 * sx + scanInkLeft;
+  ctx.fillText('SCAN IN SPOTIFY', scanX, 650 * sy);
 
   // 6. Spotify Code Strip (pill shaped, perfectly rounded, increased height h=160, full width)
-  const stripX = 56;
-  const stripY = 672;
-  const stripW = 912;
-  const stripH = 160;
-  const radius = 24;
+  const stripX = 56 * sx;
+  const stripY = 672 * sy;
+  const stripW = 912 * sx;
+  const stripH = 160 * sy;
+  const radius = 24 * s;
 
   ctx.save();
   drawRoundedRectPath(ctx, stripX, stripY, stripW, stripH, radius);
@@ -704,11 +709,11 @@ const drawBackFace = (ctx, w, h, hoveredTarget = null, animElapsed = 0, arrowRot
     ctx.fillStyle = '#020204';
     ctx.fill();
 
-    const logoCx = stripX + 92;
+    const logoCx = stripX + 92 * sx;
     const logoCy = stripY + stripH / 2;
     const paths = getBrandPaths();
     if (paths?.spotify) {
-      const spotScale = 80 / 24;
+      const spotScale = (80 / 24) * s;
       ctx.save();
       ctx.translate(logoCx - 12 * spotScale, logoCy - 12 * spotScale);
       ctx.scale(spotScale, spotScale);
@@ -718,14 +723,14 @@ const drawBackFace = (ctx, w, h, hoveredTarget = null, animElapsed = 0, arrowRot
     }
 
     // Soundwave Barcode Bars
-    const barsStartX = stripX + 272;
-    const barsEndX = stripX + stripW - 48;
+    const barsStartX = stripX + 272 * sx;
+    const barsEndX = stripX + stripW - 48 * sx;
     const barsSpacing = (barsEndX - barsStartX) / (SPOTIFY_BAR_HEIGHTS.length - 1);
-    const maxHalfH = 40;
+    const maxHalfH = 40 * sy;
 
     ctx.save();
     ctx.strokeStyle = '#ffffff';
-    ctx.lineWidth = 5.8;
+    ctx.lineWidth = 5.8 * s;
     ctx.lineCap = 'round';
     for (let i = 0; i < SPOTIFY_BAR_HEIGHTS.length; i++) {
       const bx = barsStartX + i * barsSpacing;
@@ -743,43 +748,43 @@ const drawBackFace = (ctx, w, h, hoveredTarget = null, animElapsed = 0, arrowRot
   ctx.save();
   drawRoundedRectPath(ctx, stripX, stripY, stripW, stripH, radius);
   ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
-  ctx.lineWidth = 1.5;
+  ctx.lineWidth = 1.5 * s;
   ctx.stroke();
   ctx.restore();
 
   // 7. Song Title ("Currently Listening To")
-  ctx.font = '500 28px "JetBrains Mono", Consolas, monospace';
+  ctx.font = `500 ${Math.round(28 * s)}px "JetBrains Mono", Consolas, monospace`;
   ctx.letterSpacing = '0.02em';
   ctx.fillStyle = '#f6eddc';
   const songTitle = SPOTIFY_CONFIG.songTitle;
   const mSong = ctx.measureText(songTitle);
   const songInkLeft = mSong.actualBoundingBoxLeft ?? 0;
-  ctx.fillText(songTitle, 56 + songInkLeft, 874);
+  ctx.fillText(songTitle, 56 * sx + songInkLeft, 874 * sy);
 
   // 8. "Listen on Spotify" Button (height h=100, shifted to y=902)
-  const btnX = 56;
-  const btnY = 902;
-  const btnW = 912;
-  const btnH = 100;
+  const btnX = 56 * sx;
+  const btnY = 902 * sy;
+  const btnW = 912 * sx;
+  const btnH = 100 * sy;
   const isBtnHovered = hoveredTarget?.isButton || hoveredTarget?.id === 'spotify';
 
   ctx.save();
   ctx.fillStyle = isBtnHovered ? '#1fdf64' : '#1ed760';
   if (isBtnHovered) {
     ctx.shadowColor = 'rgba(30, 215, 96, 0.45)';
-    ctx.shadowBlur = 24;
+    ctx.shadowBlur = 24 * s;
   }
-  drawRoundedRectPath(ctx, btnX, btnY, btnW, btnH, 50);
+  drawRoundedRectPath(ctx, btnX, btnY, btnW, btnH, 50 * s);
   ctx.fill();
   ctx.restore();
 
   // Button content: View Projects arrow with smooth opening/closing rotation + Label centered
   const btnText = 'Listen on Spotify';
-  ctx.font = '700 34px "JetBrains Mono", -apple-system, sans-serif';
+  ctx.font = `700 ${Math.round(34 * s)}px "JetBrains Mono", -apple-system, sans-serif`;
   ctx.letterSpacing = '0px';
   const mBtnText = ctx.measureText(btnText);
-  const arrowSize = 36;
-  const arrowGap = 16;
+  const arrowSize = 36 * s;
+  const arrowGap = 16 * sx;
   const totalContentW = arrowSize + arrowGap + mBtnText.width;
   const groupStartX = btnX + (btnW - totalContentW) / 2;
   const btnCenterY = btnY + btnH / 2;
@@ -789,61 +794,63 @@ const drawBackFace = (ctx, w, h, hoveredTarget = null, animElapsed = 0, arrowRot
 
   ctx.fillStyle = '#04140a';
   ctx.textBaseline = 'middle';
-  ctx.fillText(btnText, groupStartX + arrowSize + arrowGap, btnCenterY + 1);
+  ctx.fillText(btnText, groupStartX + arrowSize + arrowGap, btnCenterY + 1 * sy);
 
   // 9. Developer Specification Data Card (refined: 2x2 grid, h=164, shifted to y=1050)
-  const specY = 1050;
-  const specH = 164;
+  const specX = 56 * sx;
+  const specY = 1050 * sy;
+  const specW = 912 * sx;
+  const specH = 164 * sy;
   ctx.fillStyle = '#141418';
-  drawRoundedRectPath(ctx, 56, specY, 912, specH, 22);
+  drawRoundedRectPath(ctx, specX, specY, specW, specH, 22 * s);
   ctx.fill();
   ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
-  ctx.lineWidth = 1;
+  ctx.lineWidth = 1 * s;
   ctx.stroke();
 
   // Spec 2x2 rows inside card
-  const col1X = 96;
-  const col2X = 540;
-  const row1Y = specY + 52;
-  const row2Y = specY + 116;
+  const col1X = 96 * sx;
+  const col2X = 540 * sx;
+  const row1Y = specY + 52 * sy;
+  const row2Y = specY + 116 * sy;
 
-  ctx.font = '500 21px "JetBrains Mono", Consolas, monospace';
+  ctx.font = `500 ${Math.round(21 * s)}px "JetBrains Mono", Consolas, monospace`;
   ctx.letterSpacing = '0.08em';
 
   // Row 1: HOLDER & STATUS
   ctx.fillStyle = '#7a756c';
   ctx.fillText('HOLDER', col1X, row1Y);
   ctx.fillStyle = '#f2ede2';
-  ctx.fillText('Kreshhhh.11', col1X + 116, row1Y);
+  ctx.fillText('Kreshhhh.11', col1X + 116 * sx, row1Y);
 
   ctx.fillStyle = '#7a756c';
   ctx.fillText('STATUS', col2X, row1Y);
   ctx.fillStyle = '#1ed760';
-  ctx.fillText('ACTIVE', col2X + 116, row1Y);
+  ctx.fillText('ACTIVE', col2X + 116 * sx, row1Y);
 
   // Row 2: ACCESS & ISSUED
   ctx.fillStyle = '#7a756c';
   ctx.fillText('ACCESS', col1X, row2Y);
   ctx.fillStyle = '#f2ede2';
-  ctx.fillText('UNRESTRICTED', col1X + 116, row2Y);
+  ctx.fillText('UNRESTRICTED', col1X + 116 * sx, row2Y);
 
   ctx.fillStyle = '#7a756c';
   ctx.fillText('ISSUED', col2X, row2Y);
   ctx.fillStyle = '#f2ede2';
-  ctx.fillText('OCT 2026', col2X + 116, row2Y);
+  ctx.fillText('OCT 2026', col2X + 116 * sx, row2Y);
 
   // 10. DEV ID // 0011 (centered below data card at y=1272)
-  ctx.font = '600 24px "JetBrains Mono", Consolas, monospace';
+  ctx.font = `600 ${Math.round(24 * s)}px "JetBrains Mono", Consolas, monospace`;
   ctx.letterSpacing = '0.26em';
   ctx.fillStyle = '#9e988d';
   ctx.textAlign = 'center';
-  ctx.fillText('DEV ID // 0011', 512, 1272);
+  ctx.fillText('DEV ID // 0011', w / 2, 1272 * sy);
 
   // 11. Copyright line at bottom - clear, crisp contrast
-  ctx.font = '500 21px "JetBrains Mono", Consolas, monospace';
+  ctx.font = `500 ${Math.round(21 * s)}px "JetBrains Mono", Consolas, monospace`;
   ctx.letterSpacing = '0.12em';
   ctx.fillStyle = '#999388';
-  ctx.fillText('\u00A9 2026 Kresh11.dev All Rights Reserved', 512, 1372);
+  ctx.fillText('\u00A9 2026 Kresh11.dev All Rights Reserved', w / 2, 1372 * sy);
 
   ctx.restore();
 };
@@ -1390,10 +1397,16 @@ const Lanyard = ({
       if (!hit || hit.object !== backMesh || !hit.uv) return null;
       const bw = backCanvas.width || 1024;
       const bh = backCanvas.height || 1440;
+      const sx = bw / 1024;
+      const sy = bh / 1440;
       const cx = hit.uv.x * bw;
       const cy = (1 - hit.uv.y) * bh;
       for (const item of BACK_INTERACTIVE_TARGETS) {
-        if (cx >= item.x && cx <= item.x + item.w && cy >= item.y && cy <= item.y + item.h) {
+        const ix = item.x * sx;
+        const iy = item.y * sy;
+        const iw = item.w * sx;
+        const ih = item.h * sy;
+        if (cx >= ix && cx <= ix + iw && cy >= iy && cy <= iy + ih) {
           return item;
         }
       }
