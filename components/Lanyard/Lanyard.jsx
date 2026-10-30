@@ -596,12 +596,14 @@ const drawBackFace = (ctx, w, h, hoveredTarget = null, animElapsed = 0, arrowRot
   const findInkLeft = mFind.actualBoundingBoxLeft ?? 0;
   ctx.fillText('FIND ME ON', 56 + findInkLeft, 84);
 
-  // 4. 2x2 Grid of Social Cards (compact size h=210, box=72x72)
+  // 4. 2x2 Grid of Social Cards (comfortably sized h=220, box=80x80)
+  const cardH = 220;
+  const rowGap = 28;
   const TILES = [
-    { id: 'github', name: 'GitHub', x: 56, y: 136, w: 440, h: 210 },
-    { id: 'linkedin', name: 'LinkedIn', x: 528, y: 136, w: 440, h: 210 },
-    { id: 'leetcode', name: 'LeetCode', x: 56, y: 370, w: 440, h: 210 },
-    { id: 'instagram', name: 'Instagram', x: 528, y: 370, w: 440, h: 210 }
+    { id: 'github', name: 'GitHub', x: 56, y: 136, w: 440, h: cardH },
+    { id: 'linkedin', name: 'LinkedIn', x: 528, y: 136, w: 440, h: cardH },
+    { id: 'leetcode', name: 'LeetCode', x: 56, y: 136 + cardH + rowGap, w: 440, h: cardH },
+    { id: 'instagram', name: 'Instagram', x: 528, y: 136 + cardH + rowGap, w: 440, h: cardH }
   ];
 
   for (const tile of TILES) {
@@ -619,10 +621,10 @@ const drawBackFace = (ctx, w, h, hoveredTarget = null, animElapsed = 0, arrowRot
     ctx.stroke();
 
     // Inner Icon Box
-    const boxW = 72;
-    const boxH = 72;
+    const boxW = 80;
+    const boxH = 80;
     const boxX = tile.x + 28;
-    const boxY = tile.y + 22;
+    const boxY = tile.y + 24;
     const boxCx = boxX + boxW / 2;
     const boxCy = boxY + boxH / 2;
 
@@ -643,7 +645,7 @@ const drawBackFace = (ctx, w, h, hoveredTarget = null, animElapsed = 0, arrowRot
     ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
     ctx.shadowBlur = isHovered ? 16 : 12;
     ctx.shadowOffsetY = 4;
-    drawRoundedRectPath(ctx, -boxW / 2, -boxH / 2, boxW, boxH, 18);
+    drawRoundedRectPath(ctx, -boxW / 2, -boxH / 2, boxW, boxH, 20);
     ctx.fill();
 
     ctx.shadowColor = 'transparent';
@@ -653,15 +655,15 @@ const drawBackFace = (ctx, w, h, hoveredTarget = null, animElapsed = 0, arrowRot
 
     // Center Icon inside box
     ctx.fillStyle = '#ffffff';
-    drawBrandIcon(ctx, tile.id, 42);
+    drawBrandIcon(ctx, tile.id, 46);
     ctx.restore();
 
     // Social Name Label below box
-    ctx.font = '700 30px "Geist", "Inter", -apple-system, sans-serif';
+    ctx.font = '700 32px "Geist", "Inter", -apple-system, sans-serif';
     ctx.letterSpacing = '0px';
     ctx.fillStyle = '#ffffff';
     ctx.textBaseline = 'alphabetic';
-    ctx.fillText(tile.name, tile.x + 28, tile.y + 168);
+    ctx.fillText(tile.name, tile.x + 28, tile.y + 176);
 
     ctx.restore();
   }
@@ -674,13 +676,13 @@ const drawBackFace = (ctx, w, h, hoveredTarget = null, animElapsed = 0, arrowRot
   const mScan = ctx.measureText('SCAN IN SPOTIFY');
   const scanInkLeft = mScan.actualBoundingBoxLeft ?? 0;
   const scanX = 56 + scanInkLeft;
-  ctx.fillText('SCAN IN SPOTIFY', scanX, 618);
+  ctx.fillText('SCAN IN SPOTIFY', scanX, 650);
 
-  // 6. Spotify Code Strip (pill shaped, perfectly rounded, increased height, full width)
+  // 6. Spotify Code Strip (pill shaped, perfectly rounded, increased height h=160, full width)
   const stripX = 56;
-  const stripY = 638;
+  const stripY = 672;
   const stripW = 912;
-  const stripH = 150;
+  const stripH = 160;
   const radius = 24;
 
   ctx.save();
@@ -752,13 +754,13 @@ const drawBackFace = (ctx, w, h, hoveredTarget = null, animElapsed = 0, arrowRot
   const songTitle = SPOTIFY_CONFIG.songTitle;
   const mSong = ctx.measureText(songTitle);
   const songInkLeft = mSong.actualBoundingBoxLeft ?? 0;
-  ctx.fillText(songTitle, 56 + songInkLeft, 822);
+  ctx.fillText(songTitle, 56 + songInkLeft, 874);
 
-  // 8. "Listen on Spotify" Button (compact h=92, shifted to y=846)
+  // 8. "Listen on Spotify" Button (height h=100, shifted to y=902)
   const btnX = 56;
-  const btnY = 846;
+  const btnY = 902;
   const btnW = 912;
-  const btnH = 92;
+  const btnH = 100;
   const isBtnHovered = hoveredTarget?.isButton || hoveredTarget?.id === 'spotify';
 
   ctx.save();
@@ -767,16 +769,16 @@ const drawBackFace = (ctx, w, h, hoveredTarget = null, animElapsed = 0, arrowRot
     ctx.shadowColor = 'rgba(30, 215, 96, 0.45)';
     ctx.shadowBlur = 24;
   }
-  drawRoundedRectPath(ctx, btnX, btnY, btnW, btnH, 46);
+  drawRoundedRectPath(ctx, btnX, btnY, btnW, btnH, 50);
   ctx.fill();
   ctx.restore();
 
   // Button content: View Projects arrow with smooth opening/closing rotation + Label centered
   const btnText = 'Listen on Spotify';
-  ctx.font = '700 32px "JetBrains Mono", -apple-system, sans-serif';
+  ctx.font = '700 34px "JetBrains Mono", -apple-system, sans-serif';
   ctx.letterSpacing = '0px';
   const mBtnText = ctx.measureText(btnText);
-  const arrowSize = 34;
+  const arrowSize = 36;
   const arrowGap = 16;
   const totalContentW = arrowSize + arrowGap + mBtnText.width;
   const groupStartX = btnX + (btnW - totalContentW) / 2;
@@ -789,23 +791,23 @@ const drawBackFace = (ctx, w, h, hoveredTarget = null, animElapsed = 0, arrowRot
   ctx.textBaseline = 'middle';
   ctx.fillText(btnText, groupStartX + arrowSize + arrowGap, btnCenterY + 1);
 
-  // 9. Developer Specification Data Card (refined: 2x2 grid, h=150, shifted to y=966)
-  const specY = 966;
-  const specH = 150;
+  // 9. Developer Specification Data Card (refined: 2x2 grid, h=164, shifted to y=1050)
+  const specY = 1050;
+  const specH = 164;
   ctx.fillStyle = '#141418';
-  drawRoundedRectPath(ctx, 56, specY, 912, specH, 20);
+  drawRoundedRectPath(ctx, 56, specY, 912, specH, 22);
   ctx.fill();
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.07)';
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
   ctx.lineWidth = 1;
   ctx.stroke();
 
   // Spec 2x2 rows inside card
   const col1X = 96;
   const col2X = 540;
-  const row1Y = specY + 46;
-  const row2Y = specY + 104;
+  const row1Y = specY + 52;
+  const row2Y = specY + 116;
 
-  ctx.font = '500 20px "JetBrains Mono", Consolas, monospace';
+  ctx.font = '500 21px "JetBrains Mono", Consolas, monospace';
   ctx.letterSpacing = '0.08em';
 
   // Row 1: HOLDER & STATUS
@@ -830,18 +832,18 @@ const drawBackFace = (ctx, w, h, hoveredTarget = null, animElapsed = 0, arrowRot
   ctx.fillStyle = '#f2ede2';
   ctx.fillText('OCT 2026', col2X + 116, row2Y);
 
-  // 10. DEV ID // 0011 (centered below data card)
-  ctx.font = '600 22px "JetBrains Mono", Consolas, monospace';
-  ctx.letterSpacing = '0.24em';
-  ctx.fillStyle = '#8a857b';
+  // 10. DEV ID // 0011 (centered below data card at y=1272)
+  ctx.font = '600 24px "JetBrains Mono", Consolas, monospace';
+  ctx.letterSpacing = '0.26em';
+  ctx.fillStyle = '#9e988d';
   ctx.textAlign = 'center';
-  ctx.fillText('DEV ID // 0011', 512, 1180);
+  ctx.fillText('DEV ID // 0011', 512, 1272);
 
-  // 11. Copyright line at bottom
-  ctx.font = '500 17px "JetBrains Mono", Consolas, monospace';
-  ctx.letterSpacing = '0.10em';
-  ctx.fillStyle = '#54514a';
-  ctx.fillText('\u00A9 2026 Kresh11.dev all rights reserved', 512, 1360);
+  // 11. Copyright line at bottom - clear, crisp contrast
+  ctx.font = '500 21px "JetBrains Mono", Consolas, monospace';
+  ctx.letterSpacing = '0.12em';
+  ctx.fillStyle = '#999388';
+  ctx.fillText('\u00A9 2026 Kresh11.dev All Rights Reserved', 512, 1372);
 
   ctx.restore();
 };
@@ -1331,10 +1333,10 @@ const Lanyard = ({
         x: 56,
         y: 136,
         w: 440,
-        h: 210,
+        h: 220,
         iconX: 56 + 28,
-        iconY: 136 + 22,
-        iconSize: 72
+        iconY: 136 + 24,
+        iconSize: 80
       },
       {
         id: 'linkedin',
@@ -1343,43 +1345,43 @@ const Lanyard = ({
         x: 528,
         y: 136,
         w: 440,
-        h: 210,
+        h: 220,
         iconX: 528 + 28,
-        iconY: 136 + 22,
-        iconSize: 72
+        iconY: 136 + 24,
+        iconSize: 80
       },
       {
         id: 'leetcode',
         name: 'LeetCode',
         url: 'https://leetcode.com/u/kresh11i/',
         x: 56,
-        y: 370,
+        y: 384,
         w: 440,
-        h: 210,
+        h: 220,
         iconX: 56 + 28,
-        iconY: 370 + 22,
-        iconSize: 72
+        iconY: 384 + 24,
+        iconSize: 80
       },
       {
         id: 'instagram',
         name: 'Instagram',
         url: 'https://www.instagram.com/kreshhhh11/',
         x: 528,
-        y: 370,
+        y: 384,
         w: 440,
-        h: 210,
+        h: 220,
         iconX: 528 + 28,
-        iconY: 370 + 22,
-        iconSize: 72
+        iconY: 384 + 24,
+        iconSize: 80
       },
       {
         id: 'spotify',
         name: 'Spotify',
         url: SPOTIFY_CONFIG.url,
         x: 56,
-        y: 846,
+        y: 902,
         w: 912,
-        h: 92,
+        h: 100,
         isButton: true
       }
     ];
