@@ -66,6 +66,7 @@ export function Navbar() {
   const hasMountedRef = useRef<boolean>(false);
   const toastTimerRef = useRef<NodeJS.Timeout | null>(null);
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const isThemeTransitioningRef = useRef<boolean>(false);
 
   // Synchronous pre-paint setup: initialize theme, clock, active section, compact state & progress
   useIsomorphicLayoutEffect(() => {
@@ -360,6 +361,7 @@ export function Navbar() {
   }, [animationsReady]);
 
   const toggleTheme = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    isThemeTransitioningRef.current = true;
     e.currentTarget.blur();
     const nextTheme = theme === "dark" ? "light" : "dark";
 
@@ -382,6 +384,9 @@ export function Navbar() {
       window.matchMedia("(prefers-reduced-motion: reduce)").matches
     ) {
       updateDOM();
+      setTimeout(() => {
+        isThemeTransitioningRef.current = false;
+      }, 100);
       return;
     }
 
@@ -400,7 +405,7 @@ export function Navbar() {
 
     try {
       await transition.ready;
-      document.documentElement.animate(
+      const anim = document.documentElement.animate(
         {
           clipPath: [
             `circle(0px at ${x}px ${y}px)`,
@@ -413,8 +418,18 @@ export function Navbar() {
           pseudoElement: "::view-transition-new(root)",
         }
       );
+      await anim.finished;
     } catch {
       // Fallback
+    } finally {
+      setTimeout(() => {
+        isThemeTransitioningRef.current = false;
+        if (navRef.current && !navRef.current.matches(":hover")) {
+          if (isCompactRef.current) {
+            setIsHoverExpanded(false);
+          }
+        }
+      }, 50);
     }
   };
 
@@ -443,6 +458,13 @@ export function Navbar() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  const handleMouseEnterNav = () => {
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+      hoverTimeoutRef.current = null;
+    }
+  };
+
   const handleMouseEnterGraph = () => {
     if (hoverTimeoutRef.current) {
       clearTimeout(hoverTimeoutRef.current);
@@ -454,8 +476,10 @@ export function Navbar() {
   };
 
   const handleMouseLeaveNav = () => {
+    if (isThemeTransitioningRef.current) return;
     if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
     hoverTimeoutRef.current = setTimeout(() => {
+      if (isThemeTransitioningRef.current) return;
       if (isCompactRef.current) {
         setIsHoverExpanded(false);
       }
@@ -469,7 +493,7 @@ export function Navbar() {
           className={`nav ${!isExpanded ? "compact" : ""}`}
           aria-label="Main"
           ref={navRef}
-          onMouseEnter={handleMouseEnterGraph}
+          onMouseEnter={handleMouseEnterNav}
           onMouseLeave={handleMouseLeaveNav}
         >
           {/* Brand */}
@@ -519,7 +543,7 @@ export function Navbar() {
             </motion.span>
           </a>
 
-          {/* Graph Steps (hover zone between brand and time) */}
+          {/* Graph Steps (hover zone between Home and Contact) */}
           <ul
             className="graph"
             onMouseEnter={handleMouseEnterGraph}
