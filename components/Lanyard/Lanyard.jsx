@@ -444,7 +444,8 @@ const drawSpacedText = (ctx, text, x, y, spacing = 0, align = 'left') => {
 // CUSTOM: Spotify Song Configuration
 export const SPOTIFY_CONFIG = {
   songTitle: "Currently Listening To",
-  url: "https://open.spotify.com/track/6Z8oU8xMOie24Cflh2Sw6p?si=939d74ea6e214d1a"
+  url: "https://open.spotify.com/track/6Z8oU8xMOie24Cflh2Sw6p?si=939d74ea6e214d1a",
+  codeImage: "/lanyard/venmegam-code.png" // Optional custom Spotify code image path (e.g. ""). If empty or not found, defaults to vector wave.
 };
 
 const drawRoundedRectPath = (ctx, x, y, width, height, radius) => {
@@ -555,7 +556,7 @@ const drawViewProjectArrow = (ctx, cx, cy, size = 32, rotation = 0) => {
   ctx.restore();
 };
 
-const drawBackFace = (ctx, w, h, hoveredTarget = null, animElapsed = 0, arrowRot = 0) => {
+const drawBackFace = (ctx, w, h, hoveredTarget = null, animElapsed = 0, arrowRot = 0, spotifyCodeImg = null) => {
   ctx.save();
   // Background: Deep dark premium obsidian
   ctx.fillStyle = '#0e0e11';
@@ -675,64 +676,87 @@ const drawBackFace = (ctx, w, h, hoveredTarget = null, animElapsed = 0, arrowRot
   const scanX = 56 + scanInkLeft;
   ctx.fillText('SCAN IN SPOTIFY', scanX, 618);
 
-  // 6. Spotify Code Strip (compact h=130)
+  // 6. Spotify Code Strip (pill shaped, perfectly rounded, increased height, full width)
   const stripX = 56;
   const stripY = 638;
   const stripW = 912;
-  const stripH = 130;
-  ctx.fillStyle = '#020204';
-  drawRoundedRectPath(ctx, stripX, stripY, stripW, stripH, 22);
-  ctx.fill();
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
-  ctx.lineWidth = 1.5;
-  ctx.stroke();
-
-  // Spotify Logo inside strip (left)
-  const logoCx = stripX + 92;
-  const logoCy = stripY + stripH / 2;
-  const paths = getBrandPaths();
-  if (paths?.spotify) {
-    const spotScale = 80 / 24;
-    ctx.save();
-    ctx.translate(logoCx - 12 * spotScale, logoCy - 12 * spotScale);
-    ctx.scale(spotScale, spotScale);
-    ctx.fillStyle = '#ffffff';
-    ctx.fill(paths.spotify);
-    ctx.restore();
-  }
-
-  // Soundwave Barcode Bars
-  const barsStartX = stripX + 272;
-  const barsEndX = stripX + stripW - 48;
-  const barsSpacing = (barsEndX - barsStartX) / (SPOTIFY_BAR_HEIGHTS.length - 1);
-  const maxHalfH = 40;
+  const stripH = 150;
+  const radius = 24;
 
   ctx.save();
-  ctx.strokeStyle = '#ffffff';
-  ctx.lineWidth = 5.8;
-  ctx.lineCap = 'round';
-  for (let i = 0; i < SPOTIFY_BAR_HEIGHTS.length; i++) {
-    const bx = barsStartX + i * barsSpacing;
-    const bh = maxHalfH * SPOTIFY_BAR_HEIGHTS[i];
-    ctx.beginPath();
-    ctx.moveTo(bx, logoCy - bh);
-    ctx.lineTo(bx, logoCy + bh);
-    ctx.stroke();
+  drawRoundedRectPath(ctx, stripX, stripY, stripW, stripH, radius);
+  ctx.clip();
+
+  if (spotifyCodeImg) {
+    // Custom Spotify Code: use full width in cover mode, preserving exact uploaded colors
+    const iw = spotifyCodeImg.naturalWidth || spotifyCodeImg.width || 1;
+    const ih = spotifyCodeImg.naturalHeight || spotifyCodeImg.height || 1;
+    const scale = Math.max(stripW / iw, stripH / ih);
+    const sw = iw * scale;
+    const sh = ih * scale;
+    const ox = stripX + (stripW - sw) / 2;
+    const oy = stripY + (stripH - sh) / 2;
+    ctx.drawImage(spotifyCodeImg, ox, oy, sw, sh);
+  } else {
+    // Fallback: Default vector Spotify Logo + Soundwave Barcode
+    ctx.fillStyle = '#020204';
+    ctx.fill();
+
+    const logoCx = stripX + 92;
+    const logoCy = stripY + stripH / 2;
+    const paths = getBrandPaths();
+    if (paths?.spotify) {
+      const spotScale = 80 / 24;
+      ctx.save();
+      ctx.translate(logoCx - 12 * spotScale, logoCy - 12 * spotScale);
+      ctx.scale(spotScale, spotScale);
+      ctx.fillStyle = '#ffffff';
+      ctx.fill(paths.spotify);
+      ctx.restore();
+    }
+
+    // Soundwave Barcode Bars
+    const barsStartX = stripX + 272;
+    const barsEndX = stripX + stripW - 48;
+    const barsSpacing = (barsEndX - barsStartX) / (SPOTIFY_BAR_HEIGHTS.length - 1);
+    const maxHalfH = 40;
+
+    ctx.save();
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 5.8;
+    ctx.lineCap = 'round';
+    for (let i = 0; i < SPOTIFY_BAR_HEIGHTS.length; i++) {
+      const bx = barsStartX + i * barsSpacing;
+      const bh = maxHalfH * SPOTIFY_BAR_HEIGHTS[i];
+      ctx.beginPath();
+      ctx.moveTo(bx, logoCy - bh);
+      ctx.lineTo(bx, logoCy + bh);
+      ctx.stroke();
+    }
+    ctx.restore();
   }
   ctx.restore();
 
-  // 7. Song Title ("Your favourite song")
+  // Strip border stroke with matching border radius
+  ctx.save();
+  drawRoundedRectPath(ctx, stripX, stripY, stripW, stripH, radius);
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+  ctx.restore();
+
+  // 7. Song Title ("Currently Listening To")
   ctx.font = '500 28px "JetBrains Mono", Consolas, monospace';
   ctx.letterSpacing = '0.02em';
   ctx.fillStyle = '#f6eddc';
   const songTitle = SPOTIFY_CONFIG.songTitle;
   const mSong = ctx.measureText(songTitle);
   const songInkLeft = mSong.actualBoundingBoxLeft ?? 0;
-  ctx.fillText(songTitle, 56 + songInkLeft, 808);
+  ctx.fillText(songTitle, 56 + songInkLeft, 822);
 
-  // 8. "Listen on Spotify" Button (compact h=92)
+  // 8. "Listen on Spotify" Button (compact h=92, shifted to y=846)
   const btnX = 56;
-  const btnY = 832;
+  const btnY = 846;
   const btnW = 912;
   const btnH = 92;
   const isBtnHovered = hoveredTarget?.isButton || hoveredTarget?.id === 'spotify';
@@ -765,8 +789,8 @@ const drawBackFace = (ctx, w, h, hoveredTarget = null, animElapsed = 0, arrowRot
   ctx.textBaseline = 'middle';
   ctx.fillText(btnText, groupStartX + arrowSize + arrowGap, btnCenterY + 1);
 
-  // 9. Developer Specification Data Card (refined: 2x2 grid, h=150)
-  const specY = 960;
+  // 9. Developer Specification Data Card (refined: 2x2 grid, h=150, shifted to y=966)
+  const specY = 966;
   const specH = 150;
   ctx.fillStyle = '#141418';
   drawRoundedRectPath(ctx, 56, specY, 912, specH, 20);
@@ -1200,7 +1224,7 @@ const Lanyard = ({
     scene.add(keyLight, fillLight);
 
     const imageCache = new Map();
-    const images = { front: null, back: null, strap: null };
+    const images = { front: null, back: null, strap: null, spotifyCode: null };
     const frontCanvas = document.createElement('canvas');
     const backCanvas = document.createElement('canvas');
     const strapCanvas = document.createElement('canvas');
@@ -1315,7 +1339,7 @@ const Lanyard = ({
       {
         id: 'linkedin',
         name: 'LinkedIn',
-        url: 'https://www.linkedin.com/in/srikesh-tr/',
+        url: 'https://www.linkedin.com/in/srikresh11',
         x: 528,
         y: 136,
         w: 440,
@@ -1327,7 +1351,7 @@ const Lanyard = ({
       {
         id: 'leetcode',
         name: 'LeetCode',
-        url: 'https://leetcode.com/u/Kreshhhh11i/',
+        url: 'https://leetcode.com/u/kresh11i/',
         x: 56,
         y: 370,
         w: 440,
@@ -1339,7 +1363,7 @@ const Lanyard = ({
       {
         id: 'instagram',
         name: 'Instagram',
-        url: 'https://instagram.com/srikesh_tr',
+        url: 'https://www.instagram.com/kreshhhh11/',
         x: 528,
         y: 370,
         w: 440,
@@ -1353,7 +1377,7 @@ const Lanyard = ({
         name: 'Spotify',
         url: SPOTIFY_CONFIG.url,
         x: 56,
-        y: 832,
+        y: 846,
         w: 912,
         h: 92,
         isButton: true
@@ -1384,7 +1408,7 @@ const Lanyard = ({
       const elapsed = (performance.now() - shakeStartTime) / 1000;
       const easeProgress = 1 - Math.pow(1 - arrowProgress, 3);
       const currentArrowRot = easeProgress * (Math.PI / 4);
-      drawBackFace(ctx, w, h, hoveredTarget, elapsed, currentArrowRot);
+      drawBackFace(ctx, w, h, hoveredTarget, elapsed, currentArrowRot, images.spotifyCode);
       backTexture.needsUpdate = true;
     };
 
@@ -1478,18 +1502,20 @@ const Lanyard = ({
         }
       }
 
-      const imageKey = `${s.frontImage}|${s.backImage}|${s.strapImage}`;
+      const imageKey = `${s.frontImage}|${s.backImage}|${s.strapImage}|${SPOTIFY_CONFIG.codeImage || ''}`;
       if (imageKey !== applied.imageKey) {
         const token = ++imageToken;
         Promise.all([
           loadImage(imageCache, s.frontImage),
           loadImage(imageCache, s.backImage),
-          loadImage(imageCache, s.strapImage)
-        ]).then(([front, back, strap]) => {
+          loadImage(imageCache, s.strapImage),
+          loadImage(imageCache, SPOTIFY_CONFIG.codeImage)
+        ]).then(([front, back, strap, spotifyCode]) => {
           if (!alive || token !== imageToken) return;
           images.front = front;
           images.back = back;
           images.strap = strap;
+          images.spotifyCode = spotifyCode;
           paintFaces();
           repaintStrap();
         });
