@@ -441,6 +441,12 @@ const drawSpacedText = (ctx, text, x, y, spacing = 0, align = 'left') => {
   ctx.restore();
 };
 
+// CUSTOM: Spotify Song Configuration
+export const SPOTIFY_CONFIG = {
+  songTitle: "Currently Listening To",
+  url: "https://open.spotify.com/track/6Z8oU8xMOie24Cflh2Sw6p?si=939d74ea6e214d1a"
+};
+
 const drawRoundedRectPath = (ctx, x, y, width, height, radius) => {
   ctx.beginPath();
   ctx.moveTo(x + radius, y);
@@ -455,10 +461,22 @@ const drawRoundedRectPath = (ctx, x, y, width, height, radius) => {
   ctx.closePath();
 };
 
-const GITHUB_SVG = 'M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z';
-const LINKEDIN_SVG = 'M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z';
-const LEETCODE_SVG1 = 'M13.483 0a1.374 1.374 0 0 0-.961.438L7.116 6.226l-3.854 4.126a5.266 5.266 0 0 0-1.209 2.104 5.35 5.35 0 0 0-.125.513 5.527 5.527 0 0 0 .062 2.362 5.874 5.874 0 0 0 .349 1.017 5.938 5.938 0 0 0 4.858 3.57 5.961 5.961 0 0 0 3.811-1.151l4.128-4.41a1.369 1.369 0 0 0 0-1.94 1.374 1.374 0 0 0-1.94 0l-4.128 4.41a3.218 3.218 0 0 1-2.057.622 3.208 3.208 0 0 1-2.628-1.93 3.003 3.003 0 0 1-.189-.55 2.986 2.986 0 0 1-.033-1.277 2.85 2.85 0 0 1 .654-1.137l3.854-4.126 5.406-5.788A1.374 1.374 0 0 0 13.483 0z';
-const LEETCODE_SVG2 = 'M9.865 11.062a1.374 1.374 0 0 0-1.374 1.374v.054a1.374 1.374 0 0 0 1.374 1.374h9.191a1.374 1.374 0 0 0 1.374-1.374v-.054a1.374 1.374 0 0 0-1.374-1.374H9.865z';
+// Official Font Awesome Brand SVG Icons
+const GITHUB_SVG = 'M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z';
+// fa-brands fa-linkedin-in
+const LINKEDIN_IN_SVG = 'M100.28 448H7.4V148.9h92.88zM53.79 108.1C24.09 108.1 0 83.5 0 53.8a53.79 53.79 0 0 1 107.58 0c0 29.7-24.1 54.3-53.79 54.3zM447.9 448h-92.68V302.4c0-34.7-.7-79.2-48.29-79.2-48.29 0-55.69 37.7-55.69 76.7V448h-92.78V148.9h89.08v40.8h1.3c12.4-23.5 42.69-48.3 87.88-48.3 94 0 111.28 61.9 111.28 142.3V448z';
+// fa-brands fa-leetcode
+const LEETCODE_SVG = 'M13.483 0a1.374 1.374 0 0 0-.961.438L7.116 6.226l-3.854 4.126a5.266 5.266 0 0 0-1.209 2.104 5.35 5.35 0 0 0-.125.513 5.527 5.527 0 0 0 .062 2.362 5.83 5.83 0 0 0 .349 1.017 5.938 5.938 0 0 0 1.271 1.818l4.277 4.193.039.038c2.248 2.165 5.852 2.133 8.063-.074l2.396-2.392c.54-.54.54-1.414.003-1.955a1.378 1.378 0 0 0-1.951-.003l-2.396 2.392a3.021 3.021 0 0 1-4.205.038l-.02-.019-4.276-4.193c-.652-.64-.972-1.469-.948-2.263a2.68 2.68 0 0 1 .066-.523 2.545 2.545 0 0 1 .619-1.164L9.13 8.114c1.058-1.134 3.204-1.27 4.43-.278l3.501 2.831c.593.48 1.461.387 1.94-.207a1.384 1.384 0 0 0-.207-1.943l-3.5-2.831c-.8-.647-1.766-1.045-2.774-1.202l2.015-2.158A1.384 1.384 0 0 0 13.483 0zm-2.866 12.815a1.38 1.38 0 0 0-1.38 1.382 1.38 1.38 0 0 0 1.38 1.382H20.79a1.38 1.38 0 0 0 1.38-1.382 1.38 1.38 0 0 0-1.38-1.382z';
+// fa-brands fa-instagram
+const INSTAGRAM_SVG = 'M224.1 141c-63.6 0-114.9 51.3-114.9 114.9s51.3 114.9 114.9 114.9S339 319.5 339 255.9 287.7 141 224.1 141zm0 189.6c-41.1 0-74.7-33.5-74.7-74.7s33.5-74.7 74.7-74.7 74.7 33.5 74.7 74.7-33.6 74.7-74.7 74.7zm146.4-194.3c0 14.9-12 26.8-26.8 26.8-14.9 0-26.8-12-26.8-26.8s12-26.8 26.8-26.8 26.8 12 26.8 26.8zm76.1 27.2c-1.7-35.9-9.9-67.7-36.2-93.9-26.2-26.2-58-34.4-93.9-36.2-37-2.1-147.9-2.1-184.9 0-35.8 1.7-67.6 9.9-93.9 36.1s-34.4 58-36.2 93.9c-2.1 37-2.1 147.9 0 184.9 1.7 35.9 9.9 67.7 36.2 93.9s58 34.4 93.9 36.2c37 2.1 147.9 2.1 184.9 0 35.9-1.7 67.7-9.9 93.9-36.2 26.2-26.2 34.4-58 36.2-93.9 2.1-37 2.1-147.8 0-184.8zM398.8 388c-7.8 19.6-22.9 34.7-42.6 42.6-29.5 11.7-99.5 9-132.1 9s-102.7 2.6-132.1-9c-19.6-7.8-34.7-22.9-42.6-42.6-11.7-29.5-9-99.5-9-132.1s-2.6-102.7 9-132.1c7.8-19.6 22.9-34.7 42.6-42.6 29.5-11.7 99.5-9 132.1-9s102.7-2.6 132.1 9c19.6 7.8 34.7 22.9 42.6 42.6 11.7 29.5 9 99.5 9 132.1s2.7 102.7-9 132.1z';
+// Spotify Logo
+const SPOTIFY_SVG = 'M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z';
+
+const SPOTIFY_BAR_HEIGHTS = [
+  0.60, 0.32, 0.78, 0.28, 0.90, 0.48, 0.86, 0.30, 0.72, 0.52,
+  0.94, 0.44, 1.00, 0.40, 0.88, 0.50, 0.92, 0.30, 0.78, 0.46,
+  0.86, 0.26, 0.62
+];
 
 let brandPaths = null;
 const getBrandPaths = () => {
@@ -466,9 +484,10 @@ const getBrandPaths = () => {
     try {
       brandPaths = {
         github: new Path2D(GITHUB_SVG),
-        linkedin: new Path2D(LINKEDIN_SVG),
-        leetcode1: new Path2D(LEETCODE_SVG1),
-        leetcode2: new Path2D(LEETCODE_SVG2)
+        linkedin: new Path2D(LINKEDIN_IN_SVG),
+        leetcode: new Path2D(LEETCODE_SVG),
+        instagram: new Path2D(INSTAGRAM_SVG),
+        spotify: new Path2D(SPOTIFY_SVG)
       };
     } catch {
       brandPaths = null;
@@ -477,42 +496,330 @@ const getBrandPaths = () => {
   return brandPaths;
 };
 
-const drawBrandIcon = (ctx, id) => {
+const drawBrandIcon = (ctx, id, size = 48) => {
   const paths = getBrandPaths();
-  const size = 44;
-  const scale = size / 24;
   if (id === 'github' && paths?.github) {
+    const scale = size / 512;
     ctx.save();
-    ctx.translate(-12 * scale, -12 * scale);
+    ctx.translate(-248 * scale, -256 * scale);
     ctx.scale(scale, scale);
     ctx.fill(paths.github);
     ctx.restore();
   } else if (id === 'linkedin' && paths?.linkedin) {
+    const scale = size / 512;
     ctx.save();
-    ctx.translate(-12 * scale, -12 * scale);
+    ctx.translate(-224 * scale, -256 * scale);
     ctx.scale(scale, scale);
     ctx.fill(paths.linkedin);
     ctx.restore();
-  } else if (id === 'leetcode' && paths?.leetcode1 && paths?.leetcode2) {
+  } else if (id === 'leetcode' && paths?.leetcode) {
+    const scale = size / 24;
     ctx.save();
     ctx.translate(-12 * scale, -12 * scale);
     ctx.scale(scale, scale);
-    ctx.fill(paths.leetcode1);
-    ctx.fill(paths.leetcode2);
+    ctx.fill(paths.leetcode);
     ctx.restore();
-  } else if (id === 'instagram') {
+  } else if (id === 'instagram' && paths?.instagram) {
+    const scale = size / 512;
     ctx.save();
-    ctx.lineWidth = 3;
-    drawRoundedRectPath(ctx, -20, -20, 40, 40, 10);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.arc(0, 0, 9.5, 0, Math.PI * 2);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.arc(10.5, -10.5, 2.5, 0, Math.PI * 2);
-    ctx.fill();
+    ctx.translate(-224 * scale, -256 * scale);
+    ctx.scale(scale, scale);
+    ctx.fill(paths.instagram);
     ctx.restore();
   }
+};
+
+// View Projects button arrow with rotate-45 animation
+const drawViewProjectArrow = (ctx, cx, cy, size = 32, rotation = 0) => {
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.rotate(rotation);
+  const s = size / 24;
+  ctx.strokeStyle = '#04140a';
+  ctx.lineWidth = 2.5 * s;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+
+  // <line x1="5" y1="19" x2="17" y2="7"></line>
+  ctx.beginPath();
+  ctx.moveTo((5 - 12) * s, (19 - 12) * s);
+  ctx.lineTo((17 - 12) * s, (7 - 12) * s);
+  ctx.stroke();
+
+  // <polyline points="7 7 17 7 17 17"></polyline>
+  ctx.beginPath();
+  ctx.moveTo((7 - 12) * s, (7 - 12) * s);
+  ctx.lineTo((17 - 12) * s, (7 - 12) * s);
+  ctx.lineTo((17 - 12) * s, (17 - 12) * s);
+  ctx.stroke();
+  ctx.restore();
+};
+
+const drawBackFace = (ctx, w, h, hoveredTarget = null, animElapsed = 0, arrowRot = 0) => {
+  ctx.save();
+  // Background: Deep dark premium obsidian
+  ctx.fillStyle = '#0e0e11';
+  ctx.fillRect(0, 0, w, h);
+
+  // Subtle vignette / radial depth
+  const grad = ctx.createRadialGradient(w / 2, h / 2, 100, w / 2, h / 2, 900);
+  grad.addColorStop(0, 'rgba(255, 255, 255, 0.03)');
+  grad.addColorStop(1, 'rgba(0, 0, 0, 0.45)');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, w, h);
+
+  // 1. Top Slot Cutout
+  const slotW = 184;
+  const slotH = 44;
+  const slotX = (w - slotW) / 2;
+  const slotY = 62;
+  ctx.fillStyle = '#050507';
+  drawRoundedRectPath(ctx, slotX, slotY, slotW, slotH, 22);
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  // 2. "BACK" Label (top right, flush with right tiles edge at x = 968)
+  ctx.font = '500 24px "JetBrains Mono", Consolas, monospace';
+  ctx.letterSpacing = '0.12em';
+  ctx.fillStyle = '#8a857b';
+  ctx.textBaseline = 'middle';
+  const mBack = ctx.measureText('BACK');
+  const backInkRight = mBack.actualBoundingBoxRight ?? mBack.width;
+  const backX = 968 - backInkRight;
+  ctx.fillText('BACK', backX, 84);
+
+  // 3. "FIND ME ON" Label (aligned with "BACK" at y = 84)
+  const mFind = ctx.measureText('FIND ME ON');
+  const findInkLeft = mFind.actualBoundingBoxLeft ?? 0;
+  ctx.fillText('FIND ME ON', 56 + findInkLeft, 84);
+
+  // 4. 2x2 Grid of Social Cards (compact size h=210, box=72x72)
+  const TILES = [
+    { id: 'github', name: 'GitHub', x: 56, y: 136, w: 440, h: 210 },
+    { id: 'linkedin', name: 'LinkedIn', x: 528, y: 136, w: 440, h: 210 },
+    { id: 'leetcode', name: 'LeetCode', x: 56, y: 370, w: 440, h: 210 },
+    { id: 'instagram', name: 'Instagram', x: 528, y: 370, w: 440, h: 210 }
+  ];
+
+  for (const tile of TILES) {
+    const isHovered = hoveredTarget?.id === tile.id;
+    ctx.save();
+
+    // Card Container Background
+    ctx.fillStyle = isHovered ? 'rgba(255, 255, 255, 0.05)' : '#151519';
+    drawRoundedRectPath(ctx, tile.x, tile.y, tile.w, tile.h, 24);
+    ctx.fill();
+
+    // Card Border
+    ctx.lineWidth = 1.5;
+    ctx.strokeStyle = isHovered ? 'rgba(255, 255, 255, 0.32)' : 'rgba(255, 255, 255, 0.08)';
+    ctx.stroke();
+
+    // Inner Icon Box
+    const boxW = 72;
+    const boxH = 72;
+    const boxX = tile.x + 28;
+    const boxY = tile.y + 22;
+    const boxCx = boxX + boxW / 2;
+    const boxCy = boxY + boxH / 2;
+
+    let iconScale = 1;
+    let iconAngle = 0;
+    if (isHovered) {
+      iconScale = 1 + 0.08 * Math.sin(Math.min(animElapsed * 10, Math.PI));
+      iconAngle = Math.sin(animElapsed * 20) * Math.exp(-animElapsed * 3.5) * 0.12;
+    }
+
+    ctx.save();
+    ctx.translate(boxCx, boxCy);
+    ctx.rotate(iconAngle);
+    ctx.scale(iconScale, iconScale);
+
+    // Box background & border
+    ctx.fillStyle = isHovered ? '#26262e' : '#1e1e24';
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
+    ctx.shadowBlur = isHovered ? 16 : 12;
+    ctx.shadowOffsetY = 4;
+    drawRoundedRectPath(ctx, -boxW / 2, -boxH / 2, boxW, boxH, 18);
+    ctx.fill();
+
+    ctx.shadowColor = 'transparent';
+    ctx.strokeStyle = isHovered ? 'rgba(255, 255, 255, 0.28)' : 'rgba(255, 255, 255, 0.10)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // Center Icon inside box
+    ctx.fillStyle = '#ffffff';
+    drawBrandIcon(ctx, tile.id, 42);
+    ctx.restore();
+
+    // Social Name Label below box
+    ctx.font = '700 30px "Geist", "Inter", -apple-system, sans-serif';
+    ctx.letterSpacing = '0px';
+    ctx.fillStyle = '#ffffff';
+    ctx.textBaseline = 'alphabetic';
+    ctx.fillText(tile.name, tile.x + 28, tile.y + 168);
+
+    ctx.restore();
+  }
+
+  // 5. "SCAN IN SPOTIFY" Label
+  ctx.font = '500 24px "JetBrains Mono", Consolas, monospace';
+  ctx.letterSpacing = '0.12em';
+  ctx.fillStyle = '#8a857b';
+  ctx.textBaseline = 'alphabetic';
+  const mScan = ctx.measureText('SCAN IN SPOTIFY');
+  const scanInkLeft = mScan.actualBoundingBoxLeft ?? 0;
+  const scanX = 56 + scanInkLeft;
+  ctx.fillText('SCAN IN SPOTIFY', scanX, 618);
+
+  // 6. Spotify Code Strip (compact h=130)
+  const stripX = 56;
+  const stripY = 638;
+  const stripW = 912;
+  const stripH = 130;
+  ctx.fillStyle = '#020204';
+  drawRoundedRectPath(ctx, stripX, stripY, stripW, stripH, 22);
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  // Spotify Logo inside strip (left)
+  const logoCx = stripX + 92;
+  const logoCy = stripY + stripH / 2;
+  const paths = getBrandPaths();
+  if (paths?.spotify) {
+    const spotScale = 80 / 24;
+    ctx.save();
+    ctx.translate(logoCx - 12 * spotScale, logoCy - 12 * spotScale);
+    ctx.scale(spotScale, spotScale);
+    ctx.fillStyle = '#ffffff';
+    ctx.fill(paths.spotify);
+    ctx.restore();
+  }
+
+  // Soundwave Barcode Bars
+  const barsStartX = stripX + 272;
+  const barsEndX = stripX + stripW - 48;
+  const barsSpacing = (barsEndX - barsStartX) / (SPOTIFY_BAR_HEIGHTS.length - 1);
+  const maxHalfH = 40;
+
+  ctx.save();
+  ctx.strokeStyle = '#ffffff';
+  ctx.lineWidth = 5.8;
+  ctx.lineCap = 'round';
+  for (let i = 0; i < SPOTIFY_BAR_HEIGHTS.length; i++) {
+    const bx = barsStartX + i * barsSpacing;
+    const bh = maxHalfH * SPOTIFY_BAR_HEIGHTS[i];
+    ctx.beginPath();
+    ctx.moveTo(bx, logoCy - bh);
+    ctx.lineTo(bx, logoCy + bh);
+    ctx.stroke();
+  }
+  ctx.restore();
+
+  // 7. Song Title ("Your favourite song")
+  ctx.font = '500 28px "JetBrains Mono", Consolas, monospace';
+  ctx.letterSpacing = '0.02em';
+  ctx.fillStyle = '#f6eddc';
+  const songTitle = SPOTIFY_CONFIG.songTitle;
+  const mSong = ctx.measureText(songTitle);
+  const songInkLeft = mSong.actualBoundingBoxLeft ?? 0;
+  ctx.fillText(songTitle, 56 + songInkLeft, 808);
+
+  // 8. "Listen on Spotify" Button (compact h=92)
+  const btnX = 56;
+  const btnY = 832;
+  const btnW = 912;
+  const btnH = 92;
+  const isBtnHovered = hoveredTarget?.isButton || hoveredTarget?.id === 'spotify';
+
+  ctx.save();
+  ctx.fillStyle = isBtnHovered ? '#1fdf64' : '#1ed760';
+  if (isBtnHovered) {
+    ctx.shadowColor = 'rgba(30, 215, 96, 0.45)';
+    ctx.shadowBlur = 24;
+  }
+  drawRoundedRectPath(ctx, btnX, btnY, btnW, btnH, 46);
+  ctx.fill();
+  ctx.restore();
+
+  // Button content: View Projects arrow with smooth opening/closing rotation + Label centered
+  const btnText = 'Listen on Spotify';
+  ctx.font = '700 32px "JetBrains Mono", -apple-system, sans-serif';
+  ctx.letterSpacing = '0px';
+  const mBtnText = ctx.measureText(btnText);
+  const arrowSize = 34;
+  const arrowGap = 16;
+  const totalContentW = arrowSize + arrowGap + mBtnText.width;
+  const groupStartX = btnX + (btnW - totalContentW) / 2;
+  const btnCenterY = btnY + btnH / 2;
+
+  const arrowCx = groupStartX + arrowSize / 2;
+  drawViewProjectArrow(ctx, arrowCx, btnCenterY, arrowSize, arrowRot);
+
+  ctx.fillStyle = '#04140a';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(btnText, groupStartX + arrowSize + arrowGap, btnCenterY + 1);
+
+  // 9. Developer Specification Data Card (refined: 2x2 grid, h=150)
+  const specY = 960;
+  const specH = 150;
+  ctx.fillStyle = '#141418';
+  drawRoundedRectPath(ctx, 56, specY, 912, specH, 20);
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.07)';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+
+  // Spec 2x2 rows inside card
+  const col1X = 96;
+  const col2X = 540;
+  const row1Y = specY + 46;
+  const row2Y = specY + 104;
+
+  ctx.font = '500 20px "JetBrains Mono", Consolas, monospace';
+  ctx.letterSpacing = '0.08em';
+
+  // Row 1: HOLDER & STATUS
+  ctx.fillStyle = '#7a756c';
+  ctx.fillText('HOLDER', col1X, row1Y);
+  ctx.fillStyle = '#f2ede2';
+  ctx.fillText('Kreshhhh.11', col1X + 116, row1Y);
+
+  ctx.fillStyle = '#7a756c';
+  ctx.fillText('STATUS', col2X, row1Y);
+  ctx.fillStyle = '#1ed760';
+  ctx.fillText('ACTIVE', col2X + 116, row1Y);
+
+  // Row 2: ACCESS & ISSUED
+  ctx.fillStyle = '#7a756c';
+  ctx.fillText('ACCESS', col1X, row2Y);
+  ctx.fillStyle = '#f2ede2';
+  ctx.fillText('UNRESTRICTED', col1X + 116, row2Y);
+
+  ctx.fillStyle = '#7a756c';
+  ctx.fillText('ISSUED', col2X, row2Y);
+  ctx.fillStyle = '#f2ede2';
+  ctx.fillText('OCT 2026', col2X + 116, row2Y);
+
+  // 10. DEV ID // 0011 (centered below data card)
+  ctx.font = '600 22px "JetBrains Mono", Consolas, monospace';
+  ctx.letterSpacing = '0.24em';
+  ctx.fillStyle = '#8a857b';
+  ctx.textAlign = 'center';
+  ctx.fillText('DEV ID // 0011', 512, 1180);
+
+  // 11. Copyright line at bottom
+  ctx.font = '500 17px "JetBrains Mono", Consolas, monospace';
+  ctx.letterSpacing = '0.10em';
+  ctx.fillStyle = '#54514a';
+  ctx.fillText('\u00A9 2026 Kresh11.dev all rights reserved', 512, 1360);
+
+  ctx.restore();
 };
 
 const paintFace = (canvas, image, color, fit, isFront = false) => {
@@ -989,6 +1296,7 @@ const Lanyard = ({
     let imageToken = 0;
     let hoveredTarget = null;
     let shakeStartTime = 0;
+    let arrowProgress = 0;
     const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
 
     const BACK_INTERACTIVE_TARGETS = [
@@ -996,58 +1304,58 @@ const Lanyard = ({
         id: 'github',
         name: 'GitHub',
         url: 'https://github.com/Kreshhhh11i',
-        x: 88,
-        y: 154,
-        w: 408,
-        h: 246,
-        iconX: 88 + 30,
-        iconY: 154 + 30,
-        iconSize: 82
+        x: 56,
+        y: 136,
+        w: 440,
+        h: 210,
+        iconX: 56 + 28,
+        iconY: 136 + 22,
+        iconSize: 72
       },
       {
         id: 'linkedin',
         name: 'LinkedIn',
         url: 'https://www.linkedin.com/in/srikesh-tr/',
         x: 528,
-        y: 154,
-        w: 408,
-        h: 246,
-        iconX: 528 + 30,
-        iconY: 154 + 30,
-        iconSize: 82
+        y: 136,
+        w: 440,
+        h: 210,
+        iconX: 528 + 28,
+        iconY: 136 + 22,
+        iconSize: 72
       },
       {
         id: 'leetcode',
         name: 'LeetCode',
         url: 'https://leetcode.com/u/Kreshhhh11i/',
-        x: 88,
-        y: 432,
-        w: 408,
-        h: 246,
-        iconX: 88 + 30,
-        iconY: 432 + 30,
-        iconSize: 82
+        x: 56,
+        y: 370,
+        w: 440,
+        h: 210,
+        iconX: 56 + 28,
+        iconY: 370 + 22,
+        iconSize: 72
       },
       {
         id: 'instagram',
         name: 'Instagram',
         url: 'https://instagram.com/srikesh_tr',
         x: 528,
-        y: 432,
-        w: 408,
-        h: 246,
-        iconX: 528 + 30,
-        iconY: 432 + 30,
-        iconSize: 82
+        y: 370,
+        w: 440,
+        h: 210,
+        iconX: 528 + 28,
+        iconY: 370 + 22,
+        iconSize: 72
       },
       {
         id: 'spotify',
         name: 'Spotify',
-        url: 'https://open.spotify.com',
-        x: 88,
-        y: 710,
-        w: 848,
-        h: 460,
+        url: SPOTIFY_CONFIG.url,
+        x: 56,
+        y: 832,
+        w: 912,
+        h: 92,
         isButton: true
       }
     ];
@@ -1056,7 +1364,7 @@ const Lanyard = ({
       if (!hit || hit.object !== backMesh || !hit.uv) return null;
       const bw = backCanvas.width || 1024;
       const bh = backCanvas.height || 1440;
-      const cx = (1 - hit.uv.x) * bw;
+      const cx = hit.uv.x * bw;
       const cy = (1 - hit.uv.y) * bh;
       for (const item of BACK_INTERACTIVE_TARGETS) {
         if (cx >= item.x && cx <= item.x + item.w && cy >= item.y && cy <= item.y + item.h) {
@@ -1067,65 +1375,16 @@ const Lanyard = ({
     };
 
     const updateBackCanvas = () => {
-      if (!images.back || !backCanvas) return;
+      if (!backCanvas) return;
       const ctx = backCanvas.getContext('2d');
       if (!ctx) return;
       const w = backCanvas.width;
       const h = backCanvas.height;
 
-      ctx.drawImage(images.back, 0, 0, w, h);
-
-      if (hoveredTarget && !hoveredTarget.isButton) {
-        const elapsed = (performance.now() - shakeStartTime) / 1000;
-        const isShaking = elapsed < 0.65;
-        const angle = isShaking ? Math.sin(elapsed * 32) * Math.exp(-elapsed * 4.8) * 0.18 : 0;
-        const scale = isShaking ? 1 + 0.10 * Math.sin(elapsed * 16) * Math.exp(-elapsed * 4) : 1;
-
-        ctx.save();
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.04)';
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.28)';
-        ctx.lineWidth = 2;
-        drawRoundedRectPath(ctx, hoveredTarget.x, hoveredTarget.y, hoveredTarget.w, hoveredTarget.h, 28);
-        ctx.fill();
-        ctx.stroke();
-        ctx.restore();
-
-        const cx = hoveredTarget.iconX + hoveredTarget.iconSize / 2;
-        const cy = hoveredTarget.iconY + hoveredTarget.iconSize / 2;
-        const s = hoveredTarget.iconSize;
-
-        ctx.save();
-        ctx.translate(cx, cy);
-        ctx.rotate(angle);
-        ctx.scale(scale, scale);
-
-        ctx.fillStyle = '#26262c';
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.28)';
-        ctx.lineWidth = 1.5;
-        ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
-        ctx.shadowBlur = 14;
-        ctx.shadowOffsetY = 4;
-        drawRoundedRectPath(ctx, -s / 2, -s / 2, s, s, 22);
-        ctx.fill();
-        ctx.stroke();
-
-        ctx.shadowColor = 'transparent';
-        ctx.fillStyle = '#ffffff';
-        ctx.strokeStyle = '#ffffff';
-        drawBrandIcon(ctx, hoveredTarget.id);
-
-        ctx.restore();
-      } else if (hoveredTarget && hoveredTarget.isButton) {
-        ctx.save();
-        ctx.fillStyle = 'rgba(30, 215, 96, 0.12)';
-        ctx.strokeStyle = 'rgba(30, 215, 96, 0.55)';
-        ctx.lineWidth = 2;
-        drawRoundedRectPath(ctx, 88, 1045, 848, 94, 47);
-        ctx.fill();
-        ctx.stroke();
-        ctx.restore();
-      }
-
+      const elapsed = (performance.now() - shakeStartTime) / 1000;
+      const easeProgress = 1 - Math.pow(1 - arrowProgress, 3);
+      const currentArrowRot = easeProgress * (Math.PI / 4);
+      drawBackFace(ctx, w, h, hoveredTarget, elapsed, currentArrowRot);
       backTexture.needsUpdate = true;
     };
 
@@ -1143,7 +1402,7 @@ const Lanyard = ({
         backTexture.dispose();
       }
       paintFace(frontCanvas, images.front, color, s.imageFit, true);
-      paintFace(backCanvas, images.back || images.front, color, s.imageFit, false);
+      updateBackCanvas();
       frontTexture.needsUpdate = true;
       backTexture.needsUpdate = true;
       start();
@@ -1400,11 +1659,21 @@ const Lanyard = ({
         placeHanging(sim, layout, false);
       }
       render();
-      const isShaking = hoveredTarget && !hoveredTarget.isButton && (performance.now() - shakeStartTime < 650);
-      if (isShaking) {
+      const isShaking = hoveredTarget && !hoveredTarget.isButton && (performance.now() - shakeStartTime < 700);
+      const isButtonHovered = hoveredTarget && hoveredTarget.isButton;
+      const targetArrowProgress = isButtonHovered ? 1 : 0;
+      const arrowSpeed = 8;
+      const prevArrowProgress = arrowProgress;
+      if (arrowProgress < targetArrowProgress) {
+        arrowProgress = Math.min(targetArrowProgress, arrowProgress + dt * arrowSpeed);
+      } else if (arrowProgress > targetArrowProgress) {
+        arrowProgress = Math.max(targetArrowProgress, arrowProgress - dt * arrowSpeed);
+      }
+      const isArrowAnimating = Math.abs(arrowProgress - targetArrowProgress) > 0.001 || (arrowProgress > 0 && !isButtonHovered);
+      if (isShaking || isButtonHovered || isArrowAnimating || (prevArrowProgress !== arrowProgress)) {
         updateBackCanvas();
       }
-      const resting = sim.calm > 1.2 && !sim.grab && current.breeze === 0 && !isShaking;
+      const resting = sim.calm > 1.2 && !sim.grab && current.breeze === 0 && !isShaking && !isButtonHovered && !isArrowAnimating;
       if (visible && !resting) raf = requestAnimationFrame(tick);
     };
 
@@ -1483,7 +1752,7 @@ const Lanyard = ({
       const target = hit ? getBackTarget(hit) : null;
       if (target?.id !== hoveredTarget?.id) {
         hoveredTarget = target;
-        if (target && !target.isButton) {
+        if (target) {
           shakeStartTime = performance.now();
         }
         updateBackCanvas();
@@ -1539,7 +1808,7 @@ const Lanyard = ({
       const target = hit ? getBackTarget(hit) : null;
       if (target?.id !== hoveredTarget?.id) {
         hoveredTarget = target;
-        if (target && !target.isButton) {
+        if (target) {
           shakeStartTime = performance.now();
         }
         updateBackCanvas();

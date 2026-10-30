@@ -86,7 +86,7 @@ export function HeroLanyard() {
         orientation="portrait"
         finish="matte"
         cornerRadius={0.3}
-        size={isDesktop ? 0.45 : 0.60}
+        size={isDesktop ? 0.38 : 0.50}
         anchor={anchor}
         strapLength={0.42}
         strapColor="#f5643e"

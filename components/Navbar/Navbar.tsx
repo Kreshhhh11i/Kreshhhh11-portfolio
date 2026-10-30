@@ -1,12 +1,9 @@
 "use client";
 
-import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { NAV, NavItem } from "@/lib/nav-config";
 import "./Navbar.css";
-
-const useIsomorphicLayoutEffect =
-  typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
 const OPEN_CLOSE_EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -68,8 +65,8 @@ export function Navbar() {
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const isThemeTransitioningRef = useRef<boolean>(false);
 
-  // Synchronous pre-paint setup: initialize theme, clock, active section, compact state & progress
-  useIsomorphicLayoutEffect(() => {
+  // Initial client setup: sync theme, clock, active section, compact state & progress
+  useEffect(() => {
     setMounted(true);
 
     // Initial theme sync
@@ -491,6 +488,7 @@ export function Navbar() {
       <div className="nav-wrap">
         <nav
           className={`nav ${!isExpanded ? "compact" : ""}`}
+          suppressHydrationWarning
           aria-label="Main"
           ref={navRef}
           onMouseEnter={handleMouseEnterNav}
@@ -522,6 +520,7 @@ export function Navbar() {
             <motion.span
               className="brand-branch-wrap"
               initial={false}
+              suppressHydrationWarning
               animate={{
                 width: isExpanded ? branchWidth : 0,
                 opacity: isExpanded ? 0.55 : 0,
@@ -582,6 +581,7 @@ export function Navbar() {
                     <motion.span
                       className="label-wrap"
                       initial={false}
+                      suppressHydrationWarning
                       animate={{
                         width: showLabel ? targetWidth : 0,
                         opacity: showLabel ? 1 : 0,
@@ -616,6 +616,7 @@ export function Navbar() {
                   {!isLast && (
                     <motion.span
                       className="seg"
+                      suppressHydrationWarning
                       animate={{ width: isExpanded ? 28 : 14 }}
                       transition={
                         animationsReady
