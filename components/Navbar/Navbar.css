@@ -534,62 +534,77 @@ html:not([data-nav-ready])[data-nav-active="contact"] .step[data-id="playground"
 /* Phone Layout (<= 760px) */
 @media (max-width: 760px) {
   .nav-wrap {
-    top: auto;
-    bottom: max(12px, env(safe-area-inset-bottom));
-    padding: 0 12px;
+    top: max(14px, env(safe-area-inset-top));
+    bottom: auto;
+    padding: 0 10px;
+    z-index: 50;
   }
 
   .nav {
-    width: 100%;
-    height: 58px;
-    gap: 4px;
+    width: auto;
+    max-width: calc(100vw - 20px);
+    height: 48px;
+    gap: 6px;
     padding: 0 8px 0 6px;
   }
 
-  .brand,
-  .clock,
+  .brand {
+    display: flex;
+    height: 32px;
+    padding: 0 8px;
+    font-size: 12px;
+    gap: 4px;
+  }
+
+  .brand-icon {
+    width: 12px;
+    height: 12px;
+    margin-right: 4px;
+  }
+
+  .brand-branch-wrap {
+    display: none;
+  }
+
+  .clock {
+    display: none;
+  }
+
   .tip {
-    display: none !important;
+    display: none;
   }
 
   .tools {
-    border-left: none;
-    padding-left: 0;
+    border-left: 1px solid var(--line);
+    padding-left: 6px;
+  }
+
+  .theme {
+    width: 32px;
+    height: 32px;
   }
 
   .graph {
-    flex: 1;
-    min-width: 0;
+    flex: none;
+    display: flex;
+    align-items: center;
+    gap: 0;
   }
 
   .step:not(:last-child) {
-    flex: 1 1 auto;
-    min-width: 0;
+    flex: none;
   }
 
   .step:last-child {
-    flex: 0 0 auto;
+    flex: none;
   }
 
   .seg {
-    flex: 1;
-    width: auto;
-    min-width: 4px;
-  }
-
-  .step:not(.is-current) .label-wrap {
-    display: none !important;
-  }
-
-  .step.is-current .label-wrap {
-    display: inline-block !important;
-    width: auto !important;
-    opacity: 1 !important;
-    font-size: 13px;
+    flex: none;
   }
 
   .node {
-    padding: 0 10px;
+    padding: 0 4px;
     position: relative;
   }
 

@@ -177,11 +177,11 @@ export function Hero() {
   };
 
   return (
-    <section className="w-full relative flex flex-col pt-12 md:pt-20">
+    <section className="w-full relative flex flex-col pt-0 lg:pt-20">
       {/* Main Content Split */}
-      <div className="relative z-10 flex-1 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+      <div className="relative z-10 flex-1 grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-12 items-center">
         {/* Left Column (Tagline & Bio) */}
-        <div className={`w-full ${SHOW_LANYARD ? "order-1 lg:order-1" : "order-2 lg:order-1"} flex flex-col items-center lg:items-start text-center lg:text-left gap-6 pt-4 lg:pt-10 pb-4 lg:pb-20 transition-transform duration-[1200ms] ease-[cubic-bezier(0.23,1,0.32,1)] will-change-transform ${isHeroExpanded ? "translate-y-0" : "translate-y-0 lg:translate-y-36 xl:translate-y-48"}`}>
+        <div className={`w-full ${SHOW_LANYARD ? "order-2 lg:order-1" : "order-2 lg:order-1"} flex flex-col items-center lg:items-start text-center lg:text-left gap-4 lg:gap-6 pt-0 lg:pt-10 pb-8 lg:pb-20 transition-transform duration-[1200ms] ease-[cubic-bezier(0.23,1,0.32,1)] will-change-transform ${isHeroExpanded ? "translate-y-0" : "translate-y-0 lg:translate-y-36 xl:translate-y-48"}`}>
           <div className="flex items-center justify-center lg:justify-start gap-2 sm:gap-2.5 flex-nowrap max-w-full">
             <div className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full bg-[var(--background)] border border-[var(--dashed-borders)] text-[11px] sm:text-xs text-[var(--secondary-text)] font-mono shadow-sm shrink-0 whitespace-nowrap">
               <span className="h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-[#f5643e] animate-fade-in-out shrink-0" />
@@ -266,8 +266,8 @@ export function Hero() {
 
         {/* Right Column (Interactive 3D Lanyard or Original Photo & Orbit Effect) */}
         {SHOW_LANYARD ? (
-          <div className="order-2 lg:order-2 relative w-full h-[520px] lg:h-full lg:min-h-[640px] flex items-start justify-center pt-0 overflow-visible lg:-mt-20">
-            <div className="absolute -top-[100px] sm:-top-[115px] lg:-top-[132px] left-0 w-full h-[140%] lg:h-[160%] pointer-events-none overflow-visible">
+          <div className="order-1 lg:order-2 relative w-full h-[390px] sm:h-[430px] lg:h-full lg:min-h-[640px] flex items-start justify-center pt-0 overflow-visible lg:-mt-20">
+            <div className="absolute -top-[36px] sm:-top-[38px] lg:-top-[132px] left-0 w-full h-[140%] lg:h-[160%] pointer-events-none overflow-visible">
               <HeroLanyard />
             </div>
           </div>

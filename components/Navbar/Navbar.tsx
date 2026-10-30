@@ -40,12 +40,13 @@ export function Navbar() {
   const [showToast, setShowToast] = useState<boolean>(false);
   const [isCompact, setIsCompact] = useState<boolean>(false);
   const [isHoverExpanded, setIsHoverExpanded] = useState<boolean>(false);
+  const [isMobile, setIsMobile] = useState<boolean>(false);
 
   // Exact measured widths for continuous, zero-snap animations
   const [labelWidths, setLabelWidths] = useState<number[]>(DEFAULT_LABEL_WIDTHS);
   const [branchWidth, setBranchWidth] = useState<number>(DEFAULT_BRANCH_WIDTH);
 
-  const isExpanded = !isCompact || isHoverExpanded;
+  const isExpanded = !isMobile && (!isCompact || isHoverExpanded);
 
   const navRef = useRef<HTMLElement | null>(null);
   const dotRefs = useRef<(HTMLSpanElement | null)[]>([]);
@@ -68,6 +69,12 @@ export function Navbar() {
   // Initial client setup: sync theme, clock, active section, compact state & progress
   useEffect(() => {
     setMounted(true);
+
+    const updateMobile = () => {
+      setIsMobile(window.innerWidth <= 760);
+    };
+    updateMobile();
+    window.addEventListener("resize", updateMobile);
 
     // Initial theme sync
     const currentTheme =
@@ -124,6 +131,7 @@ export function Navbar() {
     });
 
     return () => {
+      window.removeEventListener("resize", updateMobile);
       cancelAnimationFrame(frameId1);
       cancelAnimationFrame(frameId2);
     };
@@ -617,7 +625,7 @@ export function Navbar() {
                     <motion.span
                       className="seg"
                       suppressHydrationWarning
-                      animate={{ width: isExpanded ? 28 : 14 }}
+                      animate={{ width: isExpanded ? 28 : (isMobile ? 12 : 14) }}
                       transition={
                         animationsReady
                           ? {
