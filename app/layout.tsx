@@ -39,7 +39,7 @@ export default function RootLayout({
       <head>
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem("portfolio-theme")||"dark";document.documentElement.setAttribute("data-theme",t);if(t==="light")document.documentElement.classList.add("light");else document.documentElement.classList.remove("light");var isMobile=window.innerWidth<=760;if(isMobile)document.documentElement.setAttribute("data-mobile","true");var c=sessionStorage.getItem("nav:compact");var isCompact=isMobile||(c!==null?(c==="true"||c==="1"):(window.scrollY>80));document.documentElement.setAttribute("data-nav",isCompact?"compact":"expanded");var a=sessionStorage.getItem("nav:active");document.documentElement.setAttribute("data-nav-active",a||"home");}catch(e){}})();`,
+            __html: `(function(){try{var t=localStorage.getItem("portfolio-theme")||"dark";document.documentElement.setAttribute("data-theme",t);if(t==="light")document.documentElement.classList.add("light");else document.documentElement.classList.remove("light");var isMobile=window.innerWidth<=1000;if(isMobile)document.documentElement.setAttribute("data-mobile","true");var c=sessionStorage.getItem("nav:compact");var isCompact=isMobile||(c!==null?(c==="true"||c==="1"):(window.scrollY>80));document.documentElement.setAttribute("data-nav",isCompact?"compact":"expanded");var a=sessionStorage.getItem("nav:active");document.documentElement.setAttribute("data-nav-active",a||"home");}catch(e){}})();`,
           }}
         />
       </head>

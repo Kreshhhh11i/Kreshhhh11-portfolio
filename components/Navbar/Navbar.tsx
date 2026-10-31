@@ -42,7 +42,13 @@ export function Navbar() {
   const [isHoverExpanded, setIsHoverExpanded] = useState<boolean>(false);
   const [isMobile, setIsMobile] = useState<boolean>(() => {
     if (typeof window !== "undefined") {
-      return window.innerWidth <= 760;
+      return window.innerWidth <= 1000;
+    }
+    return false;
+  });
+  const [isSmallMobile, setIsSmallMobile] = useState<boolean>(() => {
+    if (typeof window !== "undefined") {
+      return window.innerWidth <= 360;
     }
     return false;
   });
@@ -76,7 +82,9 @@ export function Navbar() {
     setMounted(true);
 
     const updateMobile = () => {
-      setIsMobile(window.innerWidth <= 760);
+      const w = window.innerWidth;
+      setIsMobile(w <= 1000);
+      setIsSmallMobile(w <= 360);
     };
     updateMobile();
     window.addEventListener("resize", updateMobile);
@@ -565,7 +573,9 @@ export function Navbar() {
               const isPassed = currentIdx > index;
               const isLast = index === NAV.length - 1;
               const showLabel = isExpanded || isCurrent;
-              const targetWidth = isCurrent ? CURRENT_LABEL_WIDTHS[index] : (labelWidths[index] || DEFAULT_LABEL_WIDTHS[index]);
+              const targetWidth = isCurrent
+                ? (isSmallMobile && item.id === "playground" ? 36 : CURRENT_LABEL_WIDTHS[index])
+                : (labelWidths[index] || DEFAULT_LABEL_WIDTHS[index]);
 
               return (
                 <li
@@ -616,7 +626,14 @@ export function Navbar() {
                           textRefs.current[index] = el;
                         }}
                       >
-                        {item.label}
+                        {item.id === "playground" ? (
+                          <>
+                            <span className="label-full">{item.label}</span>
+                            <span className="label-short">Play</span>
+                          </>
+                        ) : (
+                          item.label
+                        )}
                       </span>
                     </motion.span>
 
@@ -630,7 +647,7 @@ export function Navbar() {
                     <motion.span
                       className="seg"
                       suppressHydrationWarning
-                      animate={{ width: isExpanded ? 28 : (isMobile ? 12 : 14) }}
+                      animate={{ width: isExpanded ? 28 : (isSmallMobile ? 8 : (isMobile ? 12 : 14)) }}
                       transition={
                         animationsReady
                           ? {

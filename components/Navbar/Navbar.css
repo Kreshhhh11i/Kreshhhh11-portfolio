@@ -178,7 +178,7 @@ html:not([data-nav-ready]) .brand-branch-wrap {
   transform: translateZ(0);
 }
 
-@media (min-width: 761px) {
+@media (min-width: 1001px) {
   html:not([data-nav-ready]) .step[data-id="home"] .label-wrap { width: 47px; }
   html:not([data-nav-ready]) .step[data-id="exp"] .label-wrap { width: 33px; }
   html:not([data-nav-ready]) .step[data-id="projects"] .label-wrap { width: 63px; }
@@ -410,8 +410,8 @@ html:not([data-nav-ready]) .seg {
   opacity: 0 !important;
 }
 
-/* Compact Mode (Desktop & Tablet screens > 760px) */
-@media (min-width: 761px) {
+/* Compact Mode (Desktop screens > 1000px) */
+@media (min-width: 1001px) {
   .nav.compact,
   html:not([data-nav-ready])[data-nav="compact"] .nav {
     padding: 0 12px 0 8px;
@@ -527,14 +527,14 @@ html:not([data-nav-ready])[data-nav-active="contact"] .step[data-id="playground"
   font-weight: 600;
 }
 
-@media (min-width: 761px) {
+@media (min-width: 1001px) {
   .toast {
     display: none !important;
   }
 }
 
-/* Phone Layout (<= 760px) */
-@media (max-width: 760px) {
+/* Mobile & Tablet Layout (<= 1000px) */
+@media (max-width: 1000px) {
   /* Pre-hydration & first paint rules for mobile (<= 760px) */
   html:not([data-nav-ready]) .nav .step .label-wrap {
     width: 0px !important;
@@ -638,6 +638,65 @@ html:not([data-nav-ready])[data-nav-active="contact"] .step[data-id="playground"
     position: absolute;
     inset: -6px 0;
     min-height: 44px;
+  }
+}
+
+.label-short {
+  display: none;
+}
+
+@media (max-width: 440px) {
+  .nav {
+    padding: 0 6px !important;
+    gap: 4px !important;
+  }
+  .node {
+    padding: 0 3px !important;
+  }
+}
+
+/* Small Mobile (<= 400px): Remove Kresh11 to ensure enough space for all circles and theme icon */
+@media (max-width: 400px) {
+  .brand {
+    display: none !important;
+  }
+
+  .nav {
+    padding: 0 6px !important;
+    gap: 4px !important;
+  }
+
+  .tools {
+    padding-left: 4px !important;
+  }
+
+  .seg {
+    width: 8px !important;
+  }
+
+  .node {
+    padding: 0 2px !important;
+  }
+
+  .label-text {
+    font-size: 13px !important;
+    padding-left: 6px !important;
+  }
+}
+
+/* Ultra-compact mobile (<= 360px): Use short label 'Play' for playground */
+@media (max-width: 360px) {
+  .label-full {
+    display: none !important;
+  }
+
+  .label-short {
+    display: inline !important;
+  }
+
+  .step[data-id="playground"].is-current .label-wrap,
+  html:not([data-nav-ready])[data-nav-active="playground"] .nav .step[data-id="playground"] .label-wrap {
+    width: 36px !important;
   }
 }
 
