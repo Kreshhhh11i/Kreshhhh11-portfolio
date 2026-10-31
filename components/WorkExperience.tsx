@@ -4,30 +4,44 @@ import React, { useState, useEffect } from "react";
 import { experiences } from "@/data/experience";
 import "./WorkExperience.css";
 
-export function WorkExperience() {
+export interface WorkExperienceProps {
+  hideLabel?: boolean;
+  isOpen?: boolean;
+  onToggle?: () => void;
+}
+
+export function WorkExperience({ hideLabel, isOpen: controlledIsOpen, onToggle }: WorkExperienceProps = {}) {
   // First item open by default on desktop; on mobile (<= 560px) start collapsed
-  const [openIndexes, setOpenIndexes] = useState<number[]>([0]);
+  const [internalOpenIndexes, setInternalOpenIndexes] = useState<number[]>([0]);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
   useEffect(() => {
     if (typeof window !== "undefined" && window.innerWidth <= 560) {
-      setOpenIndexes([]);
+      setInternalOpenIndexes([]);
     }
   }, []);
 
+  const isControlled = typeof controlledIsOpen === "boolean";
+
   const toggleIndex = (index: number) => {
-    setOpenIndexes((prev) =>
-      prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index]
-    );
+    if (isControlled && onToggle) {
+      onToggle();
+    } else {
+      setInternalOpenIndexes((prev) =>
+        prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index]
+      );
+    }
   };
 
   return (
     <div className="work-experience-section">
       {/* 1. Section Label */}
-      <div className="exp-section-label">
-        <span className="exp-label-prefix">02 / EXP</span>
-        <span>Work Experience</span>
-      </div>
+      {!hideLabel && (
+        <div className="exp-section-label">
+          <span className="exp-label-prefix">02 / EXP</span>
+          <span>Work Experience</span>
+        </div>
+      )}
 
       {/* 2. Timeline Wrapper */}
       <div className="exp-timeline-wrapper">
@@ -36,7 +50,7 @@ export function WorkExperience() {
 
         {/* 3. Timeline Items */}
         {experiences.map((exp, index) => {
-          const isOpen = openIndexes.includes(index);
+          const isOpen = isControlled ? Boolean(controlledIsOpen) : internalOpenIndexes.includes(index);
           const isHovered = hoveredIndex === index;
           const headerId = `exp-header-${index}`;
           const contentId = `exp-content-${index}`;
@@ -112,30 +126,37 @@ export function WorkExperience() {
                   <div className="exp-middle-block">
                     <div className="exp-company-row">
                       <span className="exp-company-name">{exp.company}</span>
-                      <span className="exp-branch-chip">⎇ {exp.branch}</span>
+                      <span className="exp-branch-chip">
+                        ⎇ {exp.branch || "feat/prompt"}
+                      </span>
                     </div>
-                    <span className="exp-role-title">{exp.role}</span>
+                    <div className="exp-role-row">
+                      <span className="exp-role-title">{exp.role}</span>
+                      <span className="exp-date-inline font-mono text-[11px] text-[var(--mute)]">
+                        &bull; {exp.start} &mdash; {exp.end}
+                      </span>
+                    </div>
                   </div>
 
-                  {/* Date "{start} — {end}" (Hidden under 560px) */}
-                  <span className="exp-date-text">
-                    {exp.start} &mdash; {exp.end}
-                  </span>
-
-                  {/* Chevron Button (28x28) */}
-                  <div className="exp-chevron-box" aria-hidden="true">
-                    <svg
-                      width="12"
-                      height="12"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.6"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <polyline points="6 9 12 15 18 9" />
-                    </svg>
+                  {/* Right Meta: Date (wide desktop) + Chevron */}
+                  <div className="exp-header-right">
+                    <span className="exp-date-desktop">
+                      {exp.start} &mdash; {exp.end}
+                    </span>
+                    <div className="exp-chevron-box" aria-hidden="true">
+                      <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.8"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <polyline points="6 9 12 15 18 9" />
+                      </svg>
+                    </div>
                   </div>
                 </button>
 
@@ -147,7 +168,7 @@ export function WorkExperience() {
                   className="exp-content-grid"
                 >
                   <div className="exp-content-inner">
-                    <div className="exp-content-body">
+                    <div className="exp-content-body min-h-[148px] flex flex-col justify-between">
                       {/* Bullet List with "+" Prefix */}
                       <ul className="exp-bullet-list">
                         {exp.points.map((point, pIdx) => (

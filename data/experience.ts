@@ -6,6 +6,7 @@ export type Experience = {
   start: string;
   end: string;
   branch: string;
+  shortBranch?: string;
   points: string[];
   stack: string[];
 };
@@ -18,7 +19,8 @@ export const experiences: Experience[] = [
     role: "AI Prompt Engineer Intern",
     start: "Jun 2026",
     end: "Jun 2026",
-    branch: "feat/prompt-engineering",
+    branch: "feat/prompt",
+    shortBranch: "feat/prompt",
     points: [
       "Designed, tested and refined prompts for a range of AI applications.",
       "Created structured prompts and analyzed AI-generated responses for accuracy and relevance.",

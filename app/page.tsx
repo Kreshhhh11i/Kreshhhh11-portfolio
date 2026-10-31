@@ -1,7 +1,6 @@
 import { Hero } from "@/components/hero/hero";
-import { GitHubHeatmap } from "@/components/github/heatmap";
 import { PhotographyShowcase } from "@/components/photography/photography-showcase";
-import { WorkExperience } from "@/components/WorkExperience";
+import { ExperienceSection } from "@/components/experience/ExperienceSection";
 
 export default function Home() {
   return (
@@ -15,11 +14,11 @@ export default function Home() {
         {/* Section: Experience */}
         <section id="experience" className="scroll-mt-24 w-full relative z-10">
           <div id="exp" className="absolute -top-24 pointer-events-none" />
-          <WorkExperience />
+          <ExperienceSection />
         </section>
 
         {/* Section: Projects (also aliased as work) */}
-        <section id="projects" className="scroll-mt-24 w-full flex flex-col gap-6 relative">
+        <section id="projects" className="scroll-mt-24 w-full flex flex-col gap-6 relative transition-all duration-300">
           <div id="work" className="absolute -top-24 pointer-events-none" />
           <div className="flex items-center justify-between border-b border-[var(--line)] border-dashed pb-3">
             <div className="flex items-center gap-3">
@@ -109,8 +108,7 @@ export default function Home() {
             <span className="font-mono text-xs text-[var(--muted)] hidden sm:inline">lab: interactive space</span>
           </div>
 
-          <div className="w-full grid grid-cols-1 xl:grid-cols-2 gap-8 items-start">
-            <GitHubHeatmap />
+          <div className="w-full">
             <PhotographyShowcase />
           </div>
         </section>
