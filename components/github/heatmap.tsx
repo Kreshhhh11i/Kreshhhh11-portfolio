@@ -56,16 +56,10 @@ export function GitHubHeatmap({ isOpen: controlledIsOpen, onToggle }: GitHubHeat
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [activeCell, setActiveCell] = useState<{ count: number; date: string; x: number; y: number } | null>(null);
-  const [internalIsOpen, setInternalIsOpen] = useState<boolean>(true);
+  const [internalIsOpen, setInternalIsOpen] = useState<boolean>(false);
   const [isHovered, setIsHovered] = useState(false);
   const tooltipRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (typeof window !== "undefined" && window.innerWidth <= 560) {
-      setInternalIsOpen(false);
-    }
-  }, []);
 
   const isControlled = typeof controlledIsOpen === "boolean";
   const isOpen = isControlled ? controlledIsOpen : internalIsOpen;

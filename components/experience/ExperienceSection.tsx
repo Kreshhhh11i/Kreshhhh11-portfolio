@@ -5,9 +5,8 @@ import { WorkExperience } from "@/components/WorkExperience";
 import { GitHubHeatmap } from "@/components/github/heatmap";
 
 export function ExperienceSection() {
-  // Desktop: open by default
-  // Mobile (<= 1000px): collapsed by default
-  const [isDesktopExpanded, setIsDesktopExpanded] = useState(true);
+  // Initially shrinked / collapsed by default
+  const [isDesktopExpanded, setIsDesktopExpanded] = useState(false);
   const [isWorkMobileOpen, setIsWorkMobileOpen] = useState(false);
   const [isGitMobileOpen, setIsGitMobileOpen] = useState(false);
   const [isDesktop, setIsDesktop] = useState(true);

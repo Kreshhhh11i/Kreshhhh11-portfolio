@@ -11,15 +11,9 @@ export interface WorkExperienceProps {
 }
 
 export function WorkExperience({ hideLabel, isOpen: controlledIsOpen, onToggle }: WorkExperienceProps = {}) {
-  // First item open by default on desktop; on mobile (<= 560px) start collapsed
-  const [internalOpenIndexes, setInternalOpenIndexes] = useState<number[]>([0]);
+  // Start shrinked/collapsed by default
+  const [internalOpenIndexes, setInternalOpenIndexes] = useState<number[]>([]);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
-
-  useEffect(() => {
-    if (typeof window !== "undefined" && window.innerWidth <= 560) {
-      setInternalOpenIndexes([]);
-    }
-  }, []);
 
   const isControlled = typeof controlledIsOpen === "boolean";
 
@@ -65,7 +59,7 @@ export function WorkExperience({ hideLabel, isOpen: controlledIsOpen, onToggle }
 
               {/* Card Container with Corner Brackets & GitHub Heatmap Glow */}
               <div
-                className={`exp-card group ${
+                className={`exp-card group ${isOpen ? "is-open" : ""} ${
                   isHovered
                     ? "is-hovered border-[var(--primary-text)] shadow-[0_0_24px_rgba(246,237,220,0.12)]"
                     : "border-[var(--line)]"

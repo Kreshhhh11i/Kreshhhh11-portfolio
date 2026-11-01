@@ -521,6 +521,7 @@ export function Navbar() {
             href="#home"
             onClick={handleBrandClick}
             aria-label="Kresh11 Home"
+            suppressHydrationWarning
           >
             <svg
               className="brand-icon"
@@ -531,6 +532,7 @@ export function Navbar() {
               strokeLinecap="round"
               strokeLinejoin="round"
               aria-hidden="true"
+              suppressHydrationWarning
             >
               <circle cx="160" cy="96" r="48" />
               <circle cx="160" cy="416" r="48" />
@@ -596,7 +598,7 @@ export function Navbar() {
                       }}
                       aria-hidden="true"
                     >
-                      <svg className="tick" viewBox="0 0 12 12" aria-hidden="true">
+                      <svg className="tick" viewBox="0 0 12 12" aria-hidden="true" suppressHydrationWarning>
                         <path d="M3.2 6.3l2 2 3.6-4.2" />
                       </svg>
                     </span>
@@ -697,6 +699,7 @@ export function Navbar() {
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   aria-hidden="true"
+                  suppressHydrationWarning
                 >
                   <circle cx="12" cy="12" r="5" />
                   <line x1="12" y1="1" x2="12" y2="3" />
@@ -719,6 +722,7 @@ export function Navbar() {
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   aria-hidden="true"
+                  suppressHydrationWarning
                 >
                   <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
                 </svg>
