@@ -276,7 +276,7 @@ export function GitHubHeatmap({ isOpen: controlledIsOpen, onToggle }: GitHubHeat
             </div>
 
             {/* 5 GitHub style boxes as shown in Image 2 */}
-            <div className="flex items-center gap-[3px]" aria-hidden="true">
+            <div className="github-preview-boxes flex items-center gap-[3px]" aria-hidden="true">
               {GITHUB_STYLE_BOXES.map((boxClass, idx) => (
                 <div
                   key={idx}

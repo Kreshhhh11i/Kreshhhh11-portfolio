@@ -321,8 +321,23 @@
   }
 }
 
-/* For screens < 425px: keep feat text below the Virdhi title */
-@media (max-width: 424px) {
+/* GitHub Heatmap Header Preview Boxes:
+   Hidden on small mobile (< 350px) so contributions text aligns vertically to the container without wrapping.
+   Visible on >= 350px. */
+@media (max-width: 349px) {
+  .github-preview-boxes {
+    display: none !important;
+  }
+}
+
+@media (min-width: 350px) {
+  .github-preview-boxes {
+    display: flex !important;
+  }
+}
+
+/* For screens <= 465px: keep feat text below the Virdhi title to prevent interrupting the dropdown arrow */
+@media (max-width: 465px) {
   .exp-company-row {
     flex-direction: column !important;
     align-items: flex-start !important;
@@ -330,8 +345,8 @@
   }
 }
 
-/* For screens >= 425px: keep feat text beside the Virdhi title */
-@media (min-width: 425px) {
+/* For screens > 465px: keep feat text beside the Virdhi title */
+@media (min-width: 466px) {
   .exp-company-row {
     flex-direction: row !important;
     align-items: center !important;
