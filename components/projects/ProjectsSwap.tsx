@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import Image from "next/image";
 import CardSwap, { Card } from "@/components/CardSwap/CardSwap";
+import ProjectTimeBar from "./ProjectTimeBar";
 import { projects } from "@/data/projects";
 import "./ProjectsSwap.css";
 
@@ -16,9 +17,7 @@ interface CardDimensions {
 
 export default function ProjectsSwap() {
   const [active, setActive] = useState(0);
-  const [fillKey, setFillKey] = useState(0);
   const [isPointerHovered, setIsPointerHovered] = useState(false);
-  const [isTimeBarHovered, setIsTimeBarHovered] = useState(false);
   const [isTabVisible, setIsTabVisible] = useState(true);
   const [isSectionVisible, setIsSectionVisible] = useState(true);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
@@ -140,10 +139,12 @@ export default function ProjectsSwap() {
     };
   }, []);
 
-  // Pager jump handler
-  const handlePagerClick = useCallback(
+  // Handler for selecting a project (via time bar click or timer advance)
+  const handleSelectProject = useCallback(
     (targetIndex: number) => {
-      if (jumpInProgressRef.current || targetIndex === active) return;
+      setActive(targetIndex);
+
+      if (jumpInProgressRef.current) return;
       jumpInProgressRef.current = true;
       jumpTimeoutsRef.current.forEach(clearTimeout);
       jumpTimeoutsRef.current = [];
@@ -157,7 +158,7 @@ export default function ProjectsSwap() {
           if (i === steps - 1) {
             jumpInProgressRef.current = false;
           }
-        }, i * 170);
+        }, i * 160);
         jumpTimeoutsRef.current.push(t);
       }
     },
@@ -165,12 +166,6 @@ export default function ProjectsSwap() {
   );
 
   const currentProject = projects[active] ?? projects[0];
-
-  // Pause state for pager progress animation
-  // Pauses while pointer is hovering card, time bar, or when tab/section is not visible.
-  // Note: Unhovering does NOT reset the elapsed time — it resumes seamlessly.
-  const isAnimationPaused =
-    isPointerHovered || isTimeBarHovered || !isTabVisible || !isSectionVisible;
 
   // Status chip styles
   const statusColors: Record<string, { text: string; border: string }> = {
@@ -332,8 +327,8 @@ export default function ProjectsSwap() {
             skewAmount={6}
             visibleCards={3}
             delay={5200}
-            autoplay={!prefersReducedMotion}
-            pauseOnHover
+            autoplay={false}
+            pauseOnHover={false}
             draggable
             speed={1}
             bounce={0.35}
@@ -345,7 +340,6 @@ export default function ProjectsSwap() {
             theme="dark"
             onChange={(i) => {
               setActive(i);
-              setFillKey((k) => k + 1);
             }}
             className="projects-swap"
           >
@@ -547,42 +541,15 @@ export default function ProjectsSwap() {
         </div>
       </div>
 
-      {/* 5. Project Time Bar (Pager) - Centered at bottom, reactable & expanding on hover */}
-      <div
-        className="w-full flex items-center justify-center gap-2 mt-5 lg:mt-8 pt-1"
-        onPointerEnter={() => setIsTimeBarHovered(true)}
-        onPointerLeave={() => setIsTimeBarHovered(false)}
-      >
-        {projects.map((_, idx) => {
-          const isActive = idx === active;
-          return (
-            <button
-              key={idx}
-              type="button"
-              onClick={() => handlePagerClick(idx)}
-              aria-label={`Show project ${idx + 1}`}
-              className={`time-bar-btn ${isActive ? "is-active" : ""}`}
-            >
-              <div
-                className={`time-bar-track ${
-                  isActive
-                    ? "w-[44px] sm:w-[52px]"
-                    : "w-[24px] sm:w-[28px] hover:w-[32px] sm:hover:w-[36px]"
-                }`}
-              >
-                {isActive && (
-                  <span
-                    key={fillKey}
-                    className="pager-fill"
-                    style={{
-                      animationPlayState: isAnimationPaused ? "paused" : "running",
-                    }}
-                  />
-                )}
-              </div>
-            </button>
-          );
-        })}
+      {/* 5. Project Time Bar Component */}
+      <div className="w-full mt-5 lg:mt-7">
+        <ProjectTimeBar
+          projects={projects}
+          activeIndex={active}
+          onSelect={handleSelectProject}
+          duration={5200}
+          paused={!isTabVisible || !isSectionVisible}
+        />
       </div>
     </div>
   );

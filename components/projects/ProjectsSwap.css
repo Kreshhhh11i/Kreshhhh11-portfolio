@@ -58,58 +58,7 @@
   }
 }
 
-.pager-fill {
-  display: block;
-  width: 100%;
-  height: 100%;
-  background: #f5643e;
-  transform-origin: left;
-  animation: progressFillLinear 5200ms linear forwards;
-}
 
-@media (prefers-reduced-motion: reduce) {
-  .pager-fill {
-    animation: none !important;
-    transform: scaleX(1) !important;
-  }
-}
-
-/* Reactable time bar pager segments */
-.time-bar-btn {
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  padding: 0 4px;
-}
-
-.time-bar-track {
-  height: 4px;
-  border-radius: 9999px;
-  background: #2a2a2a;
-  transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
-  position: relative;
-  overflow: hidden;
-}
-
-.time-bar-btn:hover .time-bar-track {
-  height: 7px;
-  background: #444;
-  box-shadow: 0 0 12px rgba(245, 100, 62, 0.35);
-}
-
-.time-bar-btn.is-active .time-bar-track {
-  background: #3a3a3a;
-  box-shadow: 0 0 10px rgba(245, 100, 62, 0.2);
-}
-
-.time-bar-btn.is-active:hover .time-bar-track {
-  height: 7px;
-  box-shadow: 0 0 14px rgba(245, 100, 62, 0.55);
-}
 
 /* ==========================================================================
    Project Action Buttons (View Project & GitHub)
