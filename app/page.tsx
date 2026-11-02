@@ -1,6 +1,7 @@
 import { Hero } from "@/components/hero/hero";
 import { PhotographyShowcase } from "@/components/photography/photography-showcase";
 import { ExperienceSection } from "@/components/experience/ExperienceSection";
+import ProjectsSwap from "@/components/projects/ProjectsSwap";
 
 export default function Home() {
   return (
@@ -30,43 +31,7 @@ export default function Home() {
             <span className="font-mono text-xs text-[var(--muted)] hidden sm:inline">feat: things I shipped</span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="p-6 border border-[var(--line)] border-dashed rounded-sm bg-[var(--panel)]/40 hover:border-[var(--muted)] transition-colors flex flex-col justify-between gap-4">
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center justify-between text-xs font-mono text-[var(--muted)]">
-                  <span>FULL-STACK PERN</span>
-                  <span className="text-[var(--accent)]">ACTIVE</span>
-                </div>
-                <h3 className="text-lg font-bold text-[var(--ink)]">HelpDeskr</h3>
-                <p className="text-sm text-[var(--muted)] leading-relaxed">
-                  Enterprise-grade IT ticketing and support automation platform built with Next.js, Node.js, Express, and PostgreSQL with real-time updates.
-                </p>
-              </div>
-              <div className="flex flex-wrap gap-2 text-[11px] font-mono text-[var(--muted)]">
-                <span className="px-2 py-0.5 border border-[var(--line)] rounded">Next.js</span>
-                <span className="px-2 py-0.5 border border-[var(--line)] rounded">PostgreSQL</span>
-                <span className="px-2 py-0.5 border border-[var(--line)] rounded">Express</span>
-              </div>
-            </div>
-
-            <div className="p-6 border border-[var(--line)] border-dashed rounded-sm bg-[var(--panel)]/40 hover:border-[var(--muted)] transition-colors flex flex-col justify-between gap-4">
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center justify-between text-xs font-mono text-[var(--muted)]">
-                  <span>PERFORMANCE LAB</span>
-                  <span className="text-[var(--accent)]">SHIPPED</span>
-                </div>
-                <h3 className="text-lg font-bold text-[var(--ink)]">Kresh Portfolio</h3>
-                <p className="text-sm text-[var(--muted)] leading-relaxed">
-                  Engineered interactive developer workspace with zero-gravity atom cards, 3D photography ring, Commit Graph navigation, and GitHub telemetry.
-                </p>
-              </div>
-              <div className="flex flex-wrap gap-2 text-[11px] font-mono text-[var(--muted)]">
-                <span className="px-2 py-0.5 border border-[var(--line)] rounded">React 19</span>
-                <span className="px-2 py-0.5 border border-[var(--line)] rounded">Tailwind CSS</span>
-                <span className="px-2 py-0.5 border border-[var(--line)] rounded">TypeScript</span>
-              </div>
-            </div>
-          </div>
+          <ProjectsSwap />
         </section>
 
         {/* Section: Skills (also aliased as stack) */}

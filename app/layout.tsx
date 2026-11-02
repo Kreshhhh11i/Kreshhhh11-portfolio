@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, JetBrains_Mono } from "next/font/google";
+import { Geist, JetBrains_Mono, Allura } from "next/font/google";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -14,6 +14,13 @@ const jetBrainsMono = JetBrains_Mono({
   subsets: ["latin"],
   display: "block",
   preload: true,
+});
+
+const allura = Allura({
+  weight: "400",
+  variable: "--font-allura",
+  subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -34,7 +41,7 @@ export default function RootLayout({
       lang="en"
       data-theme="dark"
       suppressHydrationWarning
-      className={`${geistSans.variable} ${jetBrainsMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${jetBrainsMono.variable} ${allura.variable} h-full antialiased`}
     >
       <head>
         <script
