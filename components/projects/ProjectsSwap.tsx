@@ -46,23 +46,41 @@ export default function ProjectsSwap() {
       const w = stackContainerRef.current.clientWidth;
       const vw = typeof window !== "undefined" ? window.innerWidth : 1200;
 
-      if (vw >= 1440 || w >= 560) {
-        // Desktop / Large screen (increased size)
+      if (vw >= 1680 || w >= 660) {
+        // Ultrawide screen (spacious & bold)
         setCardDimensions({
-          width: 580,
-          height: 400,
-          cardDistance: 54,
-          verticalDistance: 46,
+          width: 630,
+          height: 435,
+          cardDistance: 56,
+          verticalDistance: 48,
+          depth: 110,
+        });
+      } else if (vw >= 1440 || w >= 560) {
+        // Desktop / Large screen (increased size to fill right space)
+        setCardDimensions({
+          width: 590,
+          height: 410,
+          cardDistance: 52,
+          verticalDistance: 45,
           depth: 105,
         });
-      } else if (vw >= 1024 || w >= 420) {
-        // Laptop screen (1024px+) - Generous size so it is clearly visible!
+      } else if (vw >= 1200 || w >= 480) {
+        // Standard Desktop (1200px - 1439px)
         setCardDimensions({
-          width: 500,
-          height: 350,
-          cardDistance: 44,
-          verticalDistance: 38,
-          depth: 90,
+          width: 535,
+          height: 375,
+          cardDistance: 46,
+          verticalDistance: 40,
+          depth: 95,
+        });
+      } else if (vw >= 1024 || w >= 400) {
+        // Laptop screen (1024px+)
+        setCardDimensions({
+          width: 490,
+          height: 345,
+          cardDistance: 42,
+          verticalDistance: 36,
+          depth: 85,
         });
       } else if (w >= 350) {
         // Standard Mobile (e.g. 390px, 425px)
@@ -76,10 +94,10 @@ export default function ProjectsSwap() {
       } else {
         // Tiny Mobile (320px)
         setCardDimensions({
-          width: 310,
-          height: 225,
-          cardDistance: 30,
-          verticalDistance: 26,
+          width: 300,
+          height: 220,
+          cardDistance: 28,
+          verticalDistance: 24,
           depth: 70,
         });
       }
@@ -239,13 +257,13 @@ export default function ProjectsSwap() {
       style={{
         background:
           "radial-gradient(ellipse at 70% 40%, rgba(245,100,62,0.09), transparent 60%) #0c0c0c",
-        padding: "clamp(16px, 2.2vw, 32px)",
+        padding: "clamp(20px, 3.2vw, 48px)",
       }}
     >
       {/* Main Grid: Details on Left, 3D Card Stack on Right */}
-      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,300px)_1fr] xl:grid-cols-[minmax(0,340px)_1fr] gap-[24px] lg:gap-[36px] items-center">
-        {/* Left Column: Project details (Counter, Status, Title, Tech Stack + Buttons beside each other) */}
-        <div className="w-full flex flex-col justify-center items-start text-left">
+      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,340px)_1fr] xl:grid-cols-[1fr_1.15fr] 2xl:grid-cols-2 gap-[32px] lg:gap-[40px] xl:gap-[48px] items-center">
+        {/* Left Column: Project details (Counter, Status, Title, Tech Stack + Buttons) */}
+        <div className="w-full flex flex-col justify-center items-start text-left lg:pl-6 xl:pl-10 2xl:pl-14">
           <div
             key={active}
             className="project-details-content flex flex-col items-start text-left w-full"
@@ -300,10 +318,11 @@ export default function ProjectsSwap() {
           </div>
         </div>
 
-        {/* Right Column: React Bits CardSwap 3D card stack (dynamically larger on desktop) */}
-        <div
-          ref={stackContainerRef}
-          className="relative w-full h-[320px] sm:h-[360px] lg:h-[480px] xl:h-[540px] flex items-center justify-center"
+        {/* Right Column: React Bits CardSwap 3D card stack + Time Bar centered directly below it */}
+        <div className="flex flex-col items-center justify-center w-full">
+          <div
+            ref={stackContainerRef}
+            className="relative w-full h-[300px] sm:h-[350px] lg:h-[480px] xl:h-[530px] 2xl:h-[560px] flex items-center justify-center"
           onPointerOver={(e) => {
             if ((e.target as HTMLElement).closest?.("[data-swap-index]")) {
               setIsPointerHovered(true);
@@ -372,7 +391,7 @@ export default function ProjectsSwap() {
                         sizes="580px"
                         draggable={false}
                       />
-                    ) : p.slug === "helpdeskr" ? (
+                    ) : p.slug === "helpdeskr" || p.slug === "Relay" || idx === 0 ? (
                       /* HelpDeskr Mock Cover */
                       <div className="w-full h-full flex flex-col justify-between p-3.5 sm:p-4 bg-[#0d0d0d] select-none pointer-events-none">
                         <div className="flex items-center justify-between pb-2 border-b border-[#1f1f1f]">
@@ -429,7 +448,7 @@ export default function ProjectsSwap() {
                           </div>
                         </div>
                       </div>
-                    ) : p.slug === "kresh-portfolio" ? (
+                    ) : p.slug === "kresh-portfolio" || p.slug === "Sk-Tailoring" || idx === 1 ? (
                       /* Kresh Portfolio Mock Cover */
                       <div className="w-full h-full relative flex items-center justify-between p-4 sm:p-5 bg-gradient-to-br from-[#121212] via-[#0d0d0d] to-[#080808] select-none pointer-events-none overflow-hidden">
                         <div className="flex flex-col z-10 max-w-[240px] pl-1">
@@ -539,18 +558,19 @@ export default function ProjectsSwap() {
             ))}
           </CardSwap>
         </div>
-      </div>
 
-      {/* 5. Project Time Bar Component */}
-      <div className="w-full mt-5 lg:mt-7">
-        <ProjectTimeBar
-          projects={projects}
-          activeIndex={active}
-          onSelect={handleSelectProject}
-          duration={5200}
-          paused={!isTabVisible || !isSectionVisible}
-        />
+        {/* Time process bar centered directly under the card swap component */}
+        <div className="w-full flex justify-center mt-3 lg:mt-4">
+          <ProjectTimeBar
+            projects={projects}
+            activeIndex={active}
+            onSelect={handleSelectProject}
+            duration={5200}
+            paused={!isTabVisible || !isSectionVisible}
+          />
+        </div>
       </div>
     </div>
-  );
+  </div>
+);
 }
