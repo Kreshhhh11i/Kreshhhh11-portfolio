@@ -2,6 +2,7 @@ import { Hero } from "@/components/hero/hero";
 import { PhotographyShowcase } from "@/components/photography/photography-showcase";
 import { ExperienceSection } from "@/components/experience/ExperienceSection";
 import ProjectsSwap from "@/components/projects/ProjectsSwap";
+import { SkillsArcSection } from "@/components/skills/SkillsArcSection";
 
 export default function Home() {
   return (
@@ -38,26 +39,11 @@ export default function Home() {
         <section id="skills" className="scroll-mt-24 w-full flex flex-col gap-6 relative">
           <div id="stack" className="absolute -top-24 pointer-events-none" />
           <div className="flex items-center justify-between border-b border-[var(--line)] border-dashed pb-3">
-            <div className="flex items-center gap-3">
-              <span className="font-mono text-xs text-[var(--accent)] font-semibold">04 / SKILLS</span>
-              <h2 className="font-sans font-bold text-xl md:text-2xl text-[var(--ink)] tracking-tight">
-                Tools I Reach For
-              </h2>
-            </div>
-            <span className="font-mono text-xs text-[var(--muted)] hidden sm:inline">chore: tools I reach for</span>
+            <span className="font-mono text-xs text-[var(--accent)] font-semibold">04 / SKILLS</span>
+            <span className="font-mono text-xs text-[var(--muted)]">MY TECH STACK / 2026</span>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
-            {["Next.js", "React", "TypeScript", "Node.js", "PostgreSQL", "Tailwind CSS"].map((tech) => (
-              <div
-                key={tech}
-                className="p-4 border border-[var(--line)] border-dashed rounded-sm bg-[var(--panel)]/30 hover:border-[var(--muted)] transition-colors flex flex-col items-center justify-center text-center gap-1.5"
-              >
-                <span className="font-sans font-semibold text-sm text-[var(--ink)]">{tech}</span>
-                <span className="font-mono text-[10px] text-[var(--muted)]">CORE</span>
-              </div>
-            ))}
-          </div>
+          <SkillsArcSection />
         </section>
 
         {/* Section: Playground (also aliased as log) */}
