@@ -75,7 +75,12 @@ export function GitHubHeatmap({ isOpen: controlledIsOpen, onToggle }: GitHubHeat
   // Auto-scroll to the latest weeks (right side) on load for mobile/narrow viewports
   useEffect(() => {
     if (data && scrollContainerRef.current) {
-      scrollContainerRef.current.scrollLeft = scrollContainerRef.current.scrollWidth;
+      const el = scrollContainerRef.current;
+      if (el.scrollWidth > el.clientWidth + 10) {
+        el.scrollLeft = el.scrollWidth;
+      } else {
+        el.scrollLeft = 0;
+      }
     }
   }, [data, isOpen]);
 
@@ -331,30 +336,40 @@ export function GitHubHeatmap({ isOpen: controlledIsOpen, onToggle }: GitHubHeat
                     onScroll={() => setActiveCell(null)}
                     style={{ WebkitOverflowScrolling: "touch" }}
                   >
-                    <div className="flex flex-col gap-2 min-w-max w-fit">
+                    <div className="flex flex-col gap-2.5 w-full min-w-[600px]">
                       {/* Month Labels Row */}
-                      <div className="relative h-4 text-[10px] uppercase tracking-wider min-w-max text-[var(--mute)]">
-                        {filteredMonthLabels.map((label, i) => (
-                          <div
-                            key={i}
-                            className="absolute"
-                            style={{ left: `${label.colIndex * 14}px` }}
-                          >
-                            {label.name}
-                          </div>
-                        ))}
+                      <div className="relative h-4 text-[10px] uppercase tracking-wider w-full text-[var(--mute)]">
+                        {filteredMonthLabels.map((label, i) => {
+                          const isLast = i === filteredMonthLabels.length - 1;
+                          const pct = (label.colIndex / (processedWeeks.length || 53)) * 100;
+
+                          return (
+                            <div
+                              key={i}
+                              className="absolute whitespace-nowrap"
+                              style={isLast ? { right: 0 } : { left: `${pct}%` }}
+                            >
+                              {label.name}
+                            </div>
+                          );
+                        })}
                       </div>
 
                       {/* Heatmap Grid */}
-                      <div className="flex gap-[2px] min-w-max">
+                      <div
+                        className="w-full grid gap-[2px]"
+                        style={{
+                          gridTemplateColumns: `repeat(${processedWeeks.length}, minmax(0, 1fr))`,
+                        }}
+                      >
                         {processedWeeks.map((week, wIdx) => (
-                          <div key={wIdx} className="flex flex-col gap-[2px]">
+                          <div key={wIdx} className="flex flex-col gap-[2px] w-full">
                             {week.contributionDays.map((day, dIdx) => {
                               if (day === null) {
                                 return (
                                   <div
                                     key={`empty-${dIdx}`}
-                                    className="w-[12px] h-[12px] rounded-[1px] bg-transparent pointer-events-none"
+                                    className="w-full aspect-square rounded-[1px] bg-transparent pointer-events-none"
                                   />
                                 );
                               }
@@ -365,7 +380,7 @@ export function GitHubHeatmap({ isOpen: controlledIsOpen, onToggle }: GitHubHeat
                                 <div
                                   key={day.date}
                                   tabIndex={0}
-                                  className={`relative w-[12px] h-[12px] rounded-[1px] transition-all cursor-pointer focus:outline-none ${getLevelColor(
+                                  className={`relative w-full aspect-square rounded-[1px] transition-all cursor-pointer focus:outline-none ${getLevelColor(
                                     day.contributionLevel
                                   )} ${
                                     isActive
