@@ -6,6 +6,7 @@ import {
   ArcCategory,
   SkillArcItem,
   SKILL_ARC_CATEGORIES,
+  CATEGORY_DESCRIPTIONS,
   ALL_SKILLS_RECORD,
   CATEGORY_SKILLS_MAP,
 } from "@/data/skillsArcData";
@@ -108,18 +109,18 @@ export function SkillsArcSection() {
     .filter(Boolean);
 
   const hoveredSkill = hoveredSkillId ? ALL_SKILLS_RECORD[hoveredSkillId] : null;
+  const currentCategoryMeta = CATEGORY_DESCRIPTIONS[activeCategory];
 
   // Viewport breakpoints
   const isMobile = containerWidth < 640;
   const isTablet = containerWidth >= 640 && containerWidth < 1024;
 
-  // Perfectly proportioned tile sizes to guarantee elegant spacing without overlap
-  const tileWidth = isMobile ? 32 : isTablet ? 50 : 62;
-  const tileHeight = isMobile ? 32 : isTablet ? 50 : 62;
-  const iconSize = isMobile ? 17 : isTablet ? 25 : 30;
+  // Perfectly proportioned tile sizes
+  const tileWidth = isMobile ? 34 : isTablet ? 50 : 62;
+  const tileHeight = isMobile ? 34 : isTablet ? 50 : 62;
+  const iconSize = isMobile ? 18 : isTablet ? 25 : 30;
 
-  // Mathematically Accurate Semicircle Radius:
-  // Fitted from the reference image: R = 350px on desktop
+  // Semicircle Radius: R = 350px on desktop
   const radius = isMobile
     ? Math.min(145, (containerWidth - 44) / 2)
     : isTablet
@@ -127,7 +128,6 @@ export function SkillsArcSection() {
     : 350;
 
   // Angular sweep: from 156 deg (left) down to 24 deg (right)
-  // Perfectly symmetric 132 deg sweep with apex at 90 deg
   const sweepStartDeg = 156;
   const sweepEndDeg = 24;
   const totalSweepDeg = sweepStartDeg - sweepEndDeg; // 132 deg
@@ -185,7 +185,7 @@ export function SkillsArcSection() {
           </g>
         </svg>
 
-        {/* Floating Arc of Glowing Technology Tiles */}
+        {/* Floating Arc of Technology Tiles with Curved Tangent Angles & Hover Micro-Interactions */}
         <div className="relative w-full h-full flex justify-center">
           {activeSkills.map((skill, index) => {
             const total = activeSkills.length;
@@ -198,11 +198,10 @@ export function SkillsArcSection() {
             const posX = radius * Math.cos(thetaRad);
             const posY = radius * (1 - Math.sin(thetaRad));
 
-            // Balanced tangent rotation with smooth edge-tapering:
-            // Endpoints (Git/GitHub) and Apex (React) are upright (0 deg), while intermediate tiles tilt naturally
-            const angleDelta = thetaDeg - 90;
-            const edgeTaper = 1 - Math.pow(angleDelta / 66, 2);
-            const rotation = -angleDelta * 0.48 * Math.max(0, edgeTaper);
+            // Tangent curve rotation matching reference image:
+            // 1st image on left is tilted, gradually reaching 0 deg at top center apex, then tilting down to the right
+            const angleDelta = 90 - thetaDeg; // Negative on left (e.g. -66), 0 at apex, Positive on right (e.g. +66)
+            const curveRotation = angleDelta * 0.62; // Smooth natural tangent curvature
 
             const isHovered = hoveredSkillId === skill.id;
             const isAnyHovered = hoveredSkillId !== null;
@@ -213,19 +212,20 @@ export function SkillsArcSection() {
                 layout
                 data-skill-id={skill.id}
                 data-skill-name={skill.name}
-                initial={{ opacity: 0, scale: 0.6, y: posY + 20 }}
+                initial={{ opacity: 0, scale: 0.6, y: posY + 20, rotate: curveRotation }}
                 animate={{
-                  opacity: isAnyHovered && !isHovered ? 0.45 : 1,
-                  scale: isHovered ? 1.15 : 1,
+                  opacity: isAnyHovered && !isHovered ? 0.38 : 1,
+                  scale: isHovered ? 1.2 : isAnyHovered ? 0.96 : 1,
                   x: posX,
-                  y: isHovered ? posY - 8 : posY,
-                  rotate: isHovered ? 0 : rotation,
-                  zIndex: isHovered ? 40 : 10 + index,
+                  y: isHovered ? posY - 10 : posY,
+                  // On hover: smoothly straightens up to 0deg (straight); otherwise maintains curve rotation
+                  rotate: isHovered ? 0 : curveRotation,
+                  zIndex: isHovered ? 50 : 10 + index,
                 }}
                 transition={{
                   type: "spring",
-                  stiffness: 260,
-                  damping: 24,
+                  stiffness: 280,
+                  damping: 22,
                   mass: 0.8,
                 }}
                 onMouseEnter={() => setHoveredSkillId(skill.id)}
@@ -238,34 +238,42 @@ export function SkillsArcSection() {
                   transformOrigin: "center center",
                 }}
               >
-                {/* Localized Brand Glow Layer (radial bloom matching icon color) */}
+                {/* Localized Brand Glow Layer (radial bloom expanding on hover) */}
                 <div
-                  className={`absolute -inset-2.5 sm:-inset-3 rounded-2xl blur-xl transition-all duration-300 pointer-events-none ${
-                    isHovered ? "opacity-100 scale-125" : "opacity-60"
+                  className={`absolute -inset-3 sm:-inset-4 rounded-2xl blur-xl sm:blur-2xl transition-all duration-300 pointer-events-none ${
+                    isHovered ? "opacity-100 scale-135" : "opacity-60"
                   }`}
                   style={{
                     background: `radial-gradient(circle, ${skill.glowColor} 0%, transparent 70%)`,
                   }}
                 />
 
-                {/* Main Dark Squircle Card Tile */}
+                {/* Main Dark Squircle Card Tile with micro-interaction border & shadow bloom */}
                 <div
                   className={`relative w-full h-full rounded-xl sm:rounded-2xl flex items-center justify-center bg-[#171513] transition-all duration-300 ${
                     isHovered
-                      ? "border border-white/50"
-                      : "border border-white/[0.12] hover:border-white/35"
+                      ? "border border-white/60 shadow-[0_16px_36px_-4px_rgba(0,0,0,0.85)]"
+                      : "border border-white/[0.12] hover:border-white/35 shadow-[0_8px_20px_-3px_rgba(0,0,0,0.7)]"
                   }`}
                   style={{
                     boxShadow: isHovered
-                      ? `0 14px 34px -4px ${skill.glowColor}, 0 0 20px 1px ${skill.glowColor}`
+                      ? `0 16px 36px -4px ${skill.glowColor}, 0 0 24px 2px ${skill.glowColor}`
                       : `0 8px 20px -3px rgba(0,0,0,0.7), 0 0 12px -2px ${skill.glowColor}`,
                   }}
                 >
-                  {/* Subtle top specular sheen */}
-                  <div className="absolute inset-x-2 top-0.5 h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none" />
+                  {/* Subtle top specular sheen highlight */}
+                  <div
+                    className={`absolute inset-x-2 top-0.5 h-[1px] bg-gradient-to-r from-transparent ${
+                      isHovered ? "via-white/50" : "via-white/20"
+                    } to-transparent pointer-events-none transition-all duration-300`}
+                  />
 
-                  {/* Icon Component */}
-                  <div className="transition-transform duration-200 transform hover:scale-105 flex items-center justify-center">
+                  {/* Icon Component with subtle scale micro-interaction */}
+                  <div
+                    className={`transition-transform duration-200 transform flex items-center justify-center ${
+                      isHovered ? "scale-110" : "scale-100"
+                    }`}
+                  >
                     <skill.IconComponent size={iconSize} />
                   </div>
                 </div>
@@ -293,7 +301,7 @@ export function SkillsArcSection() {
                 className="flex flex-col items-center"
               >
                 {/* Eyebrow with flanking metallic accent lines */}
-                <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-2.5">
+                <div className="flex items-center gap-2.5 sm:gap-3 mb-2 sm:mb-2.5">
                   <span className="w-5 sm:w-10 h-[1px] bg-gradient-to-r from-transparent to-[#C18B65]/40" />
                   <span className="font-mono text-[8px] sm:text-[10px] md:text-xs uppercase tracking-[0.22em] text-[#A69B88] whitespace-nowrap">
                     {hoveredSkill.tagline.toUpperCase()}
@@ -326,25 +334,26 @@ export function SkillsArcSection() {
                 transition={{ duration: 0.16, ease: [0.16, 1, 0.3, 1] }}
                 className="flex flex-col items-center"
               >
-                {/* Eyebrow with flanking metallic accent lines matching reference image */}
-                <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-2.5">
+                {/* Eyebrow with flanking metallic accent lines */}
+                <div className="flex items-center gap-2.5 sm:gap-3 mb-2 sm:mb-2.5">
                   <span className="w-5 sm:w-10 h-[1px] bg-gradient-to-r from-transparent to-[#C18B65]/40" />
                   <span className="font-mono text-[8px] sm:text-[10px] md:text-xs uppercase tracking-[0.22em] text-[#A69B88] whitespace-nowrap">
-                    TECHNOLOGIES I WORK WITH
+                    {activeCategory === "All"
+                      ? "TECHNOLOGIES I WORK WITH"
+                      : `${activeCategory.toUpperCase()} TECHNOLOGIES`}
                   </span>
                   <span className="w-5 sm:w-10 h-[1px] bg-gradient-to-l from-transparent to-[#C18B65]/40" />
                 </div>
 
-                {/* Main Heading: "My Skills." with terracotta period */}
+                {/* Main Heading dynamically changes to exact category name */}
                 <h2 className="font-sans font-bold text-3xl sm:text-4xl md:text-[44px] leading-tight text-[#F2E9D8] tracking-tight mb-2 sm:mb-3">
-                  My Skills
+                  {currentCategoryMeta?.headline || (activeCategory === "All" ? "My Skills" : activeCategory)}
                   <span className="text-[#A9472D]">.</span>
                 </h2>
 
-                {/* Description matching reference mockup */}
+                {/* Description matching category */}
                 <p className="font-sans text-xs sm:text-sm text-[#A69B88] leading-relaxed">
-                  A collection of technologies I use to build, ship and
-                  <br className="hidden sm:inline" /> bring ideas to life.
+                  {currentCategoryMeta?.subtitle}
                 </p>
               </motion.div>
             )}

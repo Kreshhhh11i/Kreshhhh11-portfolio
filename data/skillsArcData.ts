@@ -72,27 +72,27 @@ export const CATEGORY_DESCRIPTIONS: Record<
       "A collection of technologies I use to build, ship and bring ideas to life.",
   },
   Frontend: {
-    headline: "Frontend Architecture",
+    headline: "Frontend",
     subtitle:
       "Crafting type-safe, accessible user interfaces with concurrent rendering, reactive state machines, and micro-interactions.",
   },
   Backend: {
-    headline: "Backend Services",
+    headline: "Backend",
     subtitle:
       "Designing high-throughput API microservices, WebSocket streams, and secure serverless computing layers.",
   },
   Databases: {
-    headline: "Data Architecture",
+    headline: "Databases",
     subtitle:
       "Structuring relational schemas, indexed query optimizations, realtime CDC pipelines, and sub-millisecond cache layers.",
   },
   DevOps: {
-    headline: "DevOps & Infrastructure",
+    headline: "DevOps",
     subtitle:
       "Automating multi-stage container builds, edge serverless distribution, zero-downtime rollouts, and version control hygiene.",
   },
   Creative: {
-    headline: "Creative Development",
+    headline: "Creative",
     subtitle:
       "Blending creative engineering with WebGL canvas shaders, SVG timeline choreographies, and polished design systems.",
   },
