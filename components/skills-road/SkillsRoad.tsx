@@ -1,0 +1,483 @@
+'use client';
+
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import dynamic from 'next/dynamic';
+import {
+  SKILLS_ROAD_DATA,
+  SkillCategory,
+  CATEGORY_COLORS,
+} from './data';
+import {
+  getClassicGridCoords,
+  generateShuffleGridCoords,
+  coordsToWorldLayout,
+  TileLayoutPoint,
+} from './layouts';
+
+// Dynamic import with SSR false and sleek skeleton fallback
+const Scene = dynamic(() => import('./Scene'), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-full flex flex-col items-center justify-center bg-[#0b0a08] rounded-2xl border border-[var(--line)]">
+      <div className="flex items-center gap-3">
+        <div className="w-4 h-4 rounded-full border-2 border-[var(--accent)] border-t-transparent animate-spin" />
+        <span className="font-mono text-xs text-[var(--muted)] tracking-wider uppercase">
+          Initializing 3D Board Engine...
+        </span>
+      </div>
+    </div>
+  ),
+});
+
+const CATEGORIES: Array<SkillCategory | 'All'> = [
+  'All',
+  'Languages',
+  'Frontend',
+  'Backend',
+  'Databases',
+  'Tools',
+];
+
+export function SkillsRoad() {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Layout mode: 'classic' | 'shuffle'
+  const [layoutMode, setLayoutMode] = useState<'classic' | 'shuffle'>('classic');
+
+  // Precomputed classic & shuffle layouts
+  const classicLayout = useMemo(() => coordsToWorldLayout(getClassicGridCoords()), []);
+  const [shuffleLayout, setShuffleLayout] = useState<TileLayoutPoint[]>(classicLayout);
+
+  useEffect(() => {
+    // Generate initial randomized shuffle layout after mount to satisfy static prerender
+    setShuffleLayout(coordsToWorldLayout(generateShuffleGridCoords()));
+  }, []);
+
+  const currentLayoutPoints = layoutMode === 'classic' ? classicLayout : shuffleLayout;
+
+  // Active category filter
+  const [activeCategory, setActiveCategory] = useState<SkillCategory | 'All'>('All');
+
+  // Token position indices (0 to 36) & movement mode
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [targetIndex, setTargetIndex] = useState(0);
+  const [moveMode, setMoveMode] = useState<'step' | 'jump'>('step');
+
+  // Camera settings
+  const [isFlatView, setIsFlatView] = useState(false);
+  const [rotateOffset, setRotateOffset] = useState(0);
+
+  // Dice rolling state
+  const [isRolling, setIsRolling] = useState(false);
+  const [diceValue, setDiceValue] = useState<number>(1);
+
+  // Viewport & performance
+  const [isInView, setIsInView] = useState(true);
+  const [introStarted, setIntroStarted] = useState(false);
+  const [isReducedMotion, setIsReducedMotion] = useState(false);
+
+  // Reduced motion preference
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const media = window.matchMedia('(prefers-reduced-motion: reduce)');
+      setIsReducedMotion(media.matches);
+      const listener = () => setIsReducedMotion(media.matches);
+      media.addEventListener('change', listener);
+      return () => media.removeEventListener('change', listener);
+    }
+  }, []);
+
+  // IntersectionObserver to pause when offscreen and trigger intro drop-in
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el || typeof IntersectionObserver === 'undefined') return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsInView(entry.isIntersecting);
+        if (entry.isIntersecting && !introStarted) {
+          setIntroStarted(true);
+        }
+      },
+      { threshold: 0.15 }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [introStarted]);
+
+  // Roll the dice handler
+  const rollDice = useCallback(() => {
+    if (isRolling) return;
+    setIsRolling(true);
+    setMoveMode('step');
+
+    // Roll cycle animation
+    let count = 0;
+    const interval = setInterval(() => {
+      setDiceValue(Math.floor(Math.random() * 6) + 1);
+      count++;
+      if (count > 7) {
+        clearInterval(interval);
+        const finalRoll = Math.floor(Math.random() * 6) + 1;
+        setDiceValue(finalRoll);
+        setIsRolling(false);
+
+        // Compute destination
+        setTargetIndex((prev) => {
+          if (activeCategory === 'All') {
+            return Math.min(SKILLS_ROAD_DATA.length - 1, prev + finalRoll);
+          }
+
+          // If category is filtered, jump to the next matching skill tile
+          const matchingIndices: number[] = [];
+          for (let i = prev + 1; i < SKILLS_ROAD_DATA.length; i++) {
+            if (
+              SKILLS_ROAD_DATA[i].category === activeCategory ||
+              SKILLS_ROAD_DATA[i].category === 'Special'
+            ) {
+              matchingIndices.push(i);
+            }
+          }
+
+          if (matchingIndices.length === 0) {
+            return SKILLS_ROAD_DATA.length - 1;
+          }
+
+          const stepsAhead = Math.min(finalRoll - 1, matchingIndices.length - 1);
+          return matchingIndices[stepsAhead];
+        });
+      }
+    }, 60);
+  }, [isRolling, activeCategory]);
+
+  // Step prev / next
+  const stepPrev = useCallback(() => {
+    setMoveMode('step');
+    setTargetIndex((prev) => Math.max(0, prev - 1));
+  }, []);
+
+  const stepNext = useCallback(() => {
+    setMoveMode('step');
+    setTargetIndex((prev) => Math.min(SKILLS_ROAD_DATA.length - 1, prev + 1));
+  }, []);
+
+  // Layout switcher: staggered morph & token returns to start
+  const switchLayout = useCallback(
+    (mode: 'classic' | 'shuffle') => {
+      setMoveMode('jump');
+      if (mode === 'shuffle') {
+        setShuffleLayout(coordsToWorldLayout(generateShuffleGridCoords()));
+      }
+      setLayoutMode(mode);
+      setTargetIndex(0);
+    },
+    []
+  );
+
+  // Keyboard navigation: Space = roll, Left = prev, Right = next
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement)?.tagName)) return;
+
+      if (e.code === 'Space') {
+        e.preventDefault();
+        rollDice();
+      } else if (e.code === 'ArrowLeft' || e.code === 'ArrowDown') {
+        e.preventDefault();
+        stepPrev();
+      } else if (e.code === 'ArrowRight' || e.code === 'ArrowUp') {
+        e.preventDefault();
+        stepNext();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [rollDice, stepPrev, stepNext]);
+
+  // Token step update callback
+  const handleTokenStep = useCallback((newIndex: number) => {
+    setCurrentIndex(newIndex);
+  }, []);
+
+  // Current active skill for HTML info bar
+  const currentSkill = SKILLS_ROAD_DATA[currentIndex] || SKILLS_ROAD_DATA[0];
+
+  return (
+    <div
+      ref={containerRef}
+      className="w-full max-w-full overflow-hidden flex flex-col gap-4 sm:gap-5 select-none relative"
+      aria-label="3D Skills Board Game"
+    >
+      {/* Strict absolute-hidden element for accessibility without scrollWidth footprint */}
+      <div
+        className="sr-only absolute w-[1px] h-[1px] p-0 -m-[1px] overflow-hidden whitespace-nowrap border-0"
+        aria-live="polite"
+        style={{ clip: 'rect(0, 0, 0, 0)' }}
+      >
+        Current Skill: {currentSkill.name}, category: {currentSkill.category}, level:{' '}
+        {currentSkill.level}. {currentSkill.description}
+      </div>
+
+      <ul
+        className="sr-only absolute w-[1px] h-[1px] p-0 -m-[1px] overflow-hidden whitespace-nowrap border-0"
+        style={{ clip: 'rect(0, 0, 0, 0)' }}
+      >
+        {SKILLS_ROAD_DATA.map((s) => (
+          <li key={s.id}>
+            {s.name} - {s.category} ({s.level}): {s.description}
+          </li>
+        ))}
+      </ul>
+
+      {/* TOP CONTROLS BAR: Responsive wrapping for mobile & desktop */}
+      <div className="w-full flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 py-2 border-b border-[var(--line)] border-dashed">
+        {/* Category Filter Chips */}
+        <div className="w-full sm:w-auto flex flex-wrap items-center gap-1.5">
+          {CATEGORIES.map((cat) => {
+            const isActive = activeCategory === cat;
+            return (
+              <button
+                key={cat}
+                type="button"
+                onClick={() => {
+                  setActiveCategory(cat);
+                  if (cat !== 'All') {
+                    const firstMatch = SKILLS_ROAD_DATA.findIndex(
+                      (s) => s.category === cat
+                    );
+                    if (firstMatch !== -1) {
+                      setMoveMode('jump');
+                      setTargetIndex(firstMatch);
+                    }
+                  }
+                }}
+                className={`px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-full text-[11px] sm:text-xs font-mono transition-all duration-200 cursor-pointer flex items-center gap-1.5 border ${
+                  isActive
+                    ? 'bg-[#f6eddc] text-[#0a0a0a] font-bold border-[#f6eddc] shadow-sm'
+                    : 'bg-[#14120f]/60 text-[var(--muted)] border-[var(--line)] hover:text-[#f6eddc] hover:border-[var(--line-strong)]'
+                }`}
+              >
+                {cat !== 'All' && (
+                  <span
+                    className="w-1.5 h-1.5 rounded-full shrink-0"
+                    style={{ backgroundColor: CATEGORY_COLORS[cat as SkillCategory] }}
+                  />
+                )}
+                {cat}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* View & Layout Actions */}
+        <div className="w-full sm:w-auto flex flex-wrap items-center justify-between sm:justify-end gap-2 text-xs font-mono">
+          {/* Classic / Shuffle Road Toggle */}
+          <div className="inline-flex rounded-full border border-[var(--line)] p-0.5 bg-[#14120f]/80">
+            <button
+              type="button"
+              onClick={() => switchLayout('classic')}
+              className={`px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full text-[11px] sm:text-xs transition-all cursor-pointer ${
+                layoutMode === 'classic'
+                  ? 'bg-[var(--accent)] text-white font-semibold shadow-sm'
+                  : 'text-[var(--muted)] hover:text-[#f6eddc]'
+              }`}
+            >
+              Classic
+            </button>
+            <button
+              type="button"
+              onClick={() => switchLayout('shuffle')}
+              className={`px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full text-[11px] sm:text-xs transition-all cursor-pointer ${
+                layoutMode === 'shuffle'
+                  ? 'bg-[var(--accent)] text-white font-semibold shadow-sm'
+                  : 'text-[var(--muted)] hover:text-[#f6eddc]'
+              }`}
+            >
+              Shuffle
+            </button>
+          </div>
+
+          <div className="flex items-center gap-1.5">
+            {/* Flat View Toggle */}
+            <button
+              type="button"
+              onClick={() => setIsFlatView((v) => !v)}
+              title="Toggle Top-Down Flat View"
+              className={`px-2.5 py-1 sm:py-1.5 rounded-full border text-[11px] sm:text-xs transition-all cursor-pointer flex items-center gap-1 ${
+                isFlatView
+                  ? 'bg-[#f6eddc] text-[#0a0a0a] font-bold border-[#f6eddc]'
+                  : 'bg-[#14120f]/60 text-[var(--muted)] border-[var(--line)] hover:text-[#f6eddc]'
+              }`}
+            >
+              <span>{isFlatView ? 'Isometric' : 'Flat View'}</span>
+            </button>
+
+            {/* Camera Rotate Buttons */}
+            <button
+              type="button"
+              onClick={() => setRotateOffset((r) => r - Math.PI / 4)}
+              title="Rotate Left"
+              className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-[var(--line)] bg-[#14120f]/60 text-[var(--muted)] hover:text-[#f6eddc] flex items-center justify-center cursor-pointer transition-colors text-xs"
+            >
+              ↺
+            </button>
+            <button
+              type="button"
+              onClick={() => setRotateOffset((r) => r + Math.PI / 4)}
+              title="Rotate Right"
+              className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-[var(--line)] bg-[#14120f]/60 text-[var(--muted)] hover:text-[#f6eddc] flex items-center justify-center cursor-pointer transition-colors text-xs"
+            >
+              ↻
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* 3D CANVAS VIEWPORT */}
+      <div className="w-full h-[390px] sm:h-[520px] md:h-[620px] rounded-2xl overflow-hidden bg-[#0a0a0a] relative border border-[var(--line)] shadow-2xl">
+        {isInView && (
+          <Scene
+            skills={SKILLS_ROAD_DATA}
+            layoutPoints={currentLayoutPoints}
+            currentIndex={currentIndex}
+            targetIndex={targetIndex}
+            moveMode={moveMode}
+            activeCategory={activeCategory}
+            isFlatView={isFlatView}
+            rotateOffset={rotateOffset}
+            isReducedMotion={isReducedMotion}
+            introStarted={introStarted}
+            onTileClick={(idx) => {
+              setMoveMode('jump');
+              setTargetIndex(idx);
+            }}
+            onTokenStepComplete={handleTokenStep}
+          />
+        )}
+
+        {/* In-Canvas Floating Interactive Controls (Bottom Left) */}
+        <div className="absolute bottom-2.5 left-2.5 sm:bottom-4 sm:left-4 flex items-center gap-1.5 sm:gap-2 z-10 max-w-[calc(100%-20px)]">
+          {/* Dice Roller Button */}
+          <button
+            type="button"
+            onClick={rollDice}
+            disabled={isRolling}
+            className="px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl bg-[#191714]/90 backdrop-blur-md border border-[var(--line-strong)] text-[#f6eddc] hover:border-[var(--accent)] hover:text-[var(--accent)] font-mono text-xs sm:text-sm flex items-center gap-2 sm:gap-2.5 transition-all shadow-xl cursor-pointer active:scale-95 group shrink-0"
+          >
+            <span
+              className={`w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-[var(--accent)] text-white font-bold flex items-center justify-center text-xs sm:text-sm shadow-md transition-transform duration-300 ${
+                isRolling ? 'rotate-180 scale-110' : 'group-hover:scale-105'
+              }`}
+            >
+              {diceValue}
+            </span>
+            <span className="font-semibold tracking-wide">
+              {isRolling ? 'Rolling...' : 'Roll Dice'}
+            </span>
+            <span className="hidden sm:inline text-[var(--muted)] text-xs font-normal">
+              (Space)
+            </span>
+          </button>
+
+          {/* Step Back & Forward */}
+          <div className="inline-flex rounded-xl bg-[#191714]/90 backdrop-blur-md border border-[var(--line)] p-0.5 sm:p-1 text-[11px] sm:text-xs font-mono shrink-0">
+            <button
+              type="button"
+              onClick={stepPrev}
+              disabled={currentIndex <= 0}
+              title="Previous Tile (←)"
+              className="px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-lg text-[var(--muted)] hover:text-[#f6eddc] disabled:opacity-30 cursor-pointer transition-colors"
+            >
+              ◀ Prev
+            </button>
+            <div className="w-[1px] bg-[var(--line)] my-1" />
+            <button
+              type="button"
+              onClick={stepNext}
+              disabled={currentIndex >= SKILLS_ROAD_DATA.length - 1}
+              title="Next Tile (→)"
+              className="px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-lg text-[var(--muted)] hover:text-[#f6eddc] disabled:opacity-30 cursor-pointer transition-colors"
+            >
+              Next ▶
+            </button>
+          </div>
+        </div>
+
+        {/* Progress Pill Indicator (Top Right in Canvas) */}
+        <div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-10 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-[#14120f]/80 backdrop-blur-md border border-[var(--line)] text-[11px] sm:text-xs font-mono text-[var(--muted)] flex items-center gap-1.5 sm:gap-2">
+          <span className="text-[var(--ink)] font-semibold">
+            Tile {currentIndex + 1}
+          </span>
+          <span>/</span>
+          <span>{SKILLS_ROAD_DATA.length}</span>
+        </div>
+      </div>
+
+      {/* HTML INFO BAR UNDER CANVAS */}
+      <div className="w-full max-w-full rounded-2xl bg-[#14120f]/90 backdrop-blur-md border border-[var(--line)] p-3.5 sm:p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-3.5 transition-all shadow-xl overflow-hidden">
+        {/* Left: Skill Details */}
+        <div className="flex items-center gap-3 sm:gap-4 w-full min-w-0 flex-1">
+          {/* Color Indicator */}
+          <div
+            className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center font-mono font-bold text-base sm:text-lg shadow-inner shrink-0 border"
+            style={{
+              backgroundColor: `${currentSkill.color}18`,
+              borderColor: `${currentSkill.color}60`,
+              color: currentSkill.color,
+            }}
+          >
+            {currentSkill.name.slice(0, 2).toUpperCase()}
+          </div>
+
+          <div className="flex flex-col gap-1 min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+              <h3 className="font-sans font-bold text-base sm:text-lg text-[#f6eddc] tracking-tight">
+                {currentSkill.name}
+              </h3>
+              <span
+                className="px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-mono uppercase tracking-wider font-semibold border"
+                style={{
+                  backgroundColor: `${CATEGORY_COLORS[currentSkill.category]}18`,
+                  borderColor: `${CATEGORY_COLORS[currentSkill.category]}40`,
+                  color: CATEGORY_COLORS[currentSkill.category],
+                }}
+              >
+                {currentSkill.category}
+              </span>
+              <span className="px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-mono text-[var(--muted)] bg-[#1e1c18] border border-[var(--line)] capitalize">
+                Level: {currentSkill.level}
+              </span>
+            </div>
+            <p className="font-mono text-xs text-[var(--muted)] break-words leading-relaxed">
+              <span className="text-[#f6eddc] font-medium">
+                {currentSkill.tagline}
+              </span>{' '}
+              — {currentSkill.description}
+            </p>
+          </div>
+        </div>
+
+        {/* Right: FINISH "Let's talk" CTA or quick navigation hint */}
+        <div className="shrink-0 flex items-center justify-between sm:justify-end w-full md:w-auto pt-2 md:pt-0 border-t md:border-t-0 border-[var(--line)]">
+          {currentIndex === SKILLS_ROAD_DATA.length - 1 ? (
+            <a
+              href="#contact"
+              className="px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl bg-[var(--accent)] text-white font-mono font-semibold text-xs tracking-wider uppercase hover:bg-[#e05330] transition-all shadow-lg shadow-[var(--accent)]/30 flex items-center gap-2 animate-pulse cursor-pointer w-full sm:w-auto justify-center"
+            >
+              <span>🎉 Let&apos;s talk!</span>
+              <span>→</span>
+            </a>
+          ) : (
+            <span className="text-xs font-mono text-[var(--muted)]">
+              Tap any tile or press <kbd className="px-1.5 py-0.5 rounded bg-[#1e1c18] border border-[var(--line)] text-[#f6eddc]">Space</kbd> to hop
+            </span>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default SkillsRoad;

@@ -2,7 +2,7 @@ import { Hero } from "@/components/hero/hero";
 import { PhotographyShowcase } from "@/components/photography/photography-showcase";
 import { ExperienceSection } from "@/components/experience/ExperienceSection";
 import ProjectsSwap from "@/components/projects/ProjectsSwap";
-import { SkillsArcSection } from "@/components/skills/SkillsArcSection";
+import { SkillsRoad } from "@/components/skills-road/SkillsRoad";
 
 export default function Home() {
   return (
@@ -36,14 +36,14 @@ export default function Home() {
         </section>
 
         {/* Section: Skills (also aliased as stack) */}
-        <section id="skills" className="scroll-mt-24 w-full flex flex-col gap-6 relative">
+        <section id="skills" className="scroll-mt-24 w-full max-w-full overflow-hidden flex flex-col gap-6 relative">
           <div id="stack" className="absolute -top-24 pointer-events-none" />
           <div className="flex items-center justify-between border-b border-[var(--line)] border-dashed pb-3">
             <span className="font-mono text-xs text-[var(--accent)] font-semibold">04 / SKILLS</span>
             <span className="font-mono text-xs text-[var(--muted)]">MY TECH STACK / 2026</span>
           </div>
 
-          <SkillsArcSection />
+          <SkillsRoad />
         </section>
 
         {/* Section: Playground (also aliased as log) */}
