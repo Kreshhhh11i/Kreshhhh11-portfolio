@@ -6,8 +6,12 @@ import { ICON_MAP, renderIconToCanvas } from './icons';
 
 const textureCache = new Map<string, THREE.CanvasTexture>();
 
-export function useIconTexture(iconName: string, color: string): THREE.CanvasTexture | null {
-  const cacheKey = `${iconName}_${color}`;
+export function useIconTexture(
+  iconName: string,
+  color: string,
+  isDimmed: boolean = false
+): THREE.CanvasTexture | null {
+  const cacheKey = `${iconName}_${color}_${isDimmed ? 'dim' : 'bright'}`;
 
   const texture = useMemo(() => {
     if (typeof window === 'undefined') return null;
@@ -18,7 +22,7 @@ export function useIconTexture(iconName: string, color: string): THREE.CanvasTex
     const iconDef = ICON_MAP[iconName];
     if (!iconDef) return null;
 
-    const canvas = renderIconToCanvas(iconDef, color);
+    const canvas = renderIconToCanvas(iconDef, color, isDimmed);
     const tex = new THREE.CanvasTexture(canvas);
     tex.colorSpace = THREE.SRGBColorSpace;
     tex.generateMipmaps = true;
@@ -29,7 +33,7 @@ export function useIconTexture(iconName: string, color: string): THREE.CanvasTex
 
     textureCache.set(cacheKey, tex);
     return tex;
-  }, [cacheKey, iconName, color]);
+  }, [cacheKey, iconName, color, isDimmed]);
 
   return texture;
 }
@@ -38,4 +42,3 @@ export function disposeAllIconTextures() {
   textureCache.forEach((tex) => tex.dispose());
   textureCache.clear();
 }
-

@@ -65,7 +65,6 @@ export function SkillsRoad() {
 
   // Camera settings
   const [isFlatView, setIsFlatView] = useState(false);
-  const [rotateOffset, setRotateOffset] = useState(0);
 
   // Dice rolling state
   const [isRolling, setIsRolling] = useState(false);
@@ -129,19 +128,20 @@ export function SkillsRoad() {
             return Math.min(SKILLS_ROAD_DATA.length - 1, prev + finalRoll);
           }
 
-          // If category is filtered, jump to the next matching skill tile
+          // If category is filtered, jump strictly to matching skill tiles
           const matchingIndices: number[] = [];
           for (let i = prev + 1; i < SKILLS_ROAD_DATA.length; i++) {
-            if (
-              SKILLS_ROAD_DATA[i].category === activeCategory ||
-              SKILLS_ROAD_DATA[i].category === 'Special'
-            ) {
+            if (SKILLS_ROAD_DATA[i].category === activeCategory) {
               matchingIndices.push(i);
             }
           }
 
           if (matchingIndices.length === 0) {
-            return SKILLS_ROAD_DATA.length - 1;
+            // Loop back to the first matching skill
+            const allMatches = SKILLS_ROAD_DATA.map((s, idx) =>
+              s.category === activeCategory ? idx : -1
+            ).filter((idx) => idx !== -1);
+            return allMatches[0] ?? prev;
           }
 
           const stepsAhead = Math.min(finalRoll - 1, matchingIndices.length - 1);
@@ -151,16 +151,28 @@ export function SkillsRoad() {
     }, 60);
   }, [isRolling, activeCategory]);
 
-  // Step prev / next
+  // Step prev / next respecting active category
   const stepPrev = useCallback(() => {
     setMoveMode('step');
-    setTargetIndex((prev) => Math.max(0, prev - 1));
-  }, []);
+    setTargetIndex((prev) => {
+      if (activeCategory === 'All') return Math.max(0, prev - 1);
+      for (let i = prev - 1; i >= 0; i--) {
+        if (SKILLS_ROAD_DATA[i].category === activeCategory) return i;
+      }
+      return prev;
+    });
+  }, [activeCategory]);
 
   const stepNext = useCallback(() => {
     setMoveMode('step');
-    setTargetIndex((prev) => Math.min(SKILLS_ROAD_DATA.length - 1, prev + 1));
-  }, []);
+    setTargetIndex((prev) => {
+      if (activeCategory === 'All') return Math.min(SKILLS_ROAD_DATA.length - 1, prev + 1);
+      for (let i = prev + 1; i < SKILLS_ROAD_DATA.length; i++) {
+        if (SKILLS_ROAD_DATA[i].category === activeCategory) return i;
+      }
+      return prev;
+    });
+  }, [activeCategory]);
 
   // Layout switcher: staggered morph & token returns to start
   const switchLayout = useCallback(
@@ -231,10 +243,10 @@ export function SkillsRoad() {
         ))}
       </ul>
 
-      {/* TOP CONTROLS BAR: Responsive wrapping for mobile & desktop */}
+      {/* TOP CONTROLS BAR: Clean buttons without corner tick edges or hover glow */}
       <div className="w-full flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 py-2 border-b border-[var(--line)] border-dashed">
         {/* Category Filter Chips */}
-        <div className="w-full sm:w-auto flex flex-wrap items-center gap-1.5">
+        <div className="w-full sm:w-auto flex flex-wrap items-center gap-1.5 sm:gap-2">
           {CATEGORIES.map((cat) => {
             const isActive = activeCategory === cat;
             return (
@@ -251,17 +263,20 @@ export function SkillsRoad() {
                       setMoveMode('jump');
                       setTargetIndex(firstMatch);
                     }
+                  } else {
+                    setMoveMode('jump');
+                    setTargetIndex(0);
                   }
                 }}
-                className={`px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-full text-[11px] sm:text-xs font-mono transition-all duration-200 cursor-pointer flex items-center gap-1.5 border ${
+                className={`px-3 py-1.5 rounded-sm text-[11px] sm:text-xs font-mono transition-colors cursor-pointer flex items-center gap-1.5 border border-dashed select-none ${
                   isActive
-                    ? 'bg-[#f6eddc] text-[#0a0a0a] font-bold border-[#f6eddc] shadow-sm'
+                    ? 'bg-[#f6eddc] text-[#0a0a0a] font-bold border-[#f6eddc]'
                     : 'bg-[#14120f]/60 text-[var(--muted)] border-[var(--line)] hover:text-[#f6eddc] hover:border-[var(--line-strong)]'
                 }`}
               >
                 {cat !== 'All' && (
                   <span
-                    className="w-1.5 h-1.5 rounded-full shrink-0"
+                    className="w-1.5 h-1.5 shrink-0"
                     style={{ backgroundColor: CATEGORY_COLORS[cat as SkillCategory] }}
                   />
                 )}
@@ -274,14 +289,14 @@ export function SkillsRoad() {
         {/* View & Layout Actions */}
         <div className="w-full sm:w-auto flex flex-wrap items-center justify-between sm:justify-end gap-2 text-xs font-mono">
           {/* Classic / Shuffle Road Toggle */}
-          <div className="inline-flex rounded-full border border-[var(--line)] p-0.5 bg-[#14120f]/80">
+          <div className="flex items-center gap-1.5">
             <button
               type="button"
               onClick={() => switchLayout('classic')}
-              className={`px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full text-[11px] sm:text-xs transition-all cursor-pointer ${
+              className={`px-3 py-1.5 rounded-sm text-[11px] sm:text-xs font-mono transition-colors cursor-pointer border border-dashed select-none ${
                 layoutMode === 'classic'
-                  ? 'bg-[var(--accent)] text-white font-semibold shadow-sm'
-                  : 'text-[var(--muted)] hover:text-[#f6eddc]'
+                  ? 'bg-[var(--accent)] text-white font-bold border-[var(--accent)]'
+                  : 'bg-[#14120f]/60 text-[var(--muted)] border-[var(--line)] hover:text-[#f6eddc] hover:border-[var(--line-strong)]'
               }`}
             >
               Classic
@@ -289,10 +304,10 @@ export function SkillsRoad() {
             <button
               type="button"
               onClick={() => switchLayout('shuffle')}
-              className={`px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full text-[11px] sm:text-xs transition-all cursor-pointer ${
+              className={`px-3 py-1.5 rounded-sm text-[11px] sm:text-xs font-mono transition-colors cursor-pointer border border-dashed select-none ${
                 layoutMode === 'shuffle'
-                  ? 'bg-[var(--accent)] text-white font-semibold shadow-sm'
-                  : 'text-[var(--muted)] hover:text-[#f6eddc]'
+                  ? 'bg-[var(--accent)] text-white font-bold border-[var(--accent)]'
+                  : 'bg-[#14120f]/60 text-[var(--muted)] border-[var(--line)] hover:text-[#f6eddc] hover:border-[var(--line-strong)]'
               }`}
             >
               Shuffle
@@ -305,38 +320,20 @@ export function SkillsRoad() {
               type="button"
               onClick={() => setIsFlatView((v) => !v)}
               title="Toggle Top-Down Flat View"
-              className={`px-2.5 py-1 sm:py-1.5 rounded-full border text-[11px] sm:text-xs transition-all cursor-pointer flex items-center gap-1 ${
+              className={`px-3 py-1.5 rounded-sm border border-dashed text-[11px] sm:text-xs font-mono transition-colors cursor-pointer flex items-center gap-1.5 select-none ${
                 isFlatView
                   ? 'bg-[#f6eddc] text-[#0a0a0a] font-bold border-[#f6eddc]'
-                  : 'bg-[#14120f]/60 text-[var(--muted)] border-[var(--line)] hover:text-[#f6eddc]'
+                  : 'bg-[#14120f]/60 text-[var(--muted)] border-[var(--line)] hover:text-[#f6eddc] hover:border-[var(--line-strong)]'
               }`}
             >
               <span>{isFlatView ? 'Isometric' : 'Flat View'}</span>
-            </button>
-
-            {/* Camera Rotate Buttons */}
-            <button
-              type="button"
-              onClick={() => setRotateOffset((r) => r - Math.PI / 4)}
-              title="Rotate Left"
-              className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-[var(--line)] bg-[#14120f]/60 text-[var(--muted)] hover:text-[#f6eddc] flex items-center justify-center cursor-pointer transition-colors text-xs"
-            >
-              ↺
-            </button>
-            <button
-              type="button"
-              onClick={() => setRotateOffset((r) => r + Math.PI / 4)}
-              title="Rotate Right"
-              className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-[var(--line)] bg-[#14120f]/60 text-[var(--muted)] hover:text-[#f6eddc] flex items-center justify-center cursor-pointer transition-colors text-xs"
-            >
-              ↻
             </button>
           </div>
         </div>
       </div>
 
-      {/* 3D CANVAS VIEWPORT */}
-      <div className="w-full h-[390px] sm:h-[520px] md:h-[620px] rounded-2xl overflow-hidden bg-[#0a0a0a] relative border border-[var(--line)] shadow-2xl">
+      {/* 3D CANVAS VIEWPORT (Clean container without corner edges or hover glow) */}
+      <div className="w-full h-[390px] sm:h-[520px] md:h-[620px] rounded-sm bg-[#0a0a0a] border border-dashed border-[var(--line)] shadow-xl relative overflow-hidden">
         {isInView && (
           <Scene
             skills={SKILLS_ROAD_DATA}
@@ -346,7 +343,6 @@ export function SkillsRoad() {
             moveMode={moveMode}
             activeCategory={activeCategory}
             isFlatView={isFlatView}
-            rotateOffset={rotateOffset}
             isReducedMotion={isReducedMotion}
             introStarted={introStarted}
             onTileClick={(idx) => {
@@ -358,17 +354,17 @@ export function SkillsRoad() {
         )}
 
         {/* In-Canvas Floating Interactive Controls (Bottom Left) */}
-        <div className="absolute bottom-2.5 left-2.5 sm:bottom-4 sm:left-4 flex items-center gap-1.5 sm:gap-2 z-10 max-w-[calc(100%-20px)]">
+        <div className="absolute bottom-2.5 left-2.5 sm:bottom-4 sm:left-4 flex items-center gap-2 z-10 max-w-[calc(100%-20px)]">
           {/* Dice Roller Button */}
           <button
             type="button"
             onClick={rollDice}
             disabled={isRolling}
-            className="px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl bg-[#191714]/90 backdrop-blur-md border border-[var(--line-strong)] text-[#f6eddc] hover:border-[var(--accent)] hover:text-[var(--accent)] font-mono text-xs sm:text-sm flex items-center gap-2 sm:gap-2.5 transition-all shadow-xl cursor-pointer active:scale-95 group shrink-0"
+            className="px-3 py-1.5 sm:px-4 sm:py-2 rounded-sm bg-[#14120f]/95 backdrop-blur-md border border-dashed border-[var(--line-strong)] text-[#f6eddc] hover:border-[#f6eddc]/50 font-mono text-xs sm:text-sm flex items-center gap-2 sm:gap-2.5 transition-colors shadow-lg cursor-pointer active:scale-95 shrink-0"
           >
             <span
-              className={`w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-[var(--accent)] text-white font-bold flex items-center justify-center text-xs sm:text-sm shadow-md transition-transform duration-300 ${
-                isRolling ? 'rotate-180 scale-110' : 'group-hover:scale-105'
+              className={`w-6 h-6 sm:w-7 sm:h-7 rounded-sm bg-[var(--accent)] text-white font-bold flex items-center justify-center text-xs sm:text-sm shadow-sm transition-transform duration-300 ${
+                isRolling ? 'rotate-180 scale-110' : ''
               }`}
             >
               {diceValue}
@@ -382,31 +378,31 @@ export function SkillsRoad() {
           </button>
 
           {/* Step Back & Forward */}
-          <div className="inline-flex rounded-xl bg-[#191714]/90 backdrop-blur-md border border-[var(--line)] p-0.5 sm:p-1 text-[11px] sm:text-xs font-mono shrink-0">
+          <div className="inline-flex rounded-sm bg-[#14120f]/95 backdrop-blur-md border border-dashed border-[var(--line)] p-0.5 sm:p-1 text-[11px] sm:text-xs font-mono shrink-0 items-center">
             <button
               type="button"
               onClick={stepPrev}
               disabled={currentIndex <= 0}
               title="Previous Tile (←)"
-              className="px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-lg text-[var(--muted)] hover:text-[#f6eddc] disabled:opacity-30 cursor-pointer transition-colors"
+              className="px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-sm text-[var(--muted)] hover:text-[#f6eddc] disabled:opacity-30 cursor-pointer transition-colors"
             >
               ◀ Prev
             </button>
-            <div className="w-[1px] bg-[var(--line)] my-1" />
+            <div className="w-[1px] h-4 bg-[var(--line)] mx-0.5" />
             <button
               type="button"
               onClick={stepNext}
               disabled={currentIndex >= SKILLS_ROAD_DATA.length - 1}
               title="Next Tile (→)"
-              className="px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-lg text-[var(--muted)] hover:text-[#f6eddc] disabled:opacity-30 cursor-pointer transition-colors"
+              className="px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-sm text-[var(--muted)] hover:text-[#f6eddc] disabled:opacity-30 cursor-pointer transition-colors"
             >
               Next ▶
             </button>
           </div>
         </div>
 
-        {/* Progress Pill Indicator (Top Right in Canvas) */}
-        <div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-10 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-[#14120f]/80 backdrop-blur-md border border-[var(--line)] text-[11px] sm:text-xs font-mono text-[var(--muted)] flex items-center gap-1.5 sm:gap-2">
+        {/* Progress Indicator (Top Right in Canvas) */}
+        <div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-10 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-sm bg-[#14120f]/85 backdrop-blur-md border border-dashed border-[var(--line)] text-[11px] sm:text-xs font-mono text-[var(--muted)] flex items-center gap-1.5 sm:gap-2">
           <span className="text-[var(--ink)] font-semibold">
             Tile {currentIndex + 1}
           </span>
@@ -416,12 +412,12 @@ export function SkillsRoad() {
       </div>
 
       {/* HTML INFO BAR UNDER CANVAS */}
-      <div className="w-full max-w-full rounded-2xl bg-[#14120f]/90 backdrop-blur-md border border-[var(--line)] p-3.5 sm:p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-3.5 transition-all shadow-xl overflow-hidden">
+      <div className="w-full max-w-full rounded-sm bg-[#14120f]/90 backdrop-blur-md border border-dashed border-[var(--line)] p-3.5 sm:p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-3.5 shadow-lg">
         {/* Left: Skill Details */}
         <div className="flex items-center gap-3 sm:gap-4 w-full min-w-0 flex-1">
           {/* Color Indicator */}
           <div
-            className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center font-mono font-bold text-base sm:text-lg shadow-inner shrink-0 border"
+            className="w-10 h-10 sm:w-12 sm:h-12 rounded-sm flex items-center justify-center font-mono font-bold text-base sm:text-lg shadow-inner shrink-0 border border-dashed"
             style={{
               backgroundColor: `${currentSkill.color}18`,
               borderColor: `${currentSkill.color}60`,
@@ -437,7 +433,7 @@ export function SkillsRoad() {
                 {currentSkill.name}
               </h3>
               <span
-                className="px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-mono uppercase tracking-wider font-semibold border"
+                className="px-2 py-0.5 rounded-sm text-[10px] sm:text-[11px] font-mono uppercase tracking-wider font-semibold border border-dashed"
                 style={{
                   backgroundColor: `${CATEGORY_COLORS[currentSkill.category]}18`,
                   borderColor: `${CATEGORY_COLORS[currentSkill.category]}40`,
@@ -446,7 +442,7 @@ export function SkillsRoad() {
               >
                 {currentSkill.category}
               </span>
-              <span className="px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-mono text-[var(--muted)] bg-[#1e1c18] border border-[var(--line)] capitalize">
+              <span className="px-2 py-0.5 rounded-sm text-[10px] sm:text-[11px] font-mono text-[var(--muted)] bg-[#1e1c18] border border-dashed border-[var(--line)] capitalize">
                 Level: {currentSkill.level}
               </span>
             </div>
@@ -460,18 +456,18 @@ export function SkillsRoad() {
         </div>
 
         {/* Right: FINISH "Let's talk" CTA or quick navigation hint */}
-        <div className="shrink-0 flex items-center justify-between sm:justify-end w-full md:w-auto pt-2 md:pt-0 border-t md:border-t-0 border-[var(--line)]">
+        <div className="shrink-0 flex items-center justify-between sm:justify-end w-full md:w-auto pt-2 md:pt-0 border-t md:border-t-0 border-[var(--line)] border-dashed">
           {currentIndex === SKILLS_ROAD_DATA.length - 1 ? (
             <a
               href="#contact"
-              className="px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl bg-[var(--accent)] text-white font-mono font-semibold text-xs tracking-wider uppercase hover:bg-[#e05330] transition-all shadow-lg shadow-[var(--accent)]/30 flex items-center gap-2 animate-pulse cursor-pointer w-full sm:w-auto justify-center"
+              className="px-4 py-2 sm:px-5 sm:py-2.5 rounded-sm bg-[var(--accent)] text-white font-mono font-semibold text-xs tracking-wider uppercase hover:bg-[#e05330] transition-colors shadow-md flex items-center gap-2 animate-pulse cursor-pointer w-full sm:w-auto justify-center border border-dashed border-[#f6eddc]/40"
             >
               <span>🎉 Let&apos;s talk!</span>
               <span>→</span>
             </a>
           ) : (
             <span className="text-xs font-mono text-[var(--muted)]">
-              Tap any tile or press <kbd className="px-1.5 py-0.5 rounded bg-[#1e1c18] border border-[var(--line)] text-[#f6eddc]">Space</kbd> to hop
+              Tap any tile or press <kbd className="px-1.5 py-0.5 rounded-sm bg-[#1e1c18] border border-dashed border-[var(--line)] text-[#f6eddc]">Space</kbd> to hop
             </span>
           )}
         </div>

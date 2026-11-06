@@ -94,8 +94,8 @@ export function Token({
     fromPos: new THREE.Vector3(),
     toPos: new THREE.Vector3(),
     squashTimer: 0,
-    hopHeight: 0.9,
-    hopSpeed: 5.4,
+    hopHeight: 0.72,
+    hopSpeed: 5.6,
   });
 
   useEffect(() => {
@@ -106,8 +106,8 @@ export function Token({
     if (layoutPoints[currentIndex]) {
       const tile = layoutPoints[currentIndex];
       const skill = skills[currentIndex];
-      const tileTopY = skill?.height ?? 0.55;
-      animRef.current.pos.set(tile.x, tileTopY + 0.34, tile.z);
+      const tileTopY = skill?.height ?? 0.38;
+      animRef.current.pos.set(tile.x, tileTopY + 0.25, tile.z);
       animRef.current.currentTileIndex = currentIndex;
     }
   }, [layoutPoints, currentIndex, skills]);
@@ -121,7 +121,7 @@ export function Token({
       const targetPoint = layoutPoints[targetIndex];
       const targetSkill = skills[targetIndex];
       if (targetPoint && targetSkill) {
-        const targetTopY = targetSkill.height + 0.34;
+        const targetTopY = targetSkill.height + 0.25;
         meshRef.current.position.set(targetPoint.x, targetTopY, targetPoint.z);
         shadowMeshRef.current.position.set(targetPoint.x, targetSkill.height + 0.005, targetPoint.z);
         sphereMeshRef.current.scale.set(1, 1, 1);
@@ -146,16 +146,16 @@ export function Token({
         const toSkill = skills[nextIdx];
 
         if (fromPt && toPt && fromSkill && toSkill) {
-          state.fromPos.set(fromPt.x, fromSkill.height + 0.34, fromPt.z);
-          state.toPos.set(toPt.x, toSkill.height + 0.34, toPt.z);
+          state.fromPos.set(fromPt.x, fromSkill.height + 0.25, fromPt.z);
+          state.toPos.set(toPt.x, toSkill.height + 0.25, toPt.z);
 
           const dist = Math.hypot(toPt.x - fromPt.x, toPt.z - fromPt.z);
           if (moveMode === 'jump') {
-            state.hopHeight = Math.min(2.8, 1.0 + dist * 0.18);
-            state.hopSpeed = Math.max(2.4, 4.6 - dist * 0.12);
+            state.hopHeight = Math.min(2.2, 0.8 + dist * 0.16);
+            state.hopSpeed = Math.max(2.6, 4.8 - dist * 0.12);
           } else {
-            state.hopHeight = 0.9;
-            state.hopSpeed = 5.4;
+            state.hopHeight = 0.72;
+            state.hopSpeed = 5.6;
           }
 
           state.stepProgress = 0;
@@ -181,23 +181,23 @@ export function Token({
 
       // In-flight stretch and landing squash
       if (t < 0.88) {
-        const stretch = Math.sin(t * Math.PI) * 0.32;
+        const stretch = Math.sin(t * Math.PI) * 0.30;
         sphereMeshRef.current.scale.set(1 - stretch * 0.45, 1 + stretch, 1 - stretch * 0.45);
       } else {
         state.squashTimer = 0.14;
       }
 
       // Dynamic shadow scale & opacity
-      const shadowScale = THREE.MathUtils.lerp(1.3, 0.7, arc / state.hopHeight);
+      const shadowScale = THREE.MathUtils.lerp(1.25, 0.7, arc / state.hopHeight);
       const shadowOpacity = THREE.MathUtils.lerp(0.85, 0.22, arc / state.hopHeight);
       shadowMeshRef.current.scale.set(shadowScale, shadowScale, shadowScale);
       (shadowMeshRef.current.material as THREE.MeshBasicMaterial).opacity = shadowOpacity;
-      shadowMeshRef.current.position.set(state.pos.x, baseHeight - 0.33, state.pos.z);
+      shadowMeshRef.current.position.set(state.pos.x, baseHeight - 0.245, state.pos.z);
     } else {
       // Idle on current tile
       if (state.squashTimer > 0) {
         state.squashTimer -= delta;
-        sphereMeshRef.current.scale.set(1.24, 0.7, 1.24);
+        sphereMeshRef.current.scale.set(1.22, 0.72, 1.22);
       } else {
         easing.damp3(sphereMeshRef.current.scale, [1, 1, 1], 0.14, delta);
       }
@@ -205,8 +205,8 @@ export function Token({
       const currPt = layoutPoints[state.currentTileIndex];
       const currSkill = skills[state.currentTileIndex];
       if (currPt && currSkill) {
-        const activeLift = 0.26;
-        const targetTileY = currSkill.height + activeLift + 0.34;
+        const activeLift = 0.18;
+        const targetTileY = currSkill.height + activeLift + 0.25;
         easing.damp(state.pos, 'x', currPt.x, 0.2, delta);
         easing.damp(state.pos, 'y', targetTileY, 0.2, delta);
         easing.damp(state.pos, 'z', currPt.z, 0.2, delta);
@@ -225,7 +225,7 @@ export function Token({
       <group ref={meshRef}>
         {/* Token Sphere Body */}
         <mesh ref={sphereMeshRef} castShadow receiveShadow>
-          <sphereGeometry args={[0.3, 32, 32]} />
+          <sphereGeometry args={[0.23, 32, 32]} />
           <meshPhysicalMaterial
             color="#f5643e"
             roughness={0.18}
@@ -238,8 +238,8 @@ export function Token({
 
         {/* Monogram Medallion on Top Facing Camera */}
         {kTexture && (
-          <mesh position={[0, 0.285, 0]} rotation={[-Math.PI / 2.4, 0, 0]}>
-            <circleGeometry args={[0.2, 32]} />
+          <mesh position={[0, 0.22, 0]} rotation={[-Math.PI / 2.4, 0, 0]}>
+            <circleGeometry args={[0.15, 32]} />
             <meshBasicMaterial
               map={kTexture}
               transparent
@@ -250,17 +250,17 @@ export function Token({
 
         {/* Ambient Warm Accent Point Light */}
         <pointLight
-          position={[0, 0.1, 0]}
+          position={[0, 0.08, 0]}
           color="#f5643e"
-          intensity={2.2}
-          distance={3.0}
+          intensity={2.0}
+          distance={2.4}
           decay={2}
         />
       </group>
 
       {/* Dynamic Contact Shadow Plane on Top of Current Tile */}
       <mesh ref={shadowMeshRef} rotation={[-Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[0.82, 0.82]} />
+        <planeGeometry args={[0.65, 0.65]} />
         {shadowTexture && (
           <meshBasicMaterial
             map={shadowTexture}

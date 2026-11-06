@@ -10,62 +10,60 @@ export interface TileLayoutPoint {
   z: number;
 }
 
-export const TILE_SIZE = 0.92;
-export const TILE_SPACING = 1.16;
+export const TILE_SIZE = 0.72;
+export const TILE_SPACING = 0.94;
 
 /**
- * Classic road grid coordinates (37 tiles):
- * START (-1,0), col 0 (rows 0..6), connector (1,6), col 2 (rows 6..1),
- * connector (3,1), col 4 (rows 1..6), connector (5,6), col 6 (rows 6..1),
- * connector (7,1), col 8 (rows 1..6), FINISH (9,6).
+ * Classic road grid coordinates (29 tiles: START + 27 skills + FINISH):
+ * Balanced 4-column serpentine track with identical column heights and symmetrical start/finish:
+ * START (-1,0),
+ * Col 0 (rows 0..5, 6 tiles), connector (1,5),
+ * Col 2 (rows 5..0, 6 tiles), connector (3,0),
+ * Col 4 (rows 0..5, 6 tiles), connector (5,5),
+ * Col 6 (rows 5..0, 6 tiles),
+ * FINISH (7,0).
  */
 export function getClassicGridCoords(): GridCoord[] {
   const coords: GridCoord[] = [];
 
-  // START
+  // START (-1, 0)
   coords.push({ col: -1, row: 0 });
 
-  // Col 0: rows 0..6 (7 tiles)
-  for (let r = 0; r <= 6; r++) coords.push({ col: 0, row: r });
+  // Col 0: rows 0..5 (6 tiles)
+  for (let r = 0; r <= 5; r++) coords.push({ col: 0, row: r });
 
-  // Connector (1,6)
-  coords.push({ col: 1, row: 6 });
+  // Connector (1,5)
+  coords.push({ col: 1, row: 5 });
 
-  // Col 2: rows 6..1 (6 tiles)
-  for (let r = 6; r >= 1; r--) coords.push({ col: 2, row: r });
+  // Col 2: rows 5..0 (6 tiles)
+  for (let r = 5; r >= 0; r--) coords.push({ col: 2, row: r });
 
-  // Connector (3,1)
-  coords.push({ col: 3, row: 1 });
+  // Connector (3,0)
+  coords.push({ col: 3, row: 0 });
 
-  // Col 4: rows 1..6 (6 tiles)
-  for (let r = 1; r <= 6; r++) coords.push({ col: 4, row: r });
+  // Col 4: rows 0..5 (6 tiles)
+  for (let r = 0; r <= 5; r++) coords.push({ col: 4, row: r });
 
-  // Connector (5,6)
-  coords.push({ col: 5, row: 6 });
+  // Connector (5,5)
+  coords.push({ col: 5, row: 5 });
 
-  // Col 6: rows 6..1 (6 tiles)
-  for (let r = 6; r >= 1; r--) coords.push({ col: 6, row: r });
+  // Col 6: rows 5..0 (6 tiles)
+  for (let r = 5; r >= 0; r--) coords.push({ col: 6, row: r });
 
-  // Connector (7,1)
-  coords.push({ col: 7, row: 1 });
-
-  // Col 8: rows 1..6 (6 tiles)
-  for (let r = 1; r <= 6; r++) coords.push({ col: 8, row: r });
-
-  // FINISH (9,6)
-  coords.push({ col: 9, row: 6 });
+  // FINISH (7, 0)
+  coords.push({ col: 7, row: 0 });
 
   return coords;
 }
 
 /**
- * Self-avoiding walk DFS on an 11x8 grid with node budget, run length 1-3,
+ * Self-avoiding walk DFS on an grid with node budget, run length 1-3,
  * and rule relaxation on failed attempts.
  */
 export function generateShuffleGridCoords(
-  cols = 11,
-  rows = 8,
-  length = 37
+  cols = 9,
+  rows = 7,
+  length = 29
 ): GridCoord[] {
   const directions = [
     { dc: 0, dr: 1 },  // down (+row)
@@ -74,7 +72,7 @@ export function generateShuffleGridCoords(
     { dc: -1, dr: 0 }, // left (-col)
   ];
 
-  for (let attempt = 0; attempt < 60; attempt++) {
+  for (let attempt = 0; attempt < 80; attempt++) {
     const visited = new Set<string>();
     const path: GridCoord[] = [];
 
@@ -104,8 +102,8 @@ export function generateShuffleGridCoords(
         const key = `${nextCol},${nextRow}`;
         if (visited.has(key)) continue;
 
-        // Strict non-consecutive touching rule for first 30 attempts
-        if (attempt < 30) {
+        // Strict non-consecutive touching rule for first 40 attempts
+        if (attempt < 40) {
           let touchingNonConsecutive = false;
           for (const d of directions) {
             const adjCol = nextCol + d.dc;
@@ -186,4 +184,3 @@ export function coordsToWorldLayout(coords: GridCoord[]): TileLayoutPoint[] {
     z: (c.row - centerRow) * TILE_SPACING,
   }));
 }
-
