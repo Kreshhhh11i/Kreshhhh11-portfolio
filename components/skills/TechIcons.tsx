@@ -7,13 +7,49 @@ export interface IconProps {
 }
 
 export const ReactIcon: React.FC<IconProps> = ({ size = 32, className = "" }) => (
-  <svg width={size} height={size} viewBox="-11.5 -10.23174 23 20.46348" className={className} fill="none">
-    <circle cx="0" cy="0" r="2.05" fill="#61DAFB" />
-    <g stroke="#61DAFB" strokeWidth="1" fill="none">
-      <ellipse rx="11" ry="4.2" />
-      <ellipse rx="11" ry="4.2" transform="rotate(60)" />
-      <ellipse rx="11" ry="4.2" transform="rotate(120)" />
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 100 100"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    className={className}
+  >
+    <g clipPath="url(#react-clip-a)" fill="none">
+      <path
+        fill="#61dafb"
+        d="M50.307 58.816a8.816 8.816 0 1 0 0-17.632 8.816 8.816 0 0 0 0 17.632"
+      />
+      <path
+        fill="none"
+        stroke="#61dafb"
+        strokeWidth="5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M97.613 50c0 9.976-21.18 18.063-47.306 18.063C24.18 68.063 3 59.976 3 50s21.18-18.062 47.307-18.062c26.126 0 47.306 8.086 47.306 18.062Z"
+      />
+      <path
+        fill="none"
+        stroke="#61dafb"
+        strokeWidth="5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M73.96 90.969c-8.64 4.988-26.233-9.311-39.296-31.938s-16.65-45.012-8.01-50c8.638-4.988 26.232 9.311 39.295 31.938s16.65 45.012 8.01 50Z"
+      />
+      <path
+        fill="none"
+        stroke="#61dafb"
+        strokeWidth="5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M26.653 90.969c-8.639-4.988-5.052-27.374 8.011-50S65.321 4.043 73.96 9.03c8.64 4.988 5.053 27.374-8.01 50-13.065 22.628-30.659 36.927-39.298 31.94Z"
+      />
     </g>
+    <defs>
+      <clipPath id="react-clip-a">
+        <path fill="#fff" d="M0 0h100v100H0z" />
+      </clipPath>
+    </defs>
   </svg>
 );
 

@@ -41,7 +41,7 @@ export function Tile({
   const iconMaterialRef = useRef<THREE.MeshBasicMaterial>(null);
 
   // When dimmed: uses pure monochrome grey texture; when active: uses vibrant color aura
-  const texture = useIconTexture(skill.iconName, skill.color, isDimmed);
+  const texture = useIconTexture(skill.id, isDimmed);
 
   // Initial drop-in intro state
   const initialY = introStarted ? skill.height / 2 : 6 + index * 0.1;
