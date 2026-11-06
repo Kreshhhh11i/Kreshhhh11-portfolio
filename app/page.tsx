@@ -1,5 +1,6 @@
 import { Hero } from "@/components/hero/hero";
 import { PhotographyShowcase } from "@/components/photography/photography-showcase";
+import { SigningBox } from "@/components/SigningBox";
 import { ExperienceSection } from "@/components/experience/ExperienceSection";
 import ProjectsSwap from "@/components/projects/ProjectsSwap";
 import { SkillsRoad } from "@/components/skills-road/SkillsRoad";
@@ -59,8 +60,9 @@ export default function Home() {
             <span className="font-mono text-xs text-[var(--muted)] hidden sm:inline">lab: interactive space</span>
           </div>
 
-          <div className="w-full">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start w-full">
             <PhotographyShowcase />
+            <SigningBox />
           </div>
         </section>
 
