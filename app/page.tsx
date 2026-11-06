@@ -60,7 +60,7 @@ export default function Home() {
             <span className="font-mono text-xs text-[var(--muted)] hidden sm:inline">lab: interactive space</span>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start w-full">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch w-full">
             <PhotographyShowcase />
             <SigningBox />
           </div>

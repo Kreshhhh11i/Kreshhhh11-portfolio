@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, JetBrains_Mono, Allura } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -23,6 +24,13 @@ const allura = Allura({
   display: "swap",
 });
 
+const ivyOraDisplay = localFont({
+  src: "../public/fonts/IvyOraDisplay-LightItalic.ttf",
+  variable: "--font-ivyora",
+  style: "italic",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: "SRIKESH TR | Software Developer",
   description: "Portfolio of Srikesh TR, Software Developer.",
@@ -41,7 +49,7 @@ export default function RootLayout({
       lang="en"
       data-theme="dark"
       suppressHydrationWarning
-      className={`${geistSans.variable} ${jetBrainsMono.variable} ${allura.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${jetBrainsMono.variable} ${allura.variable} ${ivyOraDisplay.variable} h-full antialiased`}
     >
       <head>
         <script

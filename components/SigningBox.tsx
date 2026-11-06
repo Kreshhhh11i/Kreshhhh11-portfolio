@@ -268,7 +268,7 @@ export function SigningBox() {
   return (
     <div
       ref={containerRef}
-      className="signing-box w-full p-[18px] sm:p-6 rounded-[18px] border border-dashed border-[var(--sb-line)] bg-[var(--sb-surface)] flex flex-col font-sans transition-colors duration-200"
+      className="signing-box w-full h-full p-[18px] sm:p-6 rounded-[18px] border border-dashed border-[var(--sb-line)] bg-[var(--sb-surface)] flex flex-col justify-between font-sans transition-colors duration-200"
     >
       <style>{`
         .signing-box {
@@ -298,6 +298,9 @@ export function SigningBox() {
         }
         .sb-toast { animation: sbSlideUp 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         .sb-tile { animation: sbPopIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .sb-scroll::-webkit-scrollbar { width: 4px; }
+        .sb-scroll::-webkit-scrollbar-track { background: transparent; }
+        .sb-scroll::-webkit-scrollbar-thumb { background: var(--sb-line); border-radius: 4px; }
         @media (prefers-reduced-motion: reduce) {
           .signing-box *, .sb-toast, .sb-tile {
             animation-duration: 0.01ms !important;
@@ -324,10 +327,6 @@ export function SigningBox() {
         ref={padRef}
         className="relative w-full rounded-[12px] bg-[var(--sb-bg)] border border-solid border-[var(--sb-line)] overflow-hidden touch-none select-none h-[clamp(300px,48vh,380px)]"
       >
-        <div className="absolute left-0 right-0 bottom-[25%] border-b border-dashed border-[var(--sb-line)] pointer-events-none" />
-        <span className="absolute left-3.5 bottom-[25%] -translate-y-1/2 font-mono text-xs font-bold text-[var(--sb-accent)] pointer-events-none select-none">
-          x
-        </span>
         <div
           className={`absolute inset-0 flex items-center justify-center font-mono text-xs text-[var(--sb-muted)] tracking-wider pointer-events-none select-none transition-opacity duration-300 ${
             strokes.length > 0 || isDrawing ? 'opacity-0' : 'opacity-60'
@@ -427,34 +426,36 @@ export function SigningBox() {
           <span className="text-[var(--sb-muted)]/70">{signatures.length}/12</span>
         </div>
 
-        {signatures.length === 0 ? (
-          <div className="py-6 text-center font-mono text-xs text-[var(--sb-muted)] border border-dashed border-[var(--sb-line)] rounded-lg">
-            No signatures yet. Be the first.
-          </div>
-        ) : (
-          <div className="grid grid-cols-[repeat(auto-fill,minmax(140px,1fr))] gap-2.5">
-            {signatures.map((sig) => (
-              <div
-                key={sig.id}
-                className="sb-tile group relative aspect-[2/1] rounded-lg border border-dashed border-[var(--sb-line)] bg-[var(--sb-surface)] flex items-center justify-center p-2.5 transition-transform hover:scale-[1.02]"
-              >
-                <img
-                  src={sig.dataUrl}
-                  alt="Signature"
-                  className="max-w-full max-h-full object-contain pointer-events-none select-none"
-                />
-                <button
-                  type="button"
-                  onClick={() => saveWall(signatures.filter((s) => s.id !== sig.id))}
-                  aria-label="Remove signature"
-                  className="absolute top-1 right-1 w-5 h-5 flex items-center justify-center rounded-full bg-[var(--sb-bg)] text-[var(--sb-muted)] hover:text-[var(--sb-accent)] opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity font-mono text-xs cursor-pointer border border-[var(--sb-line)]"
+        <div className="min-h-[81px] max-h-[175px] overflow-y-auto pr-0.5 sb-scroll">
+          {signatures.length === 0 ? (
+            <div className="h-[81px] w-full flex items-center justify-center text-center font-mono text-xs text-[var(--sb-muted)] border border-dashed border-[var(--sb-line)] rounded-lg select-none">
+              No signatures yet. Be the first.
+            </div>
+          ) : (
+            <div className="grid grid-cols-[repeat(auto-fill,minmax(140px,1fr))] gap-2.5">
+              {signatures.map((sig) => (
+                <div
+                  key={sig.id}
+                  className="sb-tile group relative aspect-[2/1] rounded-lg border border-dashed border-[var(--sb-line)] bg-[var(--sb-surface)] flex items-center justify-center p-2.5 transition-transform hover:scale-[1.02]"
                 >
-                  ×
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
+                  <img
+                    src={sig.dataUrl}
+                    alt="Signature"
+                    className="max-w-full max-h-full object-contain pointer-events-none select-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => saveWall(signatures.filter((s) => s.id !== sig.id))}
+                    aria-label="Remove signature"
+                    className="absolute top-1 right-1 w-5 h-5 flex items-center justify-center rounded-full bg-[var(--sb-bg)] text-[var(--sb-muted)] hover:text-[var(--sb-accent)] opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity font-mono text-xs cursor-pointer border border-[var(--sb-line)]"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Toast Notification */}

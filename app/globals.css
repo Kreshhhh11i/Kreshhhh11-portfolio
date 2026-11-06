@@ -1,5 +1,25 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: "IvyOra Display";
+  src: url("/fonts/IvyOraDisplay-LightItalic.ttf") format("truetype");
+  font-weight: 100 900;
+  font-style: italic normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "ivyora-display";
+  src: url("/fonts/IvyOraDisplay-LightItalic.ttf") format("truetype");
+  font-weight: 100 900;
+  font-style: italic normal;
+  font-display: swap;
+}
+
+.font-ivyora {
+  font-family: var(--font-ivyora), "IvyOra Display", "ivyora-display", Georgia, serif;
+}
+
 /* View Transitions API - Circular theme ripple */
 ::view-transition {
   pointer-events: none !important;

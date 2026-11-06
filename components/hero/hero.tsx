@@ -193,27 +193,30 @@ export function Hero() {
             </div>
           </div>
 
-          <h1 className="w-full text-center lg:text-left text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold font-sans tracking-tight text-[var(--primary-text)] leading-[1.1]">
-            <span className="block lg:inline">Breaking systems to</span>{" "}
-            <span className="inline-block lg:inline">
-              <em className="italic font-normal">understand</em>{" "}
-              <br className="hidden lg:inline" />
-              <span>systems.</span>
-            </span>
-            <span className="flex lg:inline-flex items-center justify-center lg:justify-start mt-3 lg:mt-0 lg:ml-4 align-middle">
-              <button
-                onClick={() => setIsHeroExpanded(!isHeroExpanded)}
-                className="p-2 md:p-3 rounded-full border border-[var(--dashed-borders)] text-[var(--primary-text)] hover:bg-[var(--card-tint)] transition-all duration-500 cursor-pointer flex items-center justify-center group shrink-0"
-                aria-label="Toggle details"
+          <h1 className="w-full text-center lg:text-left text-[1.95rem] min-[400px]:text-[2.2rem] sm:text-5xl md:text-6xl lg:text-[2.2rem] xl:text-[2.85rem] 2xl:text-[3.6rem] font-bold font-sans tracking-tight text-[var(--primary-text)] leading-[1.15] sm:leading-[1.1]">
+            <span className="block">Breaking systems to</span>
+            <span className="block mt-1 sm:mt-1.5 lg:mt-2 lg:whitespace-nowrap">
+              <span
+                style={{ fontFamily: 'var(--font-ivyora), "IvyOra Display", "ivyora-display", Georgia, serif' }}
+                className="font-ivyora italic font-normal tracking-normal text-[var(--primary-text)]"
               >
-                <svg
-                  className={`transition-transform duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] ${isHeroExpanded ? "rotate-180 group-hover:translate-y-1" : "rotate-0 group-hover:translate-y-1"}`}
-                  width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                understand systems.
+              </span>
+              <span className="inline-flex items-center ml-2.5 sm:ml-3 lg:ml-4 align-middle">
+                <button
+                  onClick={() => setIsHeroExpanded(!isHeroExpanded)}
+                  className="p-1.5 sm:p-2 md:p-2.5 rounded-full border border-[var(--dashed-borders)] text-[var(--primary-text)] hover:bg-[var(--card-tint)] transition-all duration-500 cursor-pointer flex items-center justify-center group shrink-0"
+                  aria-label="Toggle details"
                 >
-                  <line x1="12" y1="5" x2="12" y2="19"></line>
-                  <polyline points="19 12 12 19 5 12"></polyline>
-                </svg>
-              </button>
+                  <svg
+                    className={`transition-transform duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] ${isHeroExpanded ? "rotate-180 group-hover:translate-y-1" : "rotate-0 group-hover:translate-y-1"}`}
+                    width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                  >
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <polyline points="19 12 12 19 5 12"></polyline>
+                  </svg>
+                </button>
+              </span>
             </span>
           </h1>
 
