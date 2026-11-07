@@ -8,16 +8,16 @@ import "../WorkExperience.css";
 const getLevelColor = (level: ContributionLevel): string => {
   switch (level) {
     case "FIRST_QUARTILE":
-      return "bg-[#f6c7b0] dark:bg-[#4c2318]";
+      return "bg-[#4c2318] [html.light_&]:bg-[#f6c7b0]";
     case "SECOND_QUARTILE":
-      return "bg-[#f5a285] dark:bg-[#8c3c26]";
+      return "bg-[#8c3c26] [html.light_&]:bg-[#f5a285]";
     case "THIRD_QUARTILE":
-      return "bg-[#f5755e] dark:bg-[#c65233]";
+      return "bg-[#c65233] [html.light_&]:bg-[#f5755e]";
     case "FOURTH_QUARTILE":
-      return "bg-[#f5643e] dark:bg-[#f5643e]";
+      return "bg-[#f5643e]";
     case "NONE":
     default:
-      return "bg-[#e7dece] dark:bg-[#1b1a18]";
+      return "bg-[#1b1a18] opacity-30 border border-[rgba(255,255,255,0.04)] [html[data-theme='light']_&]:border-transparent [html[data-theme='light']_&]:bg-[#e7dece] [html[data-theme='light']_&]:opacity-35 [html.light_&]:border-transparent [html.light_&]:bg-[#e7dece] [html.light_&]:opacity-35";
   }
 };
 
@@ -39,10 +39,10 @@ const ExternalLinkIcon = () => (
 );
 
 const GITHUB_STYLE_BOXES = [
-  "bg-[#1b1a18] border border-[rgba(255,255,255,0.12)]",
-  "bg-[#4c2318]",
-  "bg-[#8c3c26]",
-  "bg-[#c65233]",
+  "bg-[#1b1a18] border border-[rgba(255,255,255,0.12)] [html.light_&]:bg-[#e7dece] [html.light_&]:border-transparent",
+  "bg-[#4c2318] [html.light_&]:bg-[#f6c7b0]",
+  "bg-[#8c3c26] [html.light_&]:bg-[#f5a285]",
+  "bg-[#c65233] [html.light_&]:bg-[#f5755e]",
   "bg-[#f5643e]",
 ];
 
@@ -55,10 +55,9 @@ export function GitHubHeatmap({ isOpen: controlledIsOpen, onToggle }: GitHubHeat
   const [data, setData] = useState<ContributionCalendar | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const [activeCell, setActiveCell] = useState<{ count: number; date: string; x: number; y: number } | null>(null);
+  const [activeCell, setActiveCell] = useState<{ count: number; date: string } | null>(null);
   const [internalIsOpen, setInternalIsOpen] = useState<boolean>(false);
   const [isHovered, setIsHovered] = useState(false);
-  const tooltipRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const isControlled = typeof controlledIsOpen === "boolean";
@@ -107,30 +106,6 @@ export function GitHubHeatmap({ isOpen: controlledIsOpen, onToggle }: GitHubHeat
     fetchData();
   }, []);
 
-  // Adjust active tooltip position to prevent clipping at viewport edges
-  useEffect(() => {
-    if (activeCell && tooltipRef.current) {
-      const tooltip = tooltipRef.current;
-      const padding = 12;
-      
-      tooltip.style.transform = `translate(-50%, 0)`;
-      
-      requestAnimationFrame(() => {
-        const rect = tooltip.getBoundingClientRect();
-        let offset = 0;
-        
-        if (rect.left < padding) {
-          offset = padding - rect.left;
-        } else if (rect.right > window.innerWidth - padding) {
-          offset = window.innerWidth - padding - rect.right;
-        }
-        
-        if (offset !== 0) {
-          tooltip.style.transform = `translate(-50%, 0) translateX(${offset}px)`;
-        }
-      });
-    }
-  }, [activeCell]);
 
   // Extract last 12 contribution days for the mini preview strip in the header
   const miniSquares = useMemo(() => {
@@ -156,7 +131,7 @@ export function GitHubHeatmap({ isOpen: controlledIsOpen, onToggle }: GitHubHeat
     if (wIdx === 0 && week.contributionDays.length > 0) {
       const firstDateStr = week.contributionDays[0].date;
       const dayOfWeek = new Date(firstDateStr).getDay();
-      
+
       if (dayOfWeek > 0 && week.contributionDays.length < 7) {
         const paddedDays = Array(dayOfWeek).fill(null);
         return {
@@ -173,10 +148,10 @@ export function GitHubHeatmap({ isOpen: controlledIsOpen, onToggle }: GitHubHeat
   processedWeeks.forEach((week, wIdx) => {
     const firstValidDay = week.contributionDays.find(d => d !== null);
     if (!firstValidDay) return;
-    
+
     const dateObj = new Date(firstValidDay.date);
     const currentMonth = dateObj.toLocaleString('default', { month: 'short' });
-    
+
     if (wIdx === 0) {
       monthLabels.push({ name: currentMonth, colIndex: wIdx });
     } else {
@@ -198,7 +173,7 @@ export function GitHubHeatmap({ isOpen: controlledIsOpen, onToggle }: GitHubHeat
 
   const formatDateString = (dateStr: string) => {
     return new Date(dateStr).toLocaleDateString("en-US", {
-      month: "long",
+      month: "short",
       day: "numeric",
       year: "numeric"
     });
@@ -209,11 +184,10 @@ export function GitHubHeatmap({ isOpen: controlledIsOpen, onToggle }: GitHubHeat
   return (
     <>
       <div
-        className={`exp-card github-heatmap-card group w-full ${isOpen ? "is-open" : ""} ${
-          isHovered
+        className={`exp-card github-heatmap-card group w-full ${isOpen ? "is-open" : ""} ${isHovered
             ? "is-hovered border-[var(--primary-text)] shadow-[0_0_24px_rgba(246,237,220,0.12)]"
             : "border-[var(--line)]"
-        }`}
+          }`}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => {
           setIsHovered(false);
@@ -222,35 +196,31 @@ export function GitHubHeatmap({ isOpen: controlledIsOpen, onToggle }: GitHubHeat
       >
         {/* 4 Corner Accents with Glow (matching Work card exactly) */}
         <div
-          className={`corner-accent absolute top-[-2px] left-[-2px] w-3 h-3 border-t-2 border-l-2 border-[var(--primary-text)] transition-all duration-300 pointer-events-none z-10 ${
-            isHovered
+          className={`corner-accent absolute top-[-2px] left-[-2px] w-3 h-3 border-t-2 border-l-2 border-[var(--primary-text)] transition-all duration-300 pointer-events-none z-10 ${isHovered
               ? "corner-accent-active opacity-100"
               : "opacity-40 group-hover:opacity-100 group-hover:drop-shadow-[0_0_8px_var(--primary-text)]"
-          }`}
+            }`}
           aria-hidden="true"
         />
         <div
-          className={`corner-accent absolute top-[-2px] right-[-2px] w-3 h-3 border-t-2 border-r-2 border-[var(--primary-text)] transition-all duration-300 pointer-events-none z-10 ${
-            isHovered
+          className={`corner-accent absolute top-[-2px] right-[-2px] w-3 h-3 border-t-2 border-r-2 border-[var(--primary-text)] transition-all duration-300 pointer-events-none z-10 ${isHovered
               ? "corner-accent-active opacity-100"
               : "opacity-40 group-hover:opacity-100 group-hover:drop-shadow-[0_0_8px_var(--primary-text)]"
-          }`}
+            }`}
           aria-hidden="true"
         />
         <div
-          className={`corner-accent absolute bottom-[-2px] left-[-2px] w-3 h-3 border-b-2 border-l-2 border-[var(--primary-text)] transition-all duration-300 pointer-events-none z-10 ${
-            isHovered
+          className={`corner-accent absolute bottom-[-2px] left-[-2px] w-3 h-3 border-b-2 border-l-2 border-[var(--primary-text)] transition-all duration-300 pointer-events-none z-10 ${isHovered
               ? "corner-accent-active opacity-100"
               : "opacity-40 group-hover:opacity-100 group-hover:drop-shadow-[0_0_8px_var(--primary-text)]"
-          }`}
+            }`}
           aria-hidden="true"
         />
         <div
-          className={`corner-accent absolute bottom-[-2px] right-[-2px] w-3 h-3 border-b-2 border-r-2 border-[var(--primary-text)] transition-all duration-300 pointer-events-none z-10 ${
-            isHovered
+          className={`corner-accent absolute bottom-[-2px] right-[-2px] w-3 h-3 border-b-2 border-r-2 border-[var(--primary-text)] transition-all duration-300 pointer-events-none z-10 ${isHovered
               ? "corner-accent-active opacity-100"
               : "opacity-40 group-hover:opacity-100 group-hover:drop-shadow-[0_0_8px_var(--primary-text)]"
-          }`}
+            }`}
           aria-hidden="true"
         />
 
@@ -258,30 +228,67 @@ export function GitHubHeatmap({ isOpen: controlledIsOpen, onToggle }: GitHubHeat
         <button
           id="github-heatmap-header"
           type="button"
-          className="github-header-btn w-full bg-transparent border-none outline-none m-0 px-6 py-4 text-left cursor-pointer flex items-center justify-between gap-4 select-none font-mono focus-visible:outline-2 focus-visible:outline-[var(--acc)] box-sizing-border"
+          className="relative github-header-btn w-full bg-transparent border-none outline-none m-0 px-4 sm:px-6 py-4 text-left cursor-pointer flex items-center justify-between gap-2.5 sm:gap-4 select-none font-mono focus-visible:outline-2 focus-visible:outline-[var(--acc)] box-sizing-border"
           onClick={handleToggle}
           aria-expanded={isOpen}
           aria-controls="github-heatmap-content"
         >
           {/* Left: [NUMBER] CONTRIBUTIONS + [5 GitHub Style Boxes from Image 2] */}
-          <div className="flex items-center gap-3 sm:gap-4 flex-wrap">
-            <div className="flex items-baseline gap-2">
-              <span className="font-mono font-bold text-base sm:text-lg text-[var(--primary-text,#f6eddc)] tracking-tight">
+          <div
+            className={`flex items-center gap-2.5 sm:gap-3 flex-shrink-0 transition-opacity duration-200 ${
+              activeCell ? "max-sm:opacity-0 max-sm:pointer-events-none" : "opacity-100"
+            }`}
+          >
+            <div className="flex items-baseline gap-1.5 sm:gap-2">
+              <span
+                style={{ fontFamily: 'var(--font-ivyora), "IvyOra Display", "ivyora-display"' }}
+                className="font-ivyora italic font-normal text-xl sm:text-2xl text-[var(--primary-text,#f6eddc)] tracking-tight leading-none"
+              >
                 {totalCount}
               </span>
-              <span className="font-mono text-xs text-[var(--secondary-text,#8a857b)] uppercase tracking-widest">
-                CONTRIBUTIONS
+              <span
+                style={{ fontFamily: 'var(--font-ivyora), "IvyOra Display", "ivyora-display"' }}
+                className="font-ivyora italic font-normal text-base sm:text-lg text-[var(--primary-text,#f6eddc)] tracking-normal leading-none"
+              >
+                Contributions
               </span>
             </div>
 
             {/* 5 GitHub style boxes as shown in Image 2 */}
-            <div className="github-preview-boxes flex items-center gap-[3px]" aria-hidden="true">
+            <div className="github-preview-boxes hidden md:flex items-center gap-[3px]" aria-hidden="true">
               {GITHUB_STYLE_BOXES.map((boxClass, idx) => (
                 <div
                   key={idx}
-                  className={`w-[11px] h-[11px] rounded-[1px] ${boxClass}`}
+                  className={`w-[11px] h-[11px] rounded-[3px] ${boxClass}`}
                 />
               ))}
+            </div>
+          </div>
+
+          {/* Center / Left on mobile: Hover Details */}
+          <div className="sm:flex-1 sm:flex sm:items-center sm:justify-center sm:px-2 min-w-0 max-sm:absolute max-sm:left-4 max-sm:top-1/2 max-sm:-translate-y-1/2 pointer-events-none">
+            <div
+              className={`whitespace-nowrap transition-all duration-200 flex items-center gap-1.5 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-[var(--panel)] border border-[var(--line)] shadow-[0_2px_8px_rgba(0,0,0,0.15)] backdrop-blur-sm ${
+                activeCell ? "opacity-100 scale-100" : "opacity-0 scale-95"
+              }`}
+              aria-live="polite"
+            >
+              {activeCell && (
+                <>
+                  <span
+                    style={{ fontFamily: 'var(--font-ivyora), "IvyOra Display", "ivyora-display"' }}
+                    className="font-ivyora italic font-normal text-xs sm:text-base text-[var(--primary-text)] leading-none"
+                  >
+                    {activeCell.count === 0 ? "No" : activeCell.count} {activeCell.count === 1 ? "contribution" : "contributions"}
+                  </span>
+                  <span className="text-[var(--secondary-text)] opacity-40 font-mono text-xs select-none px-0.5">
+                    |
+                  </span>
+                  <span className="font-mono text-[10px] sm:text-[11px] text-[var(--secondary-text)] font-normal tracking-wide">
+                    {formatDateString(activeCell.date)}
+                  </span>
+                </>
+              )}
             </div>
           </div>
 
@@ -298,9 +305,8 @@ export function GitHubHeatmap({ isOpen: controlledIsOpen, onToggle }: GitHubHeat
               strokeWidth="1.8"
               strokeLinecap="round"
               strokeLinejoin="round"
-              className={`transition-transform duration-300 ml-0.5 ${
-                isOpen ? "rotate-180 text-[var(--acc,#f5643e)]" : "text-[var(--secondary-text,#8a857b)]"
-              }`}
+              className={`transition-transform duration-300 ml-0.5 ${isOpen ? "rotate-180 text-[var(--acc,#f5643e)]" : "text-[var(--secondary-text,#8a857b)]"
+                }`}
               aria-hidden="true"
             >
               <polyline points="6 9 12 15 18 9" />
@@ -369,7 +375,7 @@ export function GitHubHeatmap({ isOpen: controlledIsOpen, onToggle }: GitHubHeat
                                 return (
                                   <div
                                     key={`empty-${dIdx}`}
-                                    className="w-full aspect-square rounded-[1px] bg-transparent pointer-events-none"
+                                    className="w-full aspect-square rounded-[3px] bg-transparent pointer-events-none"
                                   />
                                 );
                               }
@@ -380,38 +386,28 @@ export function GitHubHeatmap({ isOpen: controlledIsOpen, onToggle }: GitHubHeat
                                 <div
                                   key={day.date}
                                   tabIndex={0}
-                                  className={`relative w-full aspect-square rounded-[1px] transition-all cursor-pointer focus:outline-none ${getLevelColor(
+                                  className={`relative w-full aspect-square rounded-[3px] transition-all cursor-pointer focus:outline-none ${getLevelColor(
                                     day.contributionLevel
-                                  )} ${
-                                    isActive
-                                      ? "outline outline-1 outline-[var(--primary-text)] outline-offset-[-1px] z-10 dark:outline-white"
-                                      : "hover:outline hover:outline-1 hover:outline-[var(--primary-text)] hover:outline-offset-[-1px] hover:z-10 dark:hover:outline-white"
-                                  }`}
-                                  onPointerEnter={(e) => {
-                                    const rect = e.currentTarget.getBoundingClientRect();
+                                  )} ${isActive
+                                      ? "ring-1 ring-[var(--primary-text)] z-10 !opacity-100"
+                                      : "hover:ring-1 hover:ring-[var(--primary-text)] hover:z-10 hover:!opacity-100"
+                                    }`}
+                                  onPointerEnter={() => {
                                     setActiveCell({
                                       count: day.contributionCount,
                                       date: day.date,
-                                      x: rect.left + rect.width / 2,
-                                      y: rect.top,
                                     });
                                   }}
-                                  onPointerDown={(e) => {
-                                    const rect = e.currentTarget.getBoundingClientRect();
+                                  onPointerDown={() => {
                                     setActiveCell({
                                       count: day.contributionCount,
                                       date: day.date,
-                                      x: rect.left + rect.width / 2,
-                                      y: rect.top,
                                     });
                                   }}
-                                  onFocus={(e) => {
-                                    const rect = e.currentTarget.getBoundingClientRect();
+                                  onFocus={() => {
                                     setActiveCell({
                                       count: day.contributionCount,
                                       date: day.date,
-                                      x: rect.left + rect.width / 2,
-                                      y: rect.top,
                                     });
                                   }}
                                   onBlur={() => setActiveCell(null)}
@@ -429,27 +425,27 @@ export function GitHubHeatmap({ isOpen: controlledIsOpen, onToggle }: GitHubHeat
                   <div className="w-full h-px border-b border-dashed border-[var(--line)] opacity-50 my-2" />
 
                   {/* Footer */}
-                  <div className="flex flex-wrap justify-between items-center gap-3 text-[10px] sm:text-xs tracking-widest uppercase font-mono text-[var(--mute)]">
+                  <div className="flex justify-between items-center gap-2 text-[10px] sm:text-xs tracking-widest uppercase font-mono text-[var(--mute)]">
                     <a
                       href={`https://github.com/${siteConfig.githubUsername}`}
                       target="_blank"
                       rel="noreferrer"
-                      className="flex items-center gap-2 hover:text-[var(--text)] transition-colors focus-visible:outline focus-visible:outline-[var(--acc)] normal-case"
+                      className="flex items-center gap-1.5 sm:gap-2 hover:text-[var(--text)] transition-colors focus-visible:outline focus-visible:outline-[var(--acc)] normal-case flex-shrink-0"
                     >
                       @{siteConfig.githubUsername}
                       <ExternalLinkIcon />
                     </a>
 
-                    <div className="flex items-center gap-2">
-                      <span>Less</span>
+                    <div className="flex items-center gap-1.5 sm:gap-2 ml-auto flex-shrink-0">
+                      <span className="heatmap-legend-label max-[330px]:hidden">Less</span>
                       <div className="flex gap-[2px]">
-                        <div className={`w-[12px] h-[12px] rounded-[1px] ${getLevelColor("NONE")}`} />
-                        <div className={`w-[12px] h-[12px] rounded-[1px] ${getLevelColor("FIRST_QUARTILE")}`} />
-                        <div className={`w-[12px] h-[12px] rounded-[1px] ${getLevelColor("SECOND_QUARTILE")}`} />
-                        <div className={`w-[12px] h-[12px] rounded-[1px] ${getLevelColor("THIRD_QUARTILE")}`} />
-                        <div className={`w-[12px] h-[12px] rounded-[1px] ${getLevelColor("FOURTH_QUARTILE")}`} />
+                        <div className={`w-[12px] h-[12px] rounded-[3px] ${getLevelColor("NONE")}`} />
+                        <div className={`w-[12px] h-[12px] rounded-[3px] ${getLevelColor("FIRST_QUARTILE")}`} />
+                        <div className={`w-[12px] h-[12px] rounded-[3px] ${getLevelColor("SECOND_QUARTILE")}`} />
+                        <div className={`w-[12px] h-[12px] rounded-[3px] ${getLevelColor("THIRD_QUARTILE")}`} />
+                        <div className={`w-[12px] h-[12px] rounded-[3px] ${getLevelColor("FOURTH_QUARTILE")}`} />
                       </div>
-                      <span>More</span>
+                      <span className="heatmap-legend-label max-[330px]:hidden">More</span>
                     </div>
                   </div>
                 </>
@@ -458,22 +454,6 @@ export function GitHubHeatmap({ isOpen: controlledIsOpen, onToggle }: GitHubHeat
           </div>
         </div>
       </div>
-
-      {/* Custom Tooltip rendered via fixed positioning */}
-      {activeCell && (
-        <div
-          ref={tooltipRef}
-          className="fixed z-50 pointer-events-none bg-[var(--card)] border border-[var(--line)] text-[var(--text)] px-3 py-2 rounded-sm text-xs font-mono shadow-xl whitespace-nowrap transform -translate-y-full flex flex-col gap-1 transition-opacity"
-          style={{
-            left: activeCell.x,
-            top: activeCell.y - 8,
-          }}
-        >
-          <span className="font-bold">
-            {activeCell.count} {activeCell.count === 1 ? "contribution" : "contributions"} on {formatDateString(activeCell.date)}
-          </span>
-        </div>
-      )}
     </>
   );
 }
