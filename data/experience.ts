@@ -1,6 +1,7 @@
 export type Experience = {
   company: string;
   initials: string;
+  logo?: string;
   hash?: string;
   role: string;
   start: string;
@@ -15,6 +16,7 @@ export const experiences: Experience[] = [
   {
     company: "Virdhi Tech Lab Pvt Ltd",
     initials: "VTL",
+    logo: "/images/virdhi-tech-lab.png",
     hash: "a41d7e9",
     role: "AI Prompt Engineer Intern",
     start: "Jun 2026",

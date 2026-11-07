@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
+import "./signature.css";
+import { Signature } from "./Signature";
 
 const Lanyard = dynamic(() => import("@/components/Lanyard/Lanyard"), {
   ssr: false,
@@ -89,6 +91,9 @@ export function HeroLanyard() {
       aria-label="Interactive ID card. Drag to swing it, click to flip."
       className="pointer-events-none"
     >
+      <div className="signature-viewport" aria-hidden="true">
+        <Signature anchor={anchor} />
+      </div>
       <Lanyard
         frontImage="/lanyard/Portfolio-img.png"
         backImage="/lanyard/card-back.png"

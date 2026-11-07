@@ -1,0 +1,45 @@
+.signature-viewport {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.hero-signature {
+  position: absolute;
+  top: 24%;
+  width: min(82vw, 1120px);
+  height: auto;
+  transform: translateX(-50%);
+  overflow: visible;
+  pointer-events: none;
+  color: var(--primary-text, #f6eddc);
+  opacity: 0.72;
+}
+
+.signature-stroke {
+  stroke: currentColor;
+  stroke-width: 1.35;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 2000;
+  stroke-dashoffset: 2000;
+  filter: drop-shadow(0 0 2px rgba(246, 237, 220, 0.5)) drop-shadow(0 0 5px rgba(246, 237, 220, 0.2));
+}
+
+.signature-tip {
+  fill: #fffdf7;
+  opacity: 0;
+  filter: drop-shadow(0 0 3px #fffdf7) drop-shadow(0 0 9px #fff8e8) drop-shadow(0 0 16px rgba(255, 248, 232, 0.7));
+}
+
+@media (max-width: 1023px) {
+  .hero-signature {
+    top: 26%;
+    left: 50% !important;
+    width: min(140vw, 760px);
+    transform: translateX(-50%);
+    opacity: 0.6;
+  }
+}
+

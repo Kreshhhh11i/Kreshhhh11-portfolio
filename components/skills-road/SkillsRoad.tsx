@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import dynamic from 'next/dynamic';
+import './SkillsRoad.css';
 import {
   SKILLS_ROAD_DATA,
   SkillCategory,
@@ -40,6 +41,9 @@ const CATEGORIES: Array<SkillCategory | 'All'> = [
 
 export function SkillsRoad() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const categoryMenuRef = useRef<HTMLDivElement>(null);
+  const categoryButtonRef = useRef<HTMLButtonElement>(null);
+  const [categoryMenuOpen, setCategoryMenuOpen] = useState(false);
 
   // Layout mode: 'classic' | 'shuffle'
   const [layoutMode, setLayoutMode] = useState<'classic' | 'shuffle'>('classic');
@@ -57,6 +61,34 @@ export function SkillsRoad() {
 
   // Active category filter
   const [activeCategory, setActiveCategory] = useState<SkillCategory | 'All'>('All');
+
+  const selectCategory = (category: SkillCategory | 'All') => {
+    setActiveCategory(category);
+    setMoveMode('jump');
+    const index = category === 'All'
+      ? 0
+      : SKILLS_ROAD_DATA.findIndex((skill) => skill.category === category);
+    if (index !== -1) setTargetIndex(index);
+  };
+
+  useEffect(() => {
+    if (!categoryMenuOpen) return;
+    const closeOnOutsideClick = (event: PointerEvent) => {
+      if (!categoryMenuRef.current?.contains(event.target as Node)) setCategoryMenuOpen(false);
+    };
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setCategoryMenuOpen(false);
+        categoryButtonRef.current?.focus();
+      }
+    };
+    document.addEventListener('pointerdown', closeOnOutsideClick);
+    document.addEventListener('keydown', closeOnEscape);
+    return () => {
+      document.removeEventListener('pointerdown', closeOnOutsideClick);
+      document.removeEventListener('keydown', closeOnEscape);
+    };
+  }, [categoryMenuOpen]);
 
   // Token position indices (0 to 36) & movement mode
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -190,7 +222,8 @@ export function SkillsRoad() {
   // Keyboard navigation: Space = roll, Left = prev, Right = next
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement)?.tagName)) return;
+      const target = e.target as HTMLElement | null;
+      if (!isInView || target?.closest('button, a, input, textarea, select, [contenteditable="true"]')) return;
 
       if (e.code === 'Space') {
         e.preventDefault();
@@ -206,7 +239,7 @@ export function SkillsRoad() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [rollDice, stepPrev, stepNext]);
+  }, [isInView, rollDice, stepPrev, stepNext]);
 
   // Token step update callback
   const handleTokenStep = useCallback((newIndex: number) => {
@@ -244,71 +277,78 @@ export function SkillsRoad() {
       </ul>
 
       {/* TOP CONTROLS BAR: Clean buttons without corner tick edges or hover glow */}
-      <div className="w-full flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 py-2 border-b border-[var(--line)] border-dashed">
+      <div className="skills-toolbar">
         {/* Category Filter Chips */}
-        <div className="w-full sm:w-auto flex flex-wrap items-center gap-1.5 sm:gap-2">
+        <div className="skills-filters" role="group" aria-label="Filter skills by category">
           {CATEGORIES.map((cat) => {
             const isActive = activeCategory === cat;
             return (
               <button
                 key={cat}
                 type="button"
-                onClick={() => {
-                  setActiveCategory(cat);
-                  if (cat !== 'All') {
-                    const firstMatch = SKILLS_ROAD_DATA.findIndex(
-                      (s) => s.category === cat
-                    );
-                    if (firstMatch !== -1) {
-                      setMoveMode('jump');
-                      setTargetIndex(firstMatch);
-                    }
-                  } else {
-                    setMoveMode('jump');
-                    setTargetIndex(0);
-                  }
-                }}
-                className={`px-3 py-1.5 rounded-sm text-[11px] sm:text-xs font-mono transition-colors cursor-pointer flex items-center gap-1.5 border border-dashed select-none ${
-                  isActive
-                    ? 'bg-[#f6eddc] text-[#0a0a0a] font-bold border-[#f6eddc]'
-                    : 'bg-[#14120f]/60 text-[var(--muted)] border-[var(--line)] hover:text-[#f6eddc] hover:border-[var(--line-strong)]'
-                }`}
+                aria-pressed={isActive}
+                onClick={() => selectCategory(cat)}
+                className={`skills-filter ${isActive ? 'is-active' : ''}`}
               >
-                {cat !== 'All' && (
-                  <span
-                    className="w-1.5 h-1.5 shrink-0"
-                    style={{ backgroundColor: CATEGORY_COLORS[cat as SkillCategory] }}
-                  />
-                )}
                 {cat}
               </button>
             );
           })}
         </div>
+        <div ref={categoryMenuRef} className="skills-category-select">
+          <button
+            ref={categoryButtonRef}
+            type="button"
+            className="skills-category-trigger"
+            aria-label={`Skill category: ${activeCategory === 'All' ? 'All skills' : activeCategory}`}
+            aria-expanded={categoryMenuOpen}
+            aria-controls="skills-category-menu"
+            onClick={() => setCategoryMenuOpen((open) => !open)}
+          >
+            <span>{activeCategory === 'All' ? 'All skills' : activeCategory}</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
+          </button>
+          <div id="skills-category-menu" className="skills-category-menu" role="group" aria-label="Choose skill category" hidden={!categoryMenuOpen}>
+            {CATEGORIES.map((category) => (
+              <button
+                key={category}
+                type="button"
+                className="skills-category-option"
+                aria-pressed={category === activeCategory}
+                onClick={() => {
+                  selectCategory(category);
+                  setCategoryMenuOpen(false);
+                  categoryButtonRef.current?.focus();
+                }}
+              >
+                <span>{category === 'All' ? 'All skills' : category}</span>
+                {category === activeCategory && (
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12l4 4L19 6" /></svg>
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
 
         {/* View & Layout Actions */}
-        <div className="w-full sm:w-auto flex flex-wrap items-center justify-between sm:justify-end gap-2 text-xs font-mono">
+        <div className="skills-view-controls" aria-label="Board display controls">
           {/* Classic / Shuffle Road Toggle */}
-          <div className="flex items-center gap-1.5">
+          <div className="skills-layout-control" role="group" aria-label="Board layout">
             <button
               type="button"
+              aria-pressed={layoutMode === 'classic'}
               onClick={() => switchLayout('classic')}
-              className={`px-3 py-1.5 rounded-sm text-[11px] sm:text-xs font-mono transition-colors cursor-pointer border border-dashed select-none ${
-                layoutMode === 'classic'
-                  ? 'bg-[var(--accent)] text-white font-bold border-[var(--accent)]'
-                  : 'bg-[#14120f]/60 text-[var(--muted)] border-[var(--line)] hover:text-[#f6eddc] hover:border-[var(--line-strong)]'
-              }`}
+              className={`skills-view-button ${layoutMode === 'classic' ? 'is-active' : ''}`}
             >
               Classic
             </button>
             <button
               type="button"
+              aria-pressed={layoutMode === 'shuffle'}
               onClick={() => switchLayout('shuffle')}
-              className={`px-3 py-1.5 rounded-sm text-[11px] sm:text-xs font-mono transition-colors cursor-pointer border border-dashed select-none ${
-                layoutMode === 'shuffle'
-                  ? 'bg-[var(--accent)] text-white font-bold border-[var(--accent)]'
-                  : 'bg-[#14120f]/60 text-[var(--muted)] border-[var(--line)] hover:text-[#f6eddc] hover:border-[var(--line-strong)]'
-              }`}
+              className={`skills-view-button ${layoutMode === 'shuffle' ? 'is-active' : ''}`}
             >
               Shuffle
             </button>
@@ -320,11 +360,8 @@ export function SkillsRoad() {
               type="button"
               onClick={() => setIsFlatView((v) => !v)}
               title="Toggle Top-Down Flat View"
-              className={`px-3 py-1.5 rounded-sm border border-dashed text-[11px] sm:text-xs font-mono transition-colors cursor-pointer flex items-center gap-1.5 select-none ${
-                isFlatView
-                  ? 'bg-[#f6eddc] text-[#0a0a0a] font-bold border-[#f6eddc]'
-                  : 'bg-[#14120f]/60 text-[var(--muted)] border-[var(--line)] hover:text-[#f6eddc] hover:border-[var(--line-strong)]'
-              }`}
+              aria-pressed={isFlatView}
+              className="skills-view-toggle"
             >
               <span>{isFlatView ? 'Isometric' : 'Flat View'}</span>
             </button>
@@ -333,7 +370,7 @@ export function SkillsRoad() {
       </div>
 
       {/* 3D CANVAS VIEWPORT (Clean container without corner edges or hover glow) */}
-      <div className="w-full h-[390px] sm:h-[520px] md:h-[620px] rounded-sm bg-[#0a0a0a] border border-dashed border-[var(--line)] shadow-xl relative overflow-hidden">
+      <div className="w-full h-[390px] sm:h-[520px] md:h-[620px] bg-[#0a0a0a] border border-[var(--line)] relative overflow-hidden">
         <Scene
           skills={SKILLS_ROAD_DATA}
           layoutPoints={currentLayoutPoints}
@@ -353,120 +390,81 @@ export function SkillsRoad() {
         />
 
         {/* In-Canvas Floating Interactive Controls (Bottom Left) */}
-        <div className="absolute bottom-2.5 left-2.5 sm:bottom-4 sm:left-4 flex items-center gap-2 z-10 max-w-[calc(100%-20px)]">
+        <div className="skills-board-controls">
           {/* Dice Roller Button */}
           <button
             type="button"
             onClick={rollDice}
             disabled={isRolling}
-            className="px-3 py-1.5 sm:px-4 sm:py-2 rounded-sm bg-[#14120f]/95 backdrop-blur-md border border-dashed border-[var(--line-strong)] text-[#f6eddc] hover:border-[#f6eddc]/50 font-mono text-xs sm:text-sm flex items-center gap-2 sm:gap-2.5 transition-colors shadow-lg cursor-pointer active:scale-95 shrink-0"
+            className="skills-roll"
           >
             <span
-              className={`w-6 h-6 sm:w-7 sm:h-7 rounded-sm bg-[var(--accent)] text-white font-bold flex items-center justify-center text-xs sm:text-sm shadow-sm transition-transform duration-300 ${
+              className={`skills-die ${
                 isRolling ? 'rotate-180 scale-110' : ''
               }`}
             >
               {diceValue}
             </span>
-            <span className="font-semibold tracking-wide">
+            <span>
               {isRolling ? 'Rolling...' : 'Roll Dice'}
-            </span>
-            <span className="hidden sm:inline text-[var(--muted)] text-xs font-normal">
-              (Space)
             </span>
           </button>
 
           {/* Step Back & Forward */}
-          <div className="inline-flex rounded-sm bg-[#14120f]/95 backdrop-blur-md border border-dashed border-[var(--line)] p-0.5 sm:p-1 text-[11px] sm:text-xs font-mono shrink-0 items-center">
+          <div className="skills-step-controls" role="group" aria-label="Navigate skills">
             <button
               type="button"
               onClick={stepPrev}
               disabled={currentIndex <= 0}
               title="Previous Tile (←)"
-              className="px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-sm text-[var(--muted)] hover:text-[#f6eddc] disabled:opacity-30 cursor-pointer transition-colors"
+              aria-label="Previous skill"
+              className="skills-step"
             >
-              ◀ Prev
+              ←
             </button>
-            <div className="w-[1px] h-4 bg-[var(--line)] mx-0.5" />
             <button
               type="button"
               onClick={stepNext}
               disabled={currentIndex >= SKILLS_ROAD_DATA.length - 1}
               title="Next Tile (→)"
-              className="px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-sm text-[var(--muted)] hover:text-[#f6eddc] disabled:opacity-30 cursor-pointer transition-colors"
+              aria-label="Next skill"
+              className="skills-step"
             >
-              Next ▶
+              →
             </button>
           </div>
         </div>
 
         {/* Progress Indicator (Top Right in Canvas) */}
-        <div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-10 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-sm bg-[#14120f]/85 backdrop-blur-md border border-dashed border-[var(--line)] text-[11px] sm:text-xs font-mono text-[var(--muted)] flex items-center gap-1.5 sm:gap-2">
-          <span className="text-[var(--ink)] font-semibold">
-            Tile {currentIndex + 1}
-          </span>
-          <span>/</span>
-          <span>{SKILLS_ROAD_DATA.length}</span>
+        <div className="skills-progress" aria-label={`Skill ${currentIndex + 1} of ${SKILLS_ROAD_DATA.length}`}>
+          <span>{String(currentIndex + 1).padStart(2, '0')}</span>
+          <span aria-hidden="true"> / {String(SKILLS_ROAD_DATA.length).padStart(2, '0')}</span>
         </div>
       </div>
 
       {/* HTML INFO BAR UNDER CANVAS */}
-      <div className="w-full max-w-full rounded-sm bg-[#14120f]/90 backdrop-blur-md border border-dashed border-[var(--line)] p-3.5 sm:p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-3.5 shadow-lg">
-        {/* Left: Skill Details */}
-        <div className="flex items-center gap-3 sm:gap-4 w-full min-w-0 flex-1">
-          {/* Color Indicator */}
-          <div
-            className="w-10 h-10 sm:w-12 sm:h-12 rounded-sm flex items-center justify-center font-mono font-bold text-base sm:text-lg shadow-inner shrink-0 border border-dashed"
-            style={{
-              backgroundColor: `${currentSkill.color}18`,
-              borderColor: `${currentSkill.color}60`,
-              color: currentSkill.color,
-            }}
-          >
-            {currentSkill.name.slice(0, 2).toUpperCase()}
+      <div className="skills-detail">
+        <div className="skills-detail-copy">
+          <div className="skills-detail-heading">
+            <h3>{currentSkill.name}</h3>
+            <span className="skills-detail-category" style={{ color: CATEGORY_COLORS[currentSkill.category] }}>
+              {currentSkill.category}
+            </span>
+            <span className="skills-detail-level">{currentSkill.level}</span>
           </div>
-
-          <div className="flex flex-col gap-1 min-w-0 flex-1">
-            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-              <h3 className="font-sans font-bold text-base sm:text-lg text-[#f6eddc] tracking-tight">
-                {currentSkill.name}
-              </h3>
-              <span
-                className="px-2 py-0.5 rounded-sm text-[10px] sm:text-[11px] font-mono uppercase tracking-wider font-semibold border border-dashed"
-                style={{
-                  backgroundColor: `${CATEGORY_COLORS[currentSkill.category]}18`,
-                  borderColor: `${CATEGORY_COLORS[currentSkill.category]}40`,
-                  color: CATEGORY_COLORS[currentSkill.category],
-                }}
-              >
-                {currentSkill.category}
-              </span>
-              <span className="px-2 py-0.5 rounded-sm text-[10px] sm:text-[11px] font-mono text-[var(--muted)] bg-[#1e1c18] border border-dashed border-[var(--line)] capitalize">
-                Level: {currentSkill.level}
-              </span>
-            </div>
-            <p className="font-mono text-xs text-[var(--muted)] break-words leading-relaxed">
-              <span className="text-[#f6eddc] font-medium">
-                {currentSkill.tagline}
-              </span>{' '}
-              — {currentSkill.description}
-            </p>
-          </div>
+          <p><span className="skills-detail-tagline">{currentSkill.tagline}</span> — {currentSkill.description}</p>
         </div>
-
-        {/* Right: FINISH "Let's talk" CTA or quick navigation hint */}
-        <div className="shrink-0 flex items-center justify-between sm:justify-end w-full md:w-auto pt-2 md:pt-0 border-t md:border-t-0 border-[var(--line)] border-dashed">
+        <div className="skills-detail-aside">
           {currentIndex === SKILLS_ROAD_DATA.length - 1 ? (
             <a
               href="#contact"
-              className="px-4 py-2 sm:px-5 sm:py-2.5 rounded-sm bg-[var(--accent)] text-white font-mono font-semibold text-xs tracking-wider uppercase hover:bg-[#e05330] transition-colors shadow-md flex items-center gap-2 animate-pulse cursor-pointer w-full sm:w-auto justify-center border border-dashed border-[#f6eddc]/40"
+              className="skills-contact-link"
             >
-              <span>🎉 Let&apos;s talk!</span>
-              <span>→</span>
+              Let&apos;s talk <span aria-hidden="true">↗</span>
             </a>
           ) : (
-            <span className="text-xs font-mono text-[var(--muted)]">
-              Tap any tile or press <kbd className="px-1.5 py-0.5 rounded-sm bg-[#1e1c18] border border-dashed border-[var(--line)] text-[#f6eddc]">Space</kbd> to hop
+            <span>
+              Select a tile <span aria-hidden="true">·</span> Press <kbd>Space</kbd> to roll
             </span>
           )}
         </div>

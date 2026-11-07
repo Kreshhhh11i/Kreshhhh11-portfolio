@@ -110,10 +110,11 @@ export default function ProjectTimeBar({
         role="tablist"
         aria-orientation="horizontal"
         onPointerEnter={(e) => {
+          if (e.pointerType !== "mouse") return;
           setIsHovered(true);
           handlePointerMove(e);
         }}
-        onPointerMove={handlePointerMove}
+        onPointerMove={(e) => { if (e.pointerType === "mouse") handlePointerMove(e); }}
         onPointerLeave={() => {
           setIsHovered(false);
           setCursorProgress(null);
@@ -142,7 +143,8 @@ export default function ProjectTimeBar({
               aria-label={`Project ${displayIndex}: ${project.name}`}
               tabIndex={0}
               onClick={() => handleSegmentClick(index)}
-              onFocus={() => {
+              onFocus={(e) => {
+                if (!e.currentTarget.matches(":focus-visible")) return;
                 setIsHovered(true);
                 setCursorProgress(index);
               }}

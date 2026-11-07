@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Image from "next/image";
 import { experiences } from "@/data/experience";
 import "./WorkExperience.css";
 
@@ -110,19 +111,18 @@ export function WorkExperience({ hideLabel, isOpen: controlledIsOpen, onToggle }
                   aria-expanded={isOpen}
                   aria-controls={contentId}
                 >
-                  {/* Logo Box (44x44) */}
-                  {/* Leave a comment so I can swap in a real <Image> logo later */}
                   <div className="exp-logo-box">
-                    <span>{exp.initials}</span>
+                    {exp.logo ? (
+                      <Image src={exp.logo} alt="" width={44} height={44} className="exp-company-logo" />
+                    ) : (
+                      <span>{exp.initials}</span>
+                    )}
                   </div>
 
                   {/* Middle Block */}
                   <div className="exp-middle-block">
                     <div className="exp-company-row">
                       <span className="exp-company-name">{exp.company}</span>
-                      <span className="exp-branch-chip">
-                        ⎇ {exp.branch || "feat/prompt"}
-                      </span>
                     </div>
                     <div className="exp-role-row">
                       <span className="exp-role-title">{exp.role}</span>

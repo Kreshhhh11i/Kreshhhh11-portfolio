@@ -17,6 +17,7 @@ interface CardDimensions {
 
 export default function ProjectsSwap() {
   const [active, setActive] = useState(0);
+  const [stackOpen, setStackOpen] = useState(false);
   const [isPointerHovered, setIsPointerHovered] = useState(false);
   const [isTabVisible, setIsTabVisible] = useState(true);
   const [isSectionVisible, setIsSectionVisible] = useState(true);
@@ -185,18 +186,6 @@ export default function ProjectsSwap() {
 
   const currentProject = projects[active] ?? projects[0];
 
-  // Status chip styles
-  const statusColors: Record<string, { text: string; border: string }> = {
-    ACTIVE: { text: "#f5643e", border: "rgba(245,100,62,0.5)" },
-    SHIPPED: { text: "#3ddc97", border: "rgba(61,220,151,0.5)" },
-    BUILDING: { text: "#e9d3a1", border: "rgba(233,211,161,0.45)" },
-  };
-
-  const statusStyle = statusColors[currentProject.status] || {
-    text: "#8a857b",
-    border: "#2c2c2c",
-  };
-
   // Action buttons: View Project and GitHub (identical width, Hero-style hover arrow)
   const renderActionButtons = (extraClass: string) => (
     <div className={`project-buttons-wrapper ${extraClass}`}>
@@ -261,7 +250,7 @@ export default function ProjectsSwap() {
       }}
     >
       {/* Main Grid: Details on Left, 3D Card Stack on Right */}
-      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,340px)_1fr] xl:grid-cols-[1fr_1.15fr] 2xl:grid-cols-2 gap-[32px] lg:gap-[40px] xl:gap-[48px] items-center">
+      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,340px)_1fr] xl:grid-cols-[1fr_1.15fr] 2xl:grid-cols-2 gap-4 sm:gap-6 lg:gap-[40px] xl:gap-[48px] items-center">
         {/* Left Column: Project details (Counter, Status, Title, Tech Stack + Buttons) */}
         <div className="w-full flex flex-col justify-center items-start text-left lg:pl-6 xl:pl-10 2xl:pl-14">
           <div
@@ -271,49 +260,45 @@ export default function ProjectsSwap() {
             aria-atomic="true"
           >
             {/* 1. Counter row */}
-            <div className="font-mono text-[11px] tracking-[0.1em] text-[#8a857b]">
-              <b style={{ color: "#f5643e" }}>
-                {String(active + 1).padStart(2, "0")}
-              </b>{" "}
-              / {String(projects.length).padStart(2, "0")}&nbsp;&nbsp;·&nbsp;&nbsp;
+            <div className="font-mono text-[12px] sm:text-[13px] tracking-[0.1em] text-[#8a857b]">
+              <span aria-label={`Project ${active + 1} of ${projects.length}`}>
+                <span aria-hidden="true">
+                  {String(projects.length).padStart(2, "0")} / <b style={{ color: "#f5643e" }}>{String(active + 1).padStart(2, "0")}</b>
+                </span>
+              </span>&nbsp;&nbsp;·&nbsp;&nbsp;
               {currentProject.kind}
             </div>
 
-            {/* 2. Status chip */}
-            <div className="mt-[10px]">
-              <span
-                className="font-mono font-medium text-[10px] tracking-[0.1em] rounded-full px-[10px] py-[2.5px] border inline-flex items-center"
-                style={{
-                  color: statusStyle.text,
-                  borderColor: statusStyle.border,
-                }}
-              >
-                {currentProject.status}
-              </span>
-            </div>
-
-            {/* 3. Project Title & (on 410px - 1023px) Action Buttons beside it */}
+            {/* Project title and status */}
             <div className="project-title-row">
-              <h3 className="font-sans font-semibold text-[clamp(20px,2.8vw,38px)] leading-tight tracking-[-0.035em] text-[#f6eddc] m-0 shrink-0">
+              <h3 className="font-ivyora italic font-normal text-[clamp(36px,4vw,58px)] leading-tight text-[#f6eddc] m-0 break-words max-w-full">
                 {currentProject.name}
               </h3>
-              {/* Action buttons beside title (active only between 410px and 1023px) */}
-              {renderActionButtons("project-buttons-beside-title")}
+              <span className={`project-status project-status-${currentProject.status.toLowerCase()}`}>{currentProject.status}</span>
             </div>
 
             {/* 4. Tech stack tags */}
-            <div className="flex flex-row flex-wrap items-center justify-start gap-2 sm:gap-2.5 w-full mt-1">
+            <div className="project-stack-dropdown">
+              <button type="button" className="project-stack-toggle" aria-expanded={stackOpen} aria-controls="project-stack-content" onClick={() => setStackOpen(!stackOpen)}>
+                TECHNOLOGIES USED
+                <svg className="project-stack-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9" /></svg>
+              </button>
+              <div id="project-stack-content" className={`project-stack-content ${stackOpen ? "is-open" : ""}`} inert={!stackOpen}>
+                <div><div className="project-stack-tags">{currentProject.tags.map((tag) => <span key={tag}>{tag}</span>)}</div></div>
+              </div>
+            </div>
+            <div className="project-stack-desktop flex flex-row flex-wrap items-center justify-start gap-2 sm:gap-2.5 w-full mt-1">
               {currentProject.tags.map((tag) => (
                 <span
                   key={tag}
-                  className="font-mono text-[10px] sm:text-[11px] text-[#b9b2a2] border border-[#2c2c2c] rounded-[4px] px-2 py-1 bg-[#141414]/60 whitespace-nowrap shrink-0"
+                  className="font-mono text-[12px] sm:text-[13px] text-[#b9b2a2] border border-[#2c2c2c] rounded-[4px] px-2.5 py-1.5 bg-[#141414]/60 whitespace-nowrap shrink-0"
                 >
                   {tag}
                 </span>
               ))}
             </div>
 
-            {/* 5. Action buttons below tech stack (active on < 410px and >= 1024px) */}
+            {/* Action buttons below the tech stack */}
             {renderActionButtons("project-buttons-below-tags")}
           </div>
         </div>
@@ -322,7 +307,7 @@ export default function ProjectsSwap() {
         <div className="flex flex-col items-center justify-center w-full">
           <div
             ref={stackContainerRef}
-            className="relative w-full h-[300px] sm:h-[350px] lg:h-[480px] xl:h-[530px] 2xl:h-[560px] flex items-center justify-center"
+            className="relative w-full h-[210px] min-[400px]:h-[250px] sm:h-[350px] lg:h-[480px] xl:h-[530px] 2xl:h-[560px] flex items-center justify-center"
             onPointerOver={(e) => {
               if ((e.target as HTMLElement).closest?.("[data-swap-index]")) {
                 setIsPointerHovered(true);
@@ -560,7 +545,7 @@ export default function ProjectsSwap() {
           </div>
 
           {/* Time process bar centered directly under the card swap component */}
-          <div className="w-full flex justify-center mt-3 lg:mt-4">
+          <div className="w-full flex justify-center mt-1 lg:mt-4">
             <ProjectTimeBar
               projects={projects}
               activeIndex={active}

@@ -4,6 +4,7 @@ import { SigningBox } from "@/components/SigningBox";
 import { ExperienceSection } from "@/components/experience/ExperienceSection";
 import ProjectsSwap from "@/components/projects/ProjectsSwap";
 import { SkillsRoad } from "@/components/skills-road/SkillsRoad";
+import { DeveloperQuotes } from "@/components/contact/DeveloperQuotes";
 
 export default function Home() {
   return (
@@ -104,6 +105,7 @@ export default function Home() {
               </a>
             </div>
           </div>
+          <DeveloperQuotes />
         </section>
       </div>
     </main>

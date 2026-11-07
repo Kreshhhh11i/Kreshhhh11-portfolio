@@ -44,7 +44,7 @@ export const projects: Project[] = [
   {
     slug: "Sprintly",
     name: "Sprintly",
-    kind: "Developer WORKSPACE / Productivity",
+    kind: "Productivity",
     status: "BUILDING",
     description:
       "A support workspace with a React frontend, an Express API and Supabase Postgres.",
