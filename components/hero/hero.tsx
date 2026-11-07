@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { MagnetLines } from "@/components/ui/magnet-lines";
 import { HeroLanyard } from "@/components/hero/HeroLanyard";
+import { HeroSocials } from "@/components/hero/HeroSocials";
 
 // Switch between the interactive 3D Lanyard and the original photo orbit block
 const SHOW_LANYARD = true;
@@ -178,6 +179,9 @@ export function Hero() {
 
   return (
     <section className="w-full relative flex flex-col pt-0 lg:pt-20">
+      {/* Social Media Links for Desktop > 1400px beside navbar */}
+      <HeroSocials />
+
       {/* Main Content Split */}
       <div className="relative z-10 flex-1 grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-12 items-center lg:items-start">
         {/* Left Column (Tagline & Bio) */}
@@ -197,12 +201,12 @@ export function Hero() {
             <span className="block">Breaking systems to</span>
             <span className="block mt-1 sm:mt-1.5 lg:mt-2 lg:whitespace-nowrap">
               <span
-                style={{ fontFamily: 'var(--font-ivyora), "IvyOra Display", "ivyora-display", Georgia, serif' }}
+                style={{ fontFamily: 'var(--font-ivyora), "IvyOra Display", "ivyora-display"' }}
                 className="font-ivyora italic font-normal tracking-normal text-[var(--primary-text)]"
               >
-                understand systems.
+                Understand systems.
               </span>
-              <span className="inline-flex items-center ml-2.5 sm:ml-3 lg:ml-4 align-middle">
+              <span className="inline-flex items-center ml-2.5 sm:ml-3 lg:ml-4 align-middle not-italic">
                 <button
                   onClick={() => setIsHeroExpanded(!isHeroExpanded)}
                   className="p-1.5 sm:p-2 md:p-2.5 rounded-full border border-[var(--dashed-borders)] text-[var(--primary-text)] hover:bg-[var(--card-tint)] transition-all duration-500 cursor-pointer flex items-center justify-center group shrink-0"

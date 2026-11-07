@@ -39,6 +39,7 @@ interface SceneProps {
   isFlatView: boolean;
   isReducedMotion: boolean;
   introStarted: boolean;
+  isInView?: boolean;
   onTileClick: (index: number) => void;
   onTokenStepComplete: (newIndex: number) => void;
 }
@@ -273,25 +274,33 @@ function TokenLabel({
     groupRef.current.position.set(posRef.current.x, posRef.current.y, posRef.current.z);
   });
 
-  if (!skill) return null;
-
   return (
     <group ref={groupRef} position={[targetX, targetY, targetZ]}>
-      <Html center distanceFactor={14} style={{ pointerEvents: 'none' }}>
-        <div className="flex flex-col items-center pointer-events-none transition-all duration-200">
-          <div className="px-2.5 py-1 rounded-full bg-[#14120f]/95 border border-[var(--line)] shadow-xl backdrop-blur-md text-[#f6eddc] flex items-center gap-1.5 whitespace-nowrap text-xs font-mono font-medium">
-            <span
-              className="w-1.5 h-1.5 rounded-full shrink-0"
-              style={{ backgroundColor: skill.color }}
-            />
-            <span className="text-[#f6eddc] font-semibold">{skill.name}</span>
-            <span className="text-[10px] text-[var(--muted)] capitalize">
-              • {skill.level}
-            </span>
+      <Html
+        center
+        distanceFactor={14}
+        style={{
+          pointerEvents: 'none',
+          opacity: skill ? 1 : 0,
+          transition: 'opacity 0.2s ease',
+        }}
+      >
+        {skill && (
+          <div className="flex flex-col items-center pointer-events-none transition-all duration-200">
+            <div className="px-2.5 py-1 rounded-full bg-[#14120f]/95 border border-[var(--line)] shadow-xl backdrop-blur-md text-[#f6eddc] flex items-center gap-1.5 whitespace-nowrap text-xs font-mono font-medium">
+              <span
+                className="w-1.5 h-1.5 rounded-full shrink-0"
+                style={{ backgroundColor: skill.color }}
+              />
+              <span className="text-[#f6eddc] font-semibold">{skill.name}</span>
+              <span className="text-[10px] text-[var(--muted)] capitalize">
+                • {skill.level}
+              </span>
+            </div>
+            {/* Downward notch pointing cleanly above the token sphere */}
+            <div className="w-1.5 h-1.5 rotate-45 bg-[#14120f] border-r border-b border-[var(--line)] -mt-1" />
           </div>
-          {/* Downward notch pointing cleanly above the token sphere */}
-          <div className="w-1.5 h-1.5 rotate-45 bg-[#14120f] border-r border-b border-[var(--line)] -mt-1" />
-        </div>
+        )}
       </Html>
     </group>
   );
@@ -370,6 +379,7 @@ export default function Scene({
   isFlatView,
   isReducedMotion,
   introStarted,
+  isInView = true,
   onTileClick,
   onTokenStepComplete,
 }: SceneProps) {
@@ -391,6 +401,7 @@ export default function Scene({
 
   return (
     <Canvas
+      frameloop={isInView ? 'always' : 'never'}
       shadows="percentage"
       dpr={dpr}
       gl={{

@@ -17,7 +17,7 @@
 }
 
 .font-ivyora {
-  font-family: var(--font-ivyora), "IvyOra Display", "ivyora-display", Georgia, serif;
+  font-family: var(--font-ivyora), "IvyOra Display", "ivyora-display";
 }
 
 /* View Transitions API - Circular theme ripple */
@@ -321,3 +321,81 @@ body {
   opacity: 1 !important;
   filter: drop-shadow(0 0 6px var(--primary-text)) drop-shadow(0 0 12px var(--primary-text)) !important;
 }
+
+/* Hero Social Icons & Buttons: Theme Switching, Outer Border Glow, and Shake Micro-interaction */
+.hero-social-icon {
+  color: #ffffff;
+  fill: currentColor;
+  transform-origin: center center;
+  display: block;
+  transition: color 0.25s ease;
+}
+
+:root[data-theme="dark"] .hero-social-icon,
+html:not(.light) .hero-social-icon {
+  color: #ffffff;
+  fill: currentColor;
+}
+
+:root[data-theme="light"] .hero-social-icon,
+html.light .hero-social-icon {
+  color: #1a1712;
+  fill: currentColor;
+}
+
+/* Light shaking micro-interaction on hover (WITHOUT enlarging!) */
+@keyframes hero-icon-shake {
+  0%, 100% {
+    transform: rotate(0deg) translate(0, 0);
+  }
+  15% {
+    transform: rotate(-7deg) translateX(-0.8px);
+  }
+  30% {
+    transform: rotate(6deg) translateX(0.8px);
+  }
+  45% {
+    transform: rotate(-4.5deg) translateX(-0.4px);
+  }
+  60% {
+    transform: rotate(3deg) translateX(0.4px);
+  }
+  75% {
+    transform: rotate(-1.5deg);
+  }
+}
+
+.hero-social-btn:hover .hero-social-icon,
+.group:hover .hero-social-icon {
+  animation: hero-icon-shake 0.5s ease-in-out infinite;
+}
+
+/* Circular Button: 42px diameter, no enlarge effect */
+.hero-social-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--panel);
+  border: 1px solid var(--line);
+  position: relative;
+  cursor: pointer;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease;
+}
+
+/* Outer border effect: White for dark theme, Black for light theme (NO enlarge!) */
+.hero-social-btn:hover {
+  border-color: #ffffff;
+  box-shadow: 0 0 14px rgba(255, 255, 255, 0.28);
+  background-color: rgba(255, 255, 255, 0.06);
+}
+
+:root[data-theme="light"] .hero-social-btn:hover,
+html.light .hero-social-btn:hover {
+  border-color: #1a1712;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.15);
+  background-color: rgba(0, 0, 0, 0.04);
+}
+

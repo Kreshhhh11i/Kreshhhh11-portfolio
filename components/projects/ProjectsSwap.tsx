@@ -323,254 +323,254 @@ export default function ProjectsSwap() {
           <div
             ref={stackContainerRef}
             className="relative w-full h-[300px] sm:h-[350px] lg:h-[480px] xl:h-[530px] 2xl:h-[560px] flex items-center justify-center"
-          onPointerOver={(e) => {
-            if ((e.target as HTMLElement).closest?.("[data-swap-index]")) {
-              setIsPointerHovered(true);
-            }
-          }}
-          onPointerOut={(e) => {
-            if ((e.target as HTMLElement).closest?.("[data-swap-index]")) {
-              // Pause only while pointer is inside; resumes seamlessly without resetting time
-              setIsPointerHovered(false);
-            }
-          }}
-        >
-          <CardSwap
-            key={`${cardDimensions.width}-${cardDimensions.height}`}
-            ref={swapRef}
-            width={cardDimensions.width}
-            height={cardDimensions.height}
-            cardDistance={cardDimensions.cardDistance}
-            verticalDistance={cardDimensions.verticalDistance}
-            depth={cardDimensions.depth}
-            skewAmount={6}
-            visibleCards={3}
-            delay={5200}
-            autoplay={false}
-            pauseOnHover={false}
-            draggable
-            speed={1}
-            bounce={0.35}
-            parallax={0.4}
-            hoverSpread={0.1}
-            dim={0.5}
-            cardRadius={18}
-            intro
-            theme="dark"
-            onChange={(i) => {
-              setActive(i);
+            onPointerOver={(e) => {
+              if ((e.target as HTMLElement).closest?.("[data-swap-index]")) {
+                setIsPointerHovered(true);
+              }
             }}
-            className="projects-swap"
+            onPointerOut={(e) => {
+              if ((e.target as HTMLElement).closest?.("[data-swap-index]")) {
+                // Pause only while pointer is inside; resumes seamlessly without resetting time
+                setIsPointerHovered(false);
+              }
+            }}
           >
-            {projects.map((p, idx) => (
-              <Card key={p.slug}>
-                <div className="project-card">
-                  {/* Header row */}
-                  <div className="h-[34px] flex items-center gap-[10px] w-full shrink-0">
-                    <div className="w-[26px] h-[26px] rounded-[8px] bg-[#1a1a1a] border border-[#333] flex items-center justify-center shrink-0">
-                      <span className="font-mono font-medium text-[10px] text-[#8a857b]">
-                        {String(idx + 1).padStart(2, "0")}
+            <CardSwap
+              key={`${cardDimensions.width}-${cardDimensions.height}`}
+              ref={swapRef}
+              width={cardDimensions.width}
+              height={cardDimensions.height}
+              cardDistance={cardDimensions.cardDistance}
+              verticalDistance={cardDimensions.verticalDistance}
+              depth={cardDimensions.depth}
+              skewAmount={6}
+              visibleCards={3}
+              delay={5200}
+              autoplay={false}
+              pauseOnHover={false}
+              draggable
+              speed={1}
+              bounce={0.35}
+              parallax={0.4}
+              hoverSpread={0.1}
+              dim={0.5}
+              cardRadius={18}
+              intro
+              theme="dark"
+              onChange={(i) => {
+                setActive(i);
+              }}
+              className="projects-swap"
+            >
+              {projects.map((p, idx) => (
+                <Card key={p.slug}>
+                  <div className="project-card">
+                    {/* Header row */}
+                    <div className="h-[34px] flex items-center gap-[10px] w-full shrink-0">
+                      <div className="w-[26px] h-[26px] rounded-[8px] bg-[#1a1a1a] border border-[#333] flex items-center justify-center shrink-0">
+                        <span className="font-mono font-medium text-[10px] text-[#8a857b]">
+                          {String(idx + 1).padStart(2, "0")}
+                        </span>
+                      </div>
+                      <span className="font-sans font-semibold text-[15px] text-[#f6eddc] truncate">
+                        {p.name}
+                      </span>
+                      <span className="font-mono text-[9px] tracking-[0.1em] text-[#8a857b] ml-auto uppercase shrink-0">
+                        {p.status}
                       </span>
                     </div>
-                    <span className="font-sans font-semibold text-[15px] text-[#f6eddc] truncate">
-                      {p.name}
-                    </span>
-                    <span className="font-mono text-[9px] tracking-[0.1em] text-[#8a857b] ml-auto uppercase shrink-0">
-                      {p.status}
-                    </span>
+
+                    {/* Cover area */}
+                    <div className="flex-1 rounded-[12px] border border-[#222] bg-[#0d0d0d] overflow-hidden relative flex flex-col mt-[10px]">
+                      {p.cover ? (
+                        <Image
+                          src={p.cover}
+                          alt={p.name}
+                          fill
+                          className="object-cover"
+                          sizes="580px"
+                          draggable={false}
+                        />
+                      ) : p.slug === "helpdeskr" || p.slug === "Relay" || idx === 0 ? (
+                        /* HelpDeskr Mock Cover */
+                        <div className="w-full h-full flex flex-col justify-between p-3.5 sm:p-4 bg-[#0d0d0d] select-none pointer-events-none">
+                          <div className="flex items-center justify-between pb-2 border-b border-[#1f1f1f]">
+                            <div className="flex items-center gap-2">
+                              <span className="w-2 h-2 rounded-full bg-[#f5643e] animate-pulse" />
+                              <span className="font-sans font-medium text-[11px] text-[#f6eddc]">
+                                Tickets
+                              </span>
+                            </div>
+                            <span className="font-mono text-[10px] text-[#8a857b] bg-[#1a1a1a] px-2 py-0.5 rounded border border-[#262626]">
+                              12 open
+                            </span>
+                          </div>
+
+                          <div className="flex flex-col gap-2 py-1">
+                            <div className="flex items-center justify-between gap-3 bg-[#141414]/80 px-2.5 py-1.5 rounded-lg border border-[#222]">
+                              <div className="flex items-center gap-2.5 flex-1 min-w-0">
+                                <span className="w-[7px] h-[7px] rounded-full bg-[#f5643e] shrink-0" />
+                                <div className="h-[5px] rounded-full bg-[#2a2a2a] w-[55%]" />
+                              </div>
+                              <span className="font-mono text-[9px] font-medium tracking-wide text-[#f5643e] bg-[#f5643e]/15 border border-[#f5643e]/30 px-2 py-0.5 rounded-full shrink-0">
+                                URGENT
+                              </span>
+                            </div>
+
+                            <div className="flex items-center justify-between gap-3 bg-[#141414]/80 px-2.5 py-1.5 rounded-lg border border-[#222]">
+                              <div className="flex items-center gap-2.5 flex-1 min-w-0">
+                                <span className="w-[7px] h-[7px] rounded-full bg-[#cfc8b8] shrink-0" />
+                                <div className="h-[5px] rounded-full bg-[#2a2a2a] w-[70%]" />
+                              </div>
+                              <span className="font-mono text-[9px] font-medium tracking-wide text-[#cfc8b8] bg-[#cfc8b8]/15 border border-[#cfc8b8]/30 px-2 py-0.5 rounded-full shrink-0">
+                                OPEN
+                              </span>
+                            </div>
+
+                            <div className="flex items-center justify-between gap-3 bg-[#141414]/80 px-2.5 py-1.5 rounded-lg border border-[#222]">
+                              <div className="flex items-center gap-2.5 flex-1 min-w-0">
+                                <span className="w-[7px] h-[7px] rounded-full bg-[#cfc8b8] shrink-0" />
+                                <div className="h-[5px] rounded-full bg-[#2a2a2a] w-[45%]" />
+                              </div>
+                              <span className="font-mono text-[9px] font-medium tracking-wide text-[#cfc8b8] bg-[#cfc8b8]/15 border border-[#cfc8b8]/30 px-2 py-0.5 rounded-full shrink-0">
+                                IN PROGRESS
+                              </span>
+                            </div>
+
+                            <div className="flex items-center justify-between gap-3 bg-[#141414]/80 px-2.5 py-1.5 rounded-lg border border-[#222]">
+                              <div className="flex items-center gap-2.5 flex-1 min-w-0">
+                                <span className="w-[7px] h-[7px] rounded-full bg-[#3ddc97] shrink-0" />
+                                <div className="h-[5px] rounded-full bg-[#2a2a2a] w-[60%]" />
+                              </div>
+                              <span className="font-mono text-[9px] font-medium tracking-wide text-[#3ddc97] bg-[#3ddc97]/15 border border-[#3ddc97]/30 px-2 py-0.5 rounded-full shrink-0">
+                                RESOLVED
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      ) : p.slug === "kresh-portfolio" || p.slug === "Sk-Tailoring" || idx === 1 ? (
+                        /* Kresh Portfolio Mock Cover */
+                        <div className="w-full h-full relative flex items-center justify-between p-4 sm:p-5 bg-gradient-to-br from-[#121212] via-[#0d0d0d] to-[#080808] select-none pointer-events-none overflow-hidden">
+                          <div className="flex flex-col z-10 max-w-[240px] pl-1">
+                            <span className="font-mono text-[11px] text-[#8a857b] tracking-wider uppercase mb-1">
+                              Breaking systems to
+                            </span>
+                            <span
+                              className="text-[38px] sm:text-[44px] leading-[1.05] italic font-normal tracking-wide transform -rotate-3 origin-left inline-block"
+                              style={{
+                                fontFamily: "var(--font-allura), cursive",
+                                background:
+                                  "linear-gradient(135deg, #f6eddc 0%, #f5a77c 50%, #f5643e 100%)",
+                                WebkitBackgroundClip: "text",
+                                WebkitTextFillColor: "transparent",
+                              }}
+                            >
+                              Understand
+                            </span>
+                            <span className="font-sans font-bold text-[18px] sm:text-[20px] text-[#f6eddc] tracking-tight mt-0.5">
+                              systems.
+                            </span>
+                          </div>
+
+                          {/* Light ID Card with orange strap */}
+                          <div className="relative pr-2 pt-2 flex flex-col items-center">
+                            <div className="w-[14px] h-[22px] bg-[#f5643e] rounded-t-sm shadow-sm relative -mb-1 z-20">
+                              <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[16px] h-[4px] bg-[#888] rounded-[1px]" />
+                            </div>
+                            <div className="w-[58px] sm:w-[64px] h-[80px] sm:h-[88px] rounded-[9px] bg-[#f4f4f2] text-[#111] shadow-[0_12px_24px_-6px_rgba(0,0,0,0.8)] border border-white/20 transform rotate-[5deg] flex flex-col items-center p-1.5 justify-between relative z-10">
+                              <div className="w-[10px] h-[2.5px] rounded-full bg-[#bbb] -mt-0.5" />
+                              <div className="w-[40px] sm:w-[46px] h-[44px] sm:h-[50px] rounded-[5px] bg-[#1e1e1e] flex items-center justify-center overflow-hidden">
+                                <div className="w-[20px] h-[20px] rounded-full bg-[#f5643e]/40 -mb-2" />
+                              </div>
+                              <div className="w-full flex flex-col gap-1 px-1">
+                                <div className="w-[80%] h-[3px] rounded-full bg-[#333]" />
+                                <div className="w-[50%] h-[2.5px] rounded-full bg-[#777]" />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        /* DevDesk Mock Cover */
+                        <div className="w-full h-full p-3 sm:p-4 bg-[#0d0d0d] select-none pointer-events-none flex flex-col justify-between">
+                          <div className="grid grid-cols-3 gap-2 sm:gap-2.5 h-full">
+                            {/* TODO Column */}
+                            <div className="border border-dashed border-[#2a2a2a] rounded-[8px] p-2 flex flex-col gap-2 bg-[#121212]/50">
+                              <div className="flex items-center justify-between pb-1 border-b border-[#222]">
+                                <span className="font-mono text-[9px] tracking-wider text-[#8a857b]">
+                                  TODO
+                                </span>
+                                <span className="font-mono text-[8px] text-[#555]">
+                                  2
+                                </span>
+                              </div>
+                              <div className="bg-[#1a1a1a] rounded-[5px] p-1.5 border border-[#262626] flex flex-col gap-1 shadow-sm">
+                                <div className="w-[85%] h-[4px] rounded-full bg-[#3a3a3a]" />
+                                <div className="w-[50%] h-[3px] rounded-full bg-[#2a2a2a]" />
+                              </div>
+                              <div className="bg-[#1a1a1a] rounded-[5px] p-1.5 border border-[#262626] flex flex-col gap-1 shadow-sm">
+                                <div className="w-[65%] h-[4px] rounded-full bg-[#3a3a3a]" />
+                              </div>
+                            </div>
+
+                            {/* DOING Column */}
+                            <div className="border border-dashed border-[#2a2a2a] rounded-[8px] p-2 flex flex-col gap-2 bg-[#121212]/50">
+                              <div className="flex items-center justify-between pb-1 border-b border-[#222]">
+                                <span className="font-mono text-[9px] tracking-wider text-[#f5643e]">
+                                  DOING
+                                </span>
+                                <span className="font-mono text-[8px] text-[#f5643e]/70">
+                                  2
+                                </span>
+                              </div>
+                              <div className="bg-[#1a1a1a] rounded-[5px] p-1.5 border border-[#262626] border-l-[3px] border-l-[#f5643e] flex flex-col gap-1 shadow-sm">
+                                <div className="w-[90%] h-[4px] rounded-full bg-[#4a4a4a]" />
+                                <div className="w-[60%] h-[3px] rounded-full bg-[#f5643e]/60" />
+                              </div>
+                              <div className="bg-[#1a1a1a] rounded-[5px] p-1.5 border border-[#262626] flex flex-col gap-1 shadow-sm">
+                                <div className="w-[75%] h-[4px] rounded-full bg-[#3a3a3a]" />
+                              </div>
+                            </div>
+
+                            {/* DONE Column */}
+                            <div className="border border-dashed border-[#2a2a2a] rounded-[8px] p-2 flex flex-col gap-2 bg-[#121212]/50">
+                              <div className="flex items-center justify-between pb-1 border-b border-[#222]">
+                                <span className="font-mono text-[9px] tracking-wider text-[#3ddc97]">
+                                  DONE
+                                </span>
+                                <span className="font-mono text-[8px] text-[#3ddc97]/70">
+                                  3
+                                </span>
+                              </div>
+                              <div className="bg-[#1a1a1a] rounded-[5px] p-1.5 border border-[#262626] flex flex-col gap-1 shadow-sm opacity-80">
+                                <div className="w-[80%] h-[4px] rounded-full bg-[#3a3a3a]" />
+                                <div className="w-[40%] h-[3px] rounded-full bg-[#3ddc97]/50" />
+                              </div>
+                              <div className="bg-[#1a1a1a] rounded-[5px] p-1.5 border border-[#262626] flex flex-col gap-1 shadow-sm opacity-80">
+                                <div className="w-[70%] h-[4px] rounded-full bg-[#3a3a3a]" />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
+                </Card>
+              ))}
+            </CardSwap>
+          </div>
 
-                  {/* Cover area */}
-                  <div className="flex-1 rounded-[12px] border border-[#222] bg-[#0d0d0d] overflow-hidden relative flex flex-col mt-[10px]">
-                    {p.cover ? (
-                      <Image
-                        src={p.cover}
-                        alt={p.name}
-                        fill
-                        className="object-cover"
-                        sizes="580px"
-                        draggable={false}
-                      />
-                    ) : p.slug === "helpdeskr" || p.slug === "Relay" || idx === 0 ? (
-                      /* HelpDeskr Mock Cover */
-                      <div className="w-full h-full flex flex-col justify-between p-3.5 sm:p-4 bg-[#0d0d0d] select-none pointer-events-none">
-                        <div className="flex items-center justify-between pb-2 border-b border-[#1f1f1f]">
-                          <div className="flex items-center gap-2">
-                            <span className="w-2 h-2 rounded-full bg-[#f5643e] animate-pulse" />
-                            <span className="font-sans font-medium text-[11px] text-[#f6eddc]">
-                              Tickets
-                            </span>
-                          </div>
-                          <span className="font-mono text-[10px] text-[#8a857b] bg-[#1a1a1a] px-2 py-0.5 rounded border border-[#262626]">
-                            12 open
-                          </span>
-                        </div>
-
-                        <div className="flex flex-col gap-2 py-1">
-                          <div className="flex items-center justify-between gap-3 bg-[#141414]/80 px-2.5 py-1.5 rounded-lg border border-[#222]">
-                            <div className="flex items-center gap-2.5 flex-1 min-w-0">
-                              <span className="w-[7px] h-[7px] rounded-full bg-[#f5643e] shrink-0" />
-                              <div className="h-[5px] rounded-full bg-[#2a2a2a] w-[55%]" />
-                            </div>
-                            <span className="font-mono text-[9px] font-medium tracking-wide text-[#f5643e] bg-[#f5643e]/15 border border-[#f5643e]/30 px-2 py-0.5 rounded-full shrink-0">
-                              URGENT
-                            </span>
-                          </div>
-
-                          <div className="flex items-center justify-between gap-3 bg-[#141414]/80 px-2.5 py-1.5 rounded-lg border border-[#222]">
-                            <div className="flex items-center gap-2.5 flex-1 min-w-0">
-                              <span className="w-[7px] h-[7px] rounded-full bg-[#cfc8b8] shrink-0" />
-                              <div className="h-[5px] rounded-full bg-[#2a2a2a] w-[70%]" />
-                            </div>
-                            <span className="font-mono text-[9px] font-medium tracking-wide text-[#cfc8b8] bg-[#cfc8b8]/15 border border-[#cfc8b8]/30 px-2 py-0.5 rounded-full shrink-0">
-                              OPEN
-                            </span>
-                          </div>
-
-                          <div className="flex items-center justify-between gap-3 bg-[#141414]/80 px-2.5 py-1.5 rounded-lg border border-[#222]">
-                            <div className="flex items-center gap-2.5 flex-1 min-w-0">
-                              <span className="w-[7px] h-[7px] rounded-full bg-[#cfc8b8] shrink-0" />
-                              <div className="h-[5px] rounded-full bg-[#2a2a2a] w-[45%]" />
-                            </div>
-                            <span className="font-mono text-[9px] font-medium tracking-wide text-[#cfc8b8] bg-[#cfc8b8]/15 border border-[#cfc8b8]/30 px-2 py-0.5 rounded-full shrink-0">
-                              IN PROGRESS
-                            </span>
-                          </div>
-
-                          <div className="flex items-center justify-between gap-3 bg-[#141414]/80 px-2.5 py-1.5 rounded-lg border border-[#222]">
-                            <div className="flex items-center gap-2.5 flex-1 min-w-0">
-                              <span className="w-[7px] h-[7px] rounded-full bg-[#3ddc97] shrink-0" />
-                              <div className="h-[5px] rounded-full bg-[#2a2a2a] w-[60%]" />
-                            </div>
-                            <span className="font-mono text-[9px] font-medium tracking-wide text-[#3ddc97] bg-[#3ddc97]/15 border border-[#3ddc97]/30 px-2 py-0.5 rounded-full shrink-0">
-                              RESOLVED
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    ) : p.slug === "kresh-portfolio" || p.slug === "Sk-Tailoring" || idx === 1 ? (
-                      /* Kresh Portfolio Mock Cover */
-                      <div className="w-full h-full relative flex items-center justify-between p-4 sm:p-5 bg-gradient-to-br from-[#121212] via-[#0d0d0d] to-[#080808] select-none pointer-events-none overflow-hidden">
-                        <div className="flex flex-col z-10 max-w-[240px] pl-1">
-                          <span className="font-mono text-[11px] text-[#8a857b] tracking-wider uppercase mb-1">
-                            Breaking systems to
-                          </span>
-                          <span
-                            className="text-[38px] sm:text-[44px] leading-[1.05] italic font-normal tracking-wide transform -rotate-3 origin-left inline-block"
-                            style={{
-                              fontFamily: "var(--font-allura), cursive",
-                              background:
-                                "linear-gradient(135deg, #f6eddc 0%, #f5a77c 50%, #f5643e 100%)",
-                              WebkitBackgroundClip: "text",
-                              WebkitTextFillColor: "transparent",
-                            }}
-                          >
-                            understand
-                          </span>
-                          <span className="font-sans font-bold text-[18px] sm:text-[20px] text-[#f6eddc] tracking-tight mt-0.5">
-                            systems.
-                          </span>
-                        </div>
-
-                        {/* Light ID Card with orange strap */}
-                        <div className="relative pr-2 pt-2 flex flex-col items-center">
-                          <div className="w-[14px] h-[22px] bg-[#f5643e] rounded-t-sm shadow-sm relative -mb-1 z-20">
-                            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[16px] h-[4px] bg-[#888] rounded-[1px]" />
-                          </div>
-                          <div className="w-[58px] sm:w-[64px] h-[80px] sm:h-[88px] rounded-[9px] bg-[#f4f4f2] text-[#111] shadow-[0_12px_24px_-6px_rgba(0,0,0,0.8)] border border-white/20 transform rotate-[5deg] flex flex-col items-center p-1.5 justify-between relative z-10">
-                            <div className="w-[10px] h-[2.5px] rounded-full bg-[#bbb] -mt-0.5" />
-                            <div className="w-[40px] sm:w-[46px] h-[44px] sm:h-[50px] rounded-[5px] bg-[#1e1e1e] flex items-center justify-center overflow-hidden">
-                              <div className="w-[20px] h-[20px] rounded-full bg-[#f5643e]/40 -mb-2" />
-                            </div>
-                            <div className="w-full flex flex-col gap-1 px-1">
-                              <div className="w-[80%] h-[3px] rounded-full bg-[#333]" />
-                              <div className="w-[50%] h-[2.5px] rounded-full bg-[#777]" />
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    ) : (
-                      /* DevDesk Mock Cover */
-                      <div className="w-full h-full p-3 sm:p-4 bg-[#0d0d0d] select-none pointer-events-none flex flex-col justify-between">
-                        <div className="grid grid-cols-3 gap-2 sm:gap-2.5 h-full">
-                          {/* TODO Column */}
-                          <div className="border border-dashed border-[#2a2a2a] rounded-[8px] p-2 flex flex-col gap-2 bg-[#121212]/50">
-                            <div className="flex items-center justify-between pb-1 border-b border-[#222]">
-                              <span className="font-mono text-[9px] tracking-wider text-[#8a857b]">
-                                TODO
-                              </span>
-                              <span className="font-mono text-[8px] text-[#555]">
-                                2
-                              </span>
-                            </div>
-                            <div className="bg-[#1a1a1a] rounded-[5px] p-1.5 border border-[#262626] flex flex-col gap-1 shadow-sm">
-                              <div className="w-[85%] h-[4px] rounded-full bg-[#3a3a3a]" />
-                              <div className="w-[50%] h-[3px] rounded-full bg-[#2a2a2a]" />
-                            </div>
-                            <div className="bg-[#1a1a1a] rounded-[5px] p-1.5 border border-[#262626] flex flex-col gap-1 shadow-sm">
-                              <div className="w-[65%] h-[4px] rounded-full bg-[#3a3a3a]" />
-                            </div>
-                          </div>
-
-                          {/* DOING Column */}
-                          <div className="border border-dashed border-[#2a2a2a] rounded-[8px] p-2 flex flex-col gap-2 bg-[#121212]/50">
-                            <div className="flex items-center justify-between pb-1 border-b border-[#222]">
-                              <span className="font-mono text-[9px] tracking-wider text-[#f5643e]">
-                                DOING
-                              </span>
-                              <span className="font-mono text-[8px] text-[#f5643e]/70">
-                                2
-                              </span>
-                            </div>
-                            <div className="bg-[#1a1a1a] rounded-[5px] p-1.5 border border-[#262626] border-l-[3px] border-l-[#f5643e] flex flex-col gap-1 shadow-sm">
-                              <div className="w-[90%] h-[4px] rounded-full bg-[#4a4a4a]" />
-                              <div className="w-[60%] h-[3px] rounded-full bg-[#f5643e]/60" />
-                            </div>
-                            <div className="bg-[#1a1a1a] rounded-[5px] p-1.5 border border-[#262626] flex flex-col gap-1 shadow-sm">
-                              <div className="w-[75%] h-[4px] rounded-full bg-[#3a3a3a]" />
-                            </div>
-                          </div>
-
-                          {/* DONE Column */}
-                          <div className="border border-dashed border-[#2a2a2a] rounded-[8px] p-2 flex flex-col gap-2 bg-[#121212]/50">
-                            <div className="flex items-center justify-between pb-1 border-b border-[#222]">
-                              <span className="font-mono text-[9px] tracking-wider text-[#3ddc97]">
-                                DONE
-                              </span>
-                              <span className="font-mono text-[8px] text-[#3ddc97]/70">
-                                3
-                              </span>
-                            </div>
-                            <div className="bg-[#1a1a1a] rounded-[5px] p-1.5 border border-[#262626] flex flex-col gap-1 shadow-sm opacity-80">
-                              <div className="w-[80%] h-[4px] rounded-full bg-[#3a3a3a]" />
-                              <div className="w-[40%] h-[3px] rounded-full bg-[#3ddc97]/50" />
-                            </div>
-                            <div className="bg-[#1a1a1a] rounded-[5px] p-1.5 border border-[#262626] flex flex-col gap-1 shadow-sm opacity-80">
-                              <div className="w-[70%] h-[4px] rounded-full bg-[#3a3a3a]" />
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </Card>
-            ))}
-          </CardSwap>
-        </div>
-
-        {/* Time process bar centered directly under the card swap component */}
-        <div className="w-full flex justify-center mt-3 lg:mt-4">
-          <ProjectTimeBar
-            projects={projects}
-            activeIndex={active}
-            onSelect={handleSelectProject}
-            duration={5200}
-            paused={!isTabVisible || !isSectionVisible}
-          />
+          {/* Time process bar centered directly under the card swap component */}
+          <div className="w-full flex justify-center mt-3 lg:mt-4">
+            <ProjectTimeBar
+              projects={projects}
+              activeIndex={active}
+              onSelect={handleSelectProject}
+              duration={5200}
+              paused={!isTabVisible || !isSectionVisible}
+            />
+          </div>
         </div>
       </div>
     </div>
-  </div>
-);
+  );
 }

@@ -334,24 +334,23 @@ export function SkillsRoad() {
 
       {/* 3D CANVAS VIEWPORT (Clean container without corner edges or hover glow) */}
       <div className="w-full h-[390px] sm:h-[520px] md:h-[620px] rounded-sm bg-[#0a0a0a] border border-dashed border-[var(--line)] shadow-xl relative overflow-hidden">
-        {isInView && (
-          <Scene
-            skills={SKILLS_ROAD_DATA}
-            layoutPoints={currentLayoutPoints}
-            currentIndex={currentIndex}
-            targetIndex={targetIndex}
-            moveMode={moveMode}
-            activeCategory={activeCategory}
-            isFlatView={isFlatView}
-            isReducedMotion={isReducedMotion}
-            introStarted={introStarted}
-            onTileClick={(idx) => {
-              setMoveMode('jump');
-              setTargetIndex(idx);
-            }}
-            onTokenStepComplete={handleTokenStep}
-          />
-        )}
+        <Scene
+          skills={SKILLS_ROAD_DATA}
+          layoutPoints={currentLayoutPoints}
+          currentIndex={currentIndex}
+          targetIndex={targetIndex}
+          moveMode={moveMode}
+          activeCategory={activeCategory}
+          isFlatView={isFlatView}
+          isReducedMotion={isReducedMotion}
+          introStarted={introStarted}
+          isInView={isInView}
+          onTileClick={(idx) => {
+            setMoveMode('jump');
+            setTargetIndex(idx);
+          }}
+          onTokenStepComplete={handleTokenStep}
+        />
 
         {/* In-Canvas Floating Interactive Controls (Bottom Left) */}
         <div className="absolute bottom-2.5 left-2.5 sm:bottom-4 sm:left-4 flex items-center gap-2 z-10 max-w-[calc(100%-20px)]">
