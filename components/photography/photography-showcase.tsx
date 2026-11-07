@@ -118,19 +118,19 @@ export function PhotographyShowcase() {
       <div className="corner-accent absolute bottom-[-2px] right-[-2px] w-3 h-3 border-b-2 border-r-2 border-[var(--primary-text)] opacity-40 group-hover:opacity-100 transition-all duration-300 pointer-events-none z-10 group-hover:drop-shadow-[0_0_8px_var(--primary-text)]" />
 
       {/* Header */}
-      <div className="flex justify-between items-center text-xs tracking-wider border-b border-[var(--dashed-borders)] border-dashed pb-4">
+      <div className="flex flex-wrap justify-between items-center gap-x-3 gap-y-2 text-xs tracking-wider border-b border-[var(--dashed-borders)] border-dashed pb-4">
         <div className="flex items-center gap-2.5">
           <span className="text-[var(--accent)]">
             <CameraIcon />
           </span>
-          <span className="font-bold text-[var(--primary-text)] text-sm sm:text-base">
+          <h3 className="font-ivyora italic font-normal tracking-normal text-[var(--primary-text)] text-lg sm:text-xl leading-tight">
             BEHIND THE LENS
-          </span>
+          </h3>
           <span className="text-[10px] hidden sm:inline-block px-2 py-0.5 rounded-full border border-[var(--dashed-borders)] text-[var(--secondary-text)]">
             35MM / FRAMES
           </span>
         </div>
-        <div className="flex items-center gap-2 text-[10px] sm:text-xs">
+        <div className="flex items-center gap-2 text-[11px] sm:text-xs">
           <ApertureIcon />
           <span className="text-[var(--secondary-text)]">DRAG 3D RING</span>
         </div>

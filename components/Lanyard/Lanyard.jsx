@@ -1887,7 +1887,11 @@ const Lanyard = ({
     const resize = () => {
       view.width = Math.max(1, container.clientWidth);
       view.height = Math.max(1, container.clientHeight);
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      // A modest oversampling floor keeps small card details legible on 1x
+      // displays; limit the buffer size so large screens remain responsive.
+      const desiredRatio = Math.min(Math.max(window.devicePixelRatio || 1, 1.5), 2);
+      const maxBufferRatio = Math.sqrt(6000000 / (view.width * view.height));
+      renderer.setPixelRatio(Math.min(desiredRatio, Math.max(1, maxBufferRatio)));
       renderer.setSize(view.width, view.height, false);
       apply();
       render();
@@ -1895,6 +1899,15 @@ const Lanyard = ({
 
     const resizeObserver = new ResizeObserver(resize);
     resizeObserver.observe(container);
+    // Moving a window between displays can change DPR without resizing the element.
+    let resolutionQuery;
+    const watchResolution = () => {
+      resolutionQuery?.removeEventListener('change', watchResolution);
+      resolutionQuery = window.matchMedia(`(resolution: ${window.devicePixelRatio || 1}dppx)`);
+      resolutionQuery.addEventListener('change', watchResolution);
+      resize();
+    };
+    watchResolution();
     const intersectionObserver = new IntersectionObserver(([entry]) => {
       visible = entry.isIntersecting;
       if (visible) start();
@@ -1913,6 +1926,7 @@ const Lanyard = ({
       cancelAnimationFrame(raf);
       applyRef.current = null;
       resizeObserver.disconnect();
+      resolutionQuery?.removeEventListener('change', watchResolution);
       intersectionObserver.disconnect();
       document.removeEventListener('visibilitychange', onVisibility);
       canvas.removeEventListener('pointerdown', onPointerDown);

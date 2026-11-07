@@ -1,0 +1,15 @@
+.work-experience-section .exp-role-title {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.work-experience-section .exp-stack-tag {
+  font-size: 12px;
+}
+
+:root[data-theme="light"] .work-experience-section,
+html.light .work-experience-section {
+  --text: #1a1712;
+  --mute: #6f6550;
+  --bullet-text: #51493c;
+}

@@ -29,6 +29,32 @@ if (typeof window !== 'undefined') {
   };
 }
 
+function Board() {
+  const shape = useMemo(() => {
+    const halfWidth = 5.1;
+    const halfDepth = 3.6;
+    const radius = 0.25;
+    const board = new THREE.Shape();
+    board.moveTo(-halfWidth + radius, -halfDepth);
+    board.lineTo(halfWidth - radius, -halfDepth);
+    board.quadraticCurveTo(halfWidth, -halfDepth, halfWidth, -halfDepth + radius);
+    board.lineTo(halfWidth, halfDepth - radius);
+    board.quadraticCurveTo(halfWidth, halfDepth, halfWidth - radius, halfDepth);
+    board.lineTo(-halfWidth + radius, halfDepth);
+    board.quadraticCurveTo(-halfWidth, halfDepth, -halfWidth, halfDepth - radius);
+    board.lineTo(-halfWidth, -halfDepth + radius);
+    board.quadraticCurveTo(-halfWidth, -halfDepth, -halfWidth + radius, -halfDepth);
+    return board;
+  }, []);
+
+  return (
+    <mesh position={[0, -0.455, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+      <extrudeGeometry args={[shape, { depth: 0.45, bevelEnabled: false, curveSegments: 8 }]} />
+      <meshPhysicalMaterial color="#0b0a08" roughness={0.52} metalness={0.08} clearcoat={0.3} clearcoatRoughness={0.35} />
+    </mesh>
+  );
+}
+
 interface SceneProps {
   skills: SkillItem[];
   layoutPoints: TileLayoutPoint[];
@@ -456,16 +482,7 @@ export default function Scene({
 
       {/* Dark Glossy Board Slab with shadows (with 1 row margin of surface tiles on all 4 sides) */}
       <group position={[0, 0, 0]}>
-        <mesh position={[0, -0.23, 0]} receiveShadow>
-          <boxGeometry args={[10.2, 0.45, 7.2]} />
-          <meshPhysicalMaterial
-            color="#0b0a08"
-            roughness={0.52}
-            metalness={0.08}
-            clearcoat={0.3}
-            clearcoatRoughness={0.35}
-          />
-        </mesh>
+        <Board />
 
         {/* Faint rectangular grid lines with exactly 1 row margin on all 4 sides */}
         <BoardGrid />

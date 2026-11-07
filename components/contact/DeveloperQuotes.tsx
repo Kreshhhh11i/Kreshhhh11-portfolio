@@ -53,11 +53,9 @@ export function DeveloperQuotes() {
     };
   }, [paused]);
 
-  const quote = quotes[index];
-
   return (
     <div
-      className="mt-6 sm:mt-10 border-l border-[var(--line)] pl-5 sm:pl-8 w-full min-w-0"
+      className="mt-6 sm:mt-10 mx-auto w-full min-w-0 max-w-5xl px-2 sm:px-6 text-center"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onFocus={() => setPaused(true)}
@@ -65,18 +63,22 @@ export function DeveloperQuotes() {
         if (!event.currentTarget.contains(event.relatedTarget)) setPaused(false);
       }}
     >
-      <blockquote>
-        <p className="font-ivyora italic text-[clamp(1.125rem,2vw,2rem)] leading-[1.35] text-[var(--ink)]">
-          &ldquo;{quote.text}&rdquo;
-        </p>
-        <footer className="mt-4 flex justify-end">
-          <cite className="font-mono text-[10px] sm:text-xs uppercase tracking-[0.12em] text-[var(--muted)] not-italic">
-            <a href={quote.source} target="_blank" rel="noopener noreferrer" className="hover:text-[var(--ink)] transition-colors">
-              &mdash; {quote.author}
-            </a>
-          </cite>
-        </footer>
-      </blockquote>
+      <div className="grid">
+        {quotes.map((quote, quoteIndex) => (
+          <blockquote key={quote.text} className={`col-start-1 row-start-1 ${quoteIndex === index ? "visible" : "invisible"}`}>
+            <p className="font-ivyora italic text-[clamp(1.125rem,2vw,2rem)] leading-[1.35] text-[var(--ink)]">
+              &ldquo;{quote.text}&rdquo;
+            </p>
+            <footer className="mt-4 flex justify-center">
+              <cite className="font-mono text-[11px] sm:text-xs uppercase tracking-[0.08em] leading-relaxed text-[var(--muted)] not-italic">
+                <a href={quote.source} target="_blank" rel="noopener noreferrer" className="hover:text-[var(--ink)] transition-colors">
+                  ~ {quote.author}
+                </a>
+              </cite>
+            </footer>
+          </blockquote>
+        ))}
+      </div>
     </div>
   );
 }

@@ -39,6 +39,20 @@ const CATEGORIES: Array<SkillCategory | 'All'> = [
   'Tools',
 ];
 
+function CategoryIcon({ category }: { category: SkillCategory | 'All' }) {
+  if (category === 'All' || category === 'Special') return null;
+
+  return (
+    <svg className="skills-category-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      {category === 'Languages' && <><path d="m8 7-5 5 5 5M16 7l5 5-5 5M14 4l-4 16" /></>}
+      {category === 'Frontend' && <><rect x="3" y="4" width="18" height="13" rx="2" /><path d="M8 21h8M12 17v4" /></>}
+      {category === 'Backend' && <><path d="m12 3 9 5-9 5-9-5 9-5Z" /><path d="m3 12 9 5 9-5M3 16l9 5 9-5" /></>}
+      {category === 'Databases' && <><ellipse cx="12" cy="5.5" rx="8" ry="3" /><path d="M4 5.5v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6M4 11.5v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6" /></>}
+      {category === 'Tools' && <path d="M14.7 6.3a5 5 0 0 0-6.4 6.4l-5 5a2.1 2.1 0 0 0 3 3l5-5a5 5 0 0 0 6.4-6.4l-3 3-3-3 3-3Z" />}
+    </svg>
+  );
+}
+
 export function SkillsRoad() {
   const containerRef = useRef<HTMLDivElement>(null);
   const categoryMenuRef = useRef<HTMLDivElement>(null);
@@ -290,6 +304,7 @@ export function SkillsRoad() {
                 onClick={() => selectCategory(cat)}
                 className={`skills-filter ${isActive ? 'is-active' : ''}`}
               >
+                <CategoryIcon category={cat} />
                 {cat}
               </button>
             );
@@ -323,7 +338,7 @@ export function SkillsRoad() {
                   categoryButtonRef.current?.focus();
                 }}
               >
-                <span>{category === 'All' ? 'All skills' : category}</span>
+                <span className="skills-category-option-label"><CategoryIcon category={category} />{category === 'All' ? 'All skills' : category}</span>
                 {category === activeCategory && (
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12l4 4L19 6" /></svg>
                 )}
@@ -363,7 +378,8 @@ export function SkillsRoad() {
               aria-pressed={isFlatView}
               className="skills-view-toggle"
             >
-              <span>{isFlatView ? 'Isometric' : 'Flat View'}</span>
+              <span className="skills-view-toggle-sizer" aria-hidden="true">Flat View</span>
+              <span>{isFlatView ? '3D' : 'Flat View'}</span>
             </button>
           </div>
         </div>
@@ -447,7 +463,7 @@ export function SkillsRoad() {
         <div className="skills-detail-copy">
           <div className="skills-detail-heading">
             <h3>{currentSkill.name}</h3>
-            <span className="skills-detail-category" style={{ color: CATEGORY_COLORS[currentSkill.category] }}>
+            <span className="skills-detail-category" style={{ '--skill-category-color': CATEGORY_COLORS[currentSkill.category] } as React.CSSProperties}>
               {currentSkill.category}
             </span>
             <span className="skills-detail-level">{currentSkill.level}</span>

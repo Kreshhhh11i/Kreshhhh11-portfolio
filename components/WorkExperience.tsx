@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { experiences } from "@/data/experience";
 import "./WorkExperience.css";
+import "./experience/WorkExperienceTypography.css";
 
 export interface WorkExperienceProps {
   hideLabel?: boolean;
@@ -32,10 +33,10 @@ export function WorkExperience({ hideLabel, isOpen: controlledIsOpen, onToggle }
     <div className="work-experience-section">
       {/* 1. Section Label */}
       {!hideLabel && (
-        <div className="exp-section-label">
+        <h2 className="exp-section-label">
           <span className="exp-label-prefix">02 / EXP</span>
           <span>Work Experience</span>
-        </div>
+        </h2>
       )}
 
       {/* 2. Timeline Wrapper */}
@@ -126,7 +127,7 @@ export function WorkExperience({ hideLabel, isOpen: controlledIsOpen, onToggle }
                     </div>
                     <div className="exp-role-row">
                       <span className="exp-role-title">{exp.role}</span>
-                      <span className="exp-date-inline font-mono text-[11px] text-[var(--mute)]">
+                      <span className="exp-date-inline font-mono text-xs text-[var(--mute)]">
                         &bull; {exp.start} &mdash; {exp.end}
                       </span>
                     </div>

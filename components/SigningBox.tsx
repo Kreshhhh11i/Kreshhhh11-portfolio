@@ -314,10 +314,10 @@ export function SigningBox() {
         <span className="font-mono text-xs text-[var(--sb-accent)] font-semibold tracking-wider">
           // guestbook
         </span>
-        <h1 className="font-bold text-xl md:text-2xl text-[var(--sb-ink)] tracking-tight">
+        <h3 className="font-ivyora italic font-normal text-2xl md:text-3xl text-[var(--sb-ink)] leading-tight">
           Leave your mark.
-        </h1>
-        <p className="text-xs sm:text-sm text-[var(--sb-muted)]">
+        </h3>
+        <p className="text-sm leading-relaxed text-[var(--sb-muted)]">
           Sign your name, draw an icon, or leave a quick doodle.
         </p>
       </div>

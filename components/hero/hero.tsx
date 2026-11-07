@@ -197,9 +197,9 @@ export function Hero() {
             </div>
           </div>
 
-          <h1 className="w-full text-center lg:text-left text-[1.65rem] min-[360px]:text-[1.95rem] min-[400px]:text-4xl sm:text-5xl md:text-6xl lg:text-[2.5rem] xl:text-[3.25rem] 2xl:text-[4rem] font-bold font-sans tracking-tight text-[var(--primary-text)] leading-[1.12] sm:leading-[1.1]">
-            <span className="block whitespace-normal min-[360px]:whitespace-nowrap">Breaking systems to</span>
-            <span className="block mt-1 sm:mt-1.5 lg:mt-2 whitespace-normal min-[360px]:whitespace-nowrap">
+          <h1 className="w-full lg:w-[calc(100%+3rem)] text-center lg:text-left text-[clamp(1.75rem,8vw,2.25rem)] sm:text-[clamp(2.5rem,5.8vw,3rem)] lg:text-[clamp(2.875rem,4vw,3.25rem)] xl:text-[clamp(3.125rem,4vw,3.5rem)] 2xl:text-[clamp(3.5rem,4vw,4rem)] font-bold font-sans tracking-tight text-[var(--primary-text)] leading-[1.12] sm:leading-[1.1]">
+            <span className="block">Breaking systems to</span>
+            <span className="block mt-1 sm:mt-1.5 lg:mt-2">
               <span
                 style={{ fontFamily: 'var(--font-ivyora), "IvyOra Display", "ivyora-display"' }}
                 className="font-ivyora italic font-normal tracking-normal text-[var(--primary-text)]"
@@ -218,7 +218,7 @@ export function Hero() {
           <div className="flex flex-wrap justify-center lg:justify-start items-center gap-3 sm:gap-4 pt-1 z-20">
             <a
               href="#projects"
-              className="group w-[clamp(120px,38vw,160px)] h-12 rounded-full border border-[var(--primary-text)] bg-[var(--primary-text)] text-[var(--background)] font-mono text-xs uppercase tracking-wider font-semibold hover:opacity-90 transition-opacity flex items-center justify-center gap-2 shadow-md cursor-pointer"
+              className="group w-[clamp(120px,38vw,160px)] h-12 rounded-full border border-[var(--primary-text)] bg-[var(--primary-text)] text-[var(--background)] font-mono text-[11px] min-[360px]:text-xs uppercase tracking-wider font-semibold whitespace-nowrap hover:opacity-90 transition-opacity flex items-center justify-center gap-2 shadow-md cursor-pointer"
             >
               View Projects
               <svg className="transition-transform duration-300 group-hover:rotate-45" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -228,7 +228,7 @@ export function Hero() {
             </a>
             <a
               href="#contact"
-              className="group w-[clamp(120px,38vw,160px)] h-12 rounded-full bg-transparent border border-[var(--dashed-borders)] text-[var(--primary-text)] font-mono text-xs uppercase tracking-wider font-semibold hover:bg-[var(--card-tint)] transition-colors flex items-center justify-center gap-2 cursor-pointer"
+              className="group w-[clamp(120px,38vw,160px)] h-12 rounded-full bg-transparent border border-[var(--dashed-borders)] text-[var(--primary-text)] font-mono text-[11px] min-[360px]:text-xs uppercase tracking-wider font-semibold whitespace-nowrap hover:bg-[var(--card-tint)] transition-colors flex items-center justify-center gap-2 cursor-pointer"
             >
               About me
               <svg className="transition-transform duration-300 group-hover:rotate-45" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

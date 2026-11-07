@@ -46,10 +46,10 @@ export function ExperienceSection() {
   return (
     <div className="w-full flex flex-col gap-6">
       {/* 1. Section Label */}
-      <div className="exp-section-label self-start !mb-0">
+      <h2 className="exp-section-label self-start !mb-0">
         <span className="exp-label-prefix">02 / EXP</span>
         <span>Work Experience</span>
-      </div>
+      </h2>
 
       {/* 2. Responsive 2-Column Grid on Desktop, 1-Column on Mobile */}
       <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-6 xl:gap-8 items-stretch transition-all duration-300">
