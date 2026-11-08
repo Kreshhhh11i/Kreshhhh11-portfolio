@@ -24,9 +24,9 @@ export const experiences: Experience[] = [
     branch: "feat/prompt",
     shortBranch: "feat/prompt",
     points: [
-      "Designed, tested and refined prompts for a range of AI applications.",
-      "Created structured prompts and analyzed AI-generated responses for accuracy and relevance.",
-      "Compared prompt approaches and optimized them against project requirements.",
+      "Designed and refined prompts for AI applications based on project requirements.",
+      "Reviewed AI responses for accuracy and relevance, then adjusted prompts to improve them.",
+      "Compared different prompt approaches to find what worked best for each task.",
     ],
     stack: ["Prompt Engineering", "HTML", "CSS"],
   },

@@ -1321,7 +1321,10 @@ const Lanyard = ({
     let raf = 0;
     let last = performance.now();
     let time = 0;
-    let visible = true;
+    let visible = false;
+    let introComplete = document.documentElement.dataset.introComplete === 'true';
+    let introStarted = false;
+    let introStartedAt = 0;
     let alive = true;
     let placed = false;
     let hovering = false;
@@ -1512,7 +1515,7 @@ const Lanyard = ({
         if (!placed) {
           placeHanging(sim, layout, s.intro && !reducedMotion);
           placed = true;
-        } else if (layoutKey !== applied.layoutKey || s.anchor !== applied.anchor) {
+        } else if ((layoutKey !== applied.layoutKey || s.anchor !== applied.anchor) && (!introStarted || performance.now() - introStartedAt > 1800)) {
           placeHanging(sim, layout, false);
         }
       }
@@ -1719,7 +1722,13 @@ const Lanyard = ({
     };
 
     const start = () => {
-      if (raf || !visible || !alive) return;
+      if (raf || !visible || !alive || !introComplete || !placed) return;
+      if (!introStarted) {
+        introStarted = true;
+        introStartedAt = performance.now();
+        placeHanging(sim, layout, settingsRef.current.intro && !reducedMotion);
+        render();
+      }
       sim.calm = 0;
       last = performance.now();
       raf = requestAnimationFrame(tick);
@@ -1913,6 +1922,11 @@ const Lanyard = ({
       if (visible) start();
     });
     intersectionObserver.observe(container);
+    const onIntroComplete = () => {
+      introComplete = true;
+      start();
+    };
+    window.addEventListener('portfolio:intro-complete', onIntroComplete);
     const onVisibility = () => {
       if (!document.hidden) start();
     };
@@ -1928,6 +1942,7 @@ const Lanyard = ({
       resizeObserver.disconnect();
       resolutionQuery?.removeEventListener('change', watchResolution);
       intersectionObserver.disconnect();
+      window.removeEventListener('portfolio:intro-complete', onIntroComplete);
       document.removeEventListener('visibilitychange', onVisibility);
       canvas.removeEventListener('pointerdown', onPointerDown);
       canvas.removeEventListener('pointermove', onPointerMove);

@@ -150,6 +150,7 @@ const CardSwap = forwardRef(
       theme = 'dark',
       onCardClick,
       onChange,
+      onInteractionChange,
       className = '',
       children
     },
@@ -208,7 +209,8 @@ const CardSwap = forwardRef(
       dim: clamp(dim, 0, 1),
       bounds,
       onCardClick,
-      onChange
+      onChange,
+      onInteractionChange
     };
 
     useImperativeHandle(
@@ -594,6 +596,7 @@ const CardSwap = forwardRef(
           active: false,
           samples: []
         };
+        s.onInteractionChange?.(true);
         schedule();
       };
 
@@ -601,6 +604,7 @@ const CardSwap = forwardRef(
         const drag = state.drag;
         if (!drag || drag.id !== event.pointerId) return;
         state.drag = null;
+        settingsRef.current.onInteractionChange?.(false);
         root.style.cursor = '';
         if (!drag.active) {
           schedule();
@@ -706,6 +710,8 @@ const CardSwap = forwardRef(
       root.addEventListener('pointerdown', onDown);
       root.addEventListener('pointerup', onUp);
       root.addEventListener('pointercancel', onUp);
+      window.addEventListener('pointerup', onUp);
+      window.addEventListener('pointercancel', onUp);
       root.addEventListener('click', onClick);
       document.addEventListener('visibilitychange', onVisibility);
       schedule();
@@ -721,6 +727,8 @@ const CardSwap = forwardRef(
         root.removeEventListener('pointerdown', onDown);
         root.removeEventListener('pointerup', onUp);
         root.removeEventListener('pointercancel', onUp);
+        window.removeEventListener('pointerup', onUp);
+        window.removeEventListener('pointercancel', onUp);
         root.removeEventListener('click', onClick);
         document.removeEventListener('visibilitychange', onVisibility);
         apiRef.current = null;

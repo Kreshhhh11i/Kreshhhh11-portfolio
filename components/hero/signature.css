@@ -9,37 +9,58 @@
   position: absolute;
   top: 24%;
   width: min(82vw, 1120px);
+  max-width: calc(200vw - var(--signature-anchor, 50vw) - var(--signature-anchor, 50vw) - 32px);
   height: auto;
-  transform: translateX(-50%);
+  transform: translateX(-50%) rotate(-13deg);
   overflow: visible;
   pointer-events: none;
-  color: var(--primary-text, #f6eddc);
+  color: #bcbcbc;
   opacity: 0.72;
+}
+
+.signature-drawing {
+  opacity: 0;
 }
 
 .signature-stroke {
   stroke: currentColor;
-  stroke-width: 1.35;
+  stroke-width: 3;
   stroke-linecap: round;
   stroke-linejoin: round;
   stroke-dasharray: 2000;
   stroke-dashoffset: 2000;
-  filter: drop-shadow(0 0 2px rgba(246, 237, 220, 0.5)) drop-shadow(0 0 5px rgba(246, 237, 220, 0.2));
+}
+
+.signature-glow {
+  filter: drop-shadow(0 0 2px rgba(210, 210, 210, 0.45))
+          drop-shadow(0 0 6px rgba(190, 190, 190, 0.2));
 }
 
 .signature-tip {
-  fill: #fffdf7;
   opacity: 0;
-  filter: drop-shadow(0 0 3px #fffdf7) drop-shadow(0 0 9px #fff8e8) drop-shadow(0 0 16px rgba(255, 248, 232, 0.7));
+  fill: none;
+  stroke: url(#signature-tip-gradient);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.95))
+          drop-shadow(0 0 10px rgba(235, 235, 235, 0.75));
+}
+
+:root[data-theme="light"] .hero-signature,
+html.light .hero-signature {
+  color: #666;
 }
 
 @media (max-width: 1023px) {
+  .signature-viewport {
+    display: none;
+  }
+}
+
+@media (min-width: 1024px) and (max-width: 1439px) {
   .hero-signature {
-    top: 26%;
-    left: 50% !important;
-    width: min(140vw, 760px);
-    transform: translateX(-50%);
-    opacity: 0.6;
+    top: 35%;
   }
 }
 

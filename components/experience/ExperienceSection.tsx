@@ -46,10 +46,10 @@ export function ExperienceSection() {
   return (
     <div className="w-full flex flex-col gap-6">
       {/* 1. Section Label */}
-      <h2 className="exp-section-label self-start !mb-0">
-        <span className="exp-label-prefix">02 / EXP</span>
-        <span>Work Experience</span>
-      </h2>
+      <div className="flex items-center justify-between border-b border-[var(--line)] border-dashed pb-3">
+        <h2 className="font-ivyora italic font-normal text-xl md:text-2xl text-[var(--ink)]">Work Experience</h2>
+        <span className="ml-4 text-right font-mono text-[10px] sm:text-xs uppercase tracking-wider text-[var(--muted)]">Experience</span>
+      </div>
 
       {/* 2. Responsive 2-Column Grid on Desktop, 1-Column on Mobile */}
       <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-6 xl:gap-8 items-stretch transition-all duration-300">

@@ -27,13 +27,10 @@ export default function Home() {
         <section id="projects" className="scroll-mt-24 w-full flex flex-col gap-6 relative transition-all duration-300">
           <div id="work" className="absolute -top-24 pointer-events-none" />
           <div className="flex items-center justify-between border-b border-[var(--line)] border-dashed pb-3">
-            <div className="flex items-center gap-3">
-              <span className="font-mono text-xs text-[var(--accent)] font-semibold">03 / PROJECTS</span>
-              <h2 className="font-sans font-bold text-xl md:text-2xl text-[var(--ink)] tracking-tight">
-                Things I Shipped
-              </h2>
-            </div>
-            <span className="font-mono text-xs text-[var(--muted)] hidden sm:inline">feat: things I shipped</span>
+            <h2 className="font-ivyora italic font-normal text-xl md:text-2xl text-[var(--ink)]">
+              Things I Shipped
+            </h2>
+            <span className="ml-4 text-right font-mono text-[10px] sm:text-xs uppercase tracking-wider text-[var(--muted)]">Projects</span>
           </div>
 
           <ProjectsSwap />
@@ -43,8 +40,8 @@ export default function Home() {
         <section id="skills" className="scroll-mt-24 w-full max-w-full overflow-hidden flex flex-col gap-6 relative">
           <div id="stack" className="absolute -top-24 pointer-events-none" />
           <div className="flex items-center justify-between border-b border-[var(--line)] border-dashed pb-3">
-            <h2 className="font-mono text-xs text-[var(--accent)] font-semibold">04 / SKILLS</h2>
-            <span className="font-mono text-xs text-[var(--muted)]">MY TECH STACK / 2026</span>
+            <h2 className="font-ivyora italic font-normal text-xl md:text-2xl text-[var(--ink)]">Tools I Work With</h2>
+            <span className="ml-4 text-right font-mono text-[10px] sm:text-xs uppercase tracking-wider text-[var(--muted)]">Skills</span>
           </div>
 
           <SkillsRoad />
@@ -54,13 +51,10 @@ export default function Home() {
         <section id="playground" className="scroll-mt-24 w-full flex flex-col gap-6 relative">
           <div id="log" className="absolute -top-24 pointer-events-none" />
           <div className="flex items-center justify-between border-b border-[var(--line)] border-dashed pb-3">
-            <div className="flex items-center gap-3">
-              <span className="font-mono text-xs text-[var(--accent)] font-semibold">05 / PLAYGROUND</span>
-              <h2 className="font-sans font-bold text-xl md:text-2xl text-[var(--ink)] tracking-tight">
-                Activity & Visual Log
-              </h2>
-            </div>
-            <span className="font-mono text-xs text-[var(--muted)] hidden sm:inline">lab: interactive space</span>
+            <h2 className="font-ivyora italic font-normal text-xl md:text-2xl text-[var(--ink)]">
+              Beyond the code
+            </h2>
+            <span className="ml-4 text-right font-mono text-[10px] sm:text-xs uppercase tracking-wider text-[var(--muted)]">Playground</span>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch w-full">
@@ -72,20 +66,17 @@ export default function Home() {
         {/* Section: Contact */}
         <section id="contact" className="scroll-mt-24 w-full flex flex-col gap-6 pb-12">
           <div className="flex items-center justify-between border-b border-[var(--line)] border-dashed pb-3">
-            <div className="flex items-center gap-3">
-              <span className="font-mono text-xs text-[var(--accent)] font-semibold">06 / CONTACT</span>
-              <h2 className="font-sans font-bold text-xl md:text-2xl text-[var(--ink)] tracking-tight">
-                Let&apos;s Build
-              </h2>
-            </div>
-            <span className="font-mono text-xs text-[var(--muted)] hidden sm:inline">merge: let&apos;s build</span>
+            <h2 className="font-ivyora italic font-normal text-xl md:text-2xl text-[var(--ink)]">
+              Let&apos;s Build
+            </h2>
+            <span className="ml-4 text-right font-mono text-[10px] sm:text-xs uppercase tracking-wider text-[var(--muted)]">Contact</span>
           </div>
 
           <div className="content-frame group bg-[var(--panel)]/40 p-6 sm:p-8 lg:p-10">
             <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8 lg:gap-12">
               <div className="max-w-2xl">
                 <h3 className="text-[clamp(1.75rem,3vw,2.75rem)] font-semibold leading-[1.15] tracking-tight text-[var(--ink)]">
-                  Good work starts with a <span className="font-ivyora italic font-normal tracking-normal">conversation.</span>
+                  Good work starts with a <span className="font-ivyora italic font-normal tracking-normal">Conversation.</span>
                 </h3>
                 <p className="mt-4 max-w-lg text-sm sm:text-base leading-relaxed text-[var(--muted)]">
                   Have a role, a project, or an idea in mind? I&apos;d love to hear about it.
@@ -93,11 +84,16 @@ export default function Home() {
               </div>
               <div className="flex w-full min-[425px]:w-auto flex-wrap items-center gap-3 lg:shrink-0">
                 <a
-                  href="mailto:contact@srikesh.dev"
+                  href="https://mail.google.com/mail/?view=cm&fs=1&to=srikresh11%40gmail.com&su=Portfolio%20inquiry"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="group/contact inline-flex h-11 w-full min-[425px]:w-[164px] items-center justify-center gap-2 rounded-full border border-transparent bg-[var(--ink)] px-3 text-xs font-mono font-semibold uppercase tracking-wider whitespace-nowrap text-[var(--bg)] transition-opacity hover:opacity-85"
                 >
                   Send an email
-                  <span aria-hidden="true" className="text-sm motion-safe:transition-transform motion-safe:duration-200 motion-safe:group-hover/contact:translate-x-1">↗</span>
+                  <svg aria-hidden="true" className="motion-safe:transition-transform motion-safe:duration-300 motion-safe:group-hover/contact:rotate-45" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="5" y1="19" x2="17" y2="7" />
+                    <polyline points="7 7 17 7 17 17" />
+                  </svg>
                 </a>
                 <a
                   href="https://github.com/Kreshhhh11i"
@@ -106,7 +102,10 @@ export default function Home() {
                   className="group/github inline-flex h-11 w-full min-[425px]:w-[164px] items-center justify-center gap-2 rounded-full border border-[var(--line)] px-3 text-xs font-mono font-semibold uppercase tracking-wider whitespace-nowrap text-[var(--ink)] transition-colors hover:border-[var(--muted)] hover:bg-[var(--line)]/30"
                 >
                   GitHub
-                  <span aria-hidden="true" className="text-sm motion-safe:transition-transform motion-safe:duration-200 motion-safe:group-hover/github:translate-x-1">↗</span>
+                  <svg aria-hidden="true" className="motion-safe:transition-transform motion-safe:duration-300 motion-safe:group-hover/github:rotate-45" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="5" y1="19" x2="17" y2="7" />
+                    <polyline points="7 7 17 7 17 17" />
+                  </svg>
                 </a>
               </div>
             </div>
@@ -118,7 +117,7 @@ export default function Home() {
         </section>
       </div>
     </main>
-    <footer className="w-full px-4 md:px-12 lg:px-24 xl:px-32 pb-36 sm:pb-24">
+    <footer className="w-full px-4 md:px-12 lg:px-24 xl:px-32">
       <div className="flex items-end justify-between gap-4 border-t border-[var(--line)] py-8 sm:py-10">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-x-5 gap-y-2 font-mono text-xs text-[var(--muted)]">

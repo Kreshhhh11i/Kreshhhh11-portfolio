@@ -13,7 +13,7 @@ export interface Project {
   status: ProjectStatus;
   description: string;
   tags: string[];
-  liveUrl: string;
+  liveUrl?: string;
   repoUrl: string;
   cover?: string;
 }
@@ -25,10 +25,11 @@ export const projects: Project[] = [
     kind: "FULL-STACK PERN",
     status: "ACTIVE",
     description:
-      "Enterprise-grade IT ticketing and support automation platform built with Next.js, Node.js, Express, and PostgreSQL with real-time updates.",
-    tags: ["Next.js", "PostgreSQL", "Express"],
-    liveUrl: "https://github.com/Kreshhhh11i",
-    repoUrl: "https://github.com/Kreshhhh11i",
+      "A support-ticketing platform with real-time updates.",
+    tags: ["React 19", "Tailwind CSS", "Node.js", "Express", "JWT", "Supabase"],
+    cover: "/images/projects/relay.png",
+    liveUrl: "https://relay-tms.vercel.app/",
+    repoUrl: "https://github.com/Devster11/RELAY",
   },
   {
     slug: "Sk-Tailoring",
@@ -36,10 +37,11 @@ export const projects: Project[] = [
     kind: "Client ",
     status: "SHIPPED",
     description:
-      "Engineered interactive developer workspace with zero-gravity atom cards, 3D photography ring, Commit Graph navigation, and GitHub telemetry.",
-    tags: ["React", "Tailwind CSS", "TypeScript"],
-    liveUrl: "https://github.com/Kreshhhh11i",
-    repoUrl: "https://github.com/Kreshhhh11i",
+      "A client project built with React and Tailwind CSS.",
+    tags: ["React 19", "Tailwind CSS"],
+    cover: "/images/projects/sktailoring.png",
+    liveUrl: "https://sktailoring.vercel.app/",
+    repoUrl: "https://github.com/Devster11/SK-TAILORING",
   },
   {
     slug: "Sprintly",
@@ -47,10 +49,10 @@ export const projects: Project[] = [
     kind: "Productivity",
     status: "BUILDING",
     description:
-      "A support workspace with a React frontend, an Express API and Supabase Postgres.",
+      "Something new is taking shape. Stay curious.",
     tags: ["React", "Express", "Supabase"],
-    liveUrl: "https://github.com/Kreshhhh11i",
-    repoUrl: "https://github.com/Kreshhhh11i",
+    cover: "/images/projects/sprintly.png",
+    repoUrl: "https://github.com/Kreshhhh11i/Sprintly",
   },
 ];
 

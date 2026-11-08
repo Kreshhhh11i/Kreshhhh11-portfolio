@@ -27,6 +27,7 @@ export interface CardSwapProps {
   theme?: 'dark' | 'light';
   onCardClick?: (index: number) => void;
   onChange?: (index: number) => void;
+  onInteractionChange?: (interacting: boolean) => void;
   className?: string;
   children?: ReactNode;
 }

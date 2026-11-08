@@ -30,11 +30,9 @@ export default function ProjectTimeBar({
   const [cursorProgress, setCursorProgress] = useState<number | null>(null);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
-  const isMountedRef = useRef(false);
 
   // Check prefers-reduced-motion
   useEffect(() => {
-    isMountedRef.current = true;
     if (typeof window === "undefined") return;
 
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -44,33 +42,9 @@ export default function ProjectTimeBar({
     mq.addEventListener("change", handler);
 
     return () => {
-      isMountedRef.current = false;
       mq.removeEventListener("change", handler);
     };
   }, []);
-
-  // When activeIndex changes, restart the active progress animation
-  useEffect(() => {
-    setFillKey((k) => k + 1);
-  }, [activeIndex]);
-
-  // Automatic advancement timer (5.2s)
-  // Hovering the bar only expands visual appearance; it does NOT pause or reset the timer.
-  useEffect(() => {
-    if (prefersReducedMotion || paused || projects.length < 2) {
-      return;
-    }
-
-    const timer = setTimeout(() => {
-      if (!isMountedRef.current) return;
-      const nextIndex = (activeIndex + 1) % projects.length;
-      onSelect(nextIndex);
-    }, duration);
-
-    return () => {
-      clearTimeout(timer);
-    };
-  }, [activeIndex, duration, paused, prefersReducedMotion, projects.length, onSelect]);
 
   const handleSegmentClick = useCallback(
     (index: number) => {
@@ -160,10 +134,16 @@ export default function ProjectTimeBar({
               >
                 {isActive && (
                   <span
-                    key={fillKey}
+                    key={`${activeIndex}-${fillKey}`}
                     className="time-bar-fill"
                     style={{
                       animationDuration: `${duration}ms`,
+                      animationPlayState: paused ? "paused" : "running",
+                    }}
+                    onAnimationEnd={() => {
+                      if (!paused && !prefersReducedMotion && projects.length > 1) {
+                        onSelect((activeIndex + 1) % projects.length);
+                      }
                     }}
                   />
                 )}

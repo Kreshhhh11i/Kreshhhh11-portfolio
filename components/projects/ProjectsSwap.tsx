@@ -19,6 +19,7 @@ export default function ProjectsSwap() {
   const [active, setActive] = useState(0);
   const [stackOpen, setStackOpen] = useState(false);
   const [isPointerHovered, setIsPointerHovered] = useState(false);
+  const [isDraggingCard, setIsDraggingCard] = useState(false);
   const [isTabVisible, setIsTabVisible] = useState(true);
   const [isSectionVisible, setIsSectionVisible] = useState(true);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
@@ -161,6 +162,7 @@ export default function ProjectsSwap() {
   // Handler for selecting a project (via time bar click or timer advance)
   const handleSelectProject = useCallback(
     (targetIndex: number) => {
+      if (targetIndex === active) return;
       setActive(targetIndex);
 
       if (jumpInProgressRef.current) return;
@@ -190,13 +192,14 @@ export default function ProjectsSwap() {
   const renderActionButtons = (extraClass: string) => (
     <div className={`project-buttons-wrapper ${extraClass}`}>
       {/* View Project Button */}
+      {currentProject.liveUrl && (
       <a
         href={currentProject.liveUrl}
         target={currentProject.liveUrl?.startsWith("http") ? "_blank" : undefined}
         rel={currentProject.liveUrl?.startsWith("http") ? "noopener noreferrer" : undefined}
         className="project-action-btn project-action-btn-primary group"
       >
-        <span>View Project</span>
+        <span>Live Demo</span>
         <svg
           className="transition-transform duration-300 group-hover:rotate-45 shrink-0"
           width="12"
@@ -212,6 +215,7 @@ export default function ProjectsSwap() {
           <polyline points="7 7 17 7 17 17"></polyline>
         </svg>
       </a>
+      )}
 
       {/* GitHub Button (equal width to View Project) */}
       <a
@@ -276,6 +280,10 @@ export default function ProjectsSwap() {
               </h3>
               <span className={`project-status project-status-${currentProject.status.toLowerCase()}`}>{currentProject.status}</span>
             </div>
+
+            <p className="mt-2 mb-3 max-w-md text-sm sm:text-base leading-relaxed text-[#b9b2a2]">
+              {currentProject.description}
+            </p>
 
             {/* 4. Tech stack tags */}
             <div className="project-stack-dropdown">
@@ -345,6 +353,7 @@ export default function ProjectsSwap() {
               onChange={(i) => {
                 setActive(i);
               }}
+              onInteractionChange={setIsDraggingCard}
               className="projects-swap"
             >
               {projects.map((p, idx) => (
@@ -370,10 +379,11 @@ export default function ProjectsSwap() {
                       {p.cover ? (
                         <Image
                           src={p.cover}
-                          alt={p.name}
+                          alt={`${p.name} project mockup`}
                           fill
                           className="object-cover"
-                          sizes="580px"
+                          sizes={`${cardDimensions.width}px`}
+                          quality={90}
                           draggable={false}
                         />
                       ) : p.slug === "helpdeskr" || p.slug === "Relay" || idx === 0 ? (
@@ -551,7 +561,7 @@ export default function ProjectsSwap() {
               activeIndex={active}
               onSelect={handleSelectProject}
               duration={5200}
-              paused={!isTabVisible || !isSectionVisible}
+              paused={isDraggingCard || !isTabVisible || !isSectionVisible}
             />
           </div>
         </div>

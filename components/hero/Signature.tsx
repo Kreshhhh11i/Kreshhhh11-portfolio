@@ -1,6 +1,8 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type CSSProperties } from "react";
+
+const SIGNATURE_PATH = "M 704 231 C 595 252 396 305 267 357 C 184 390 101 430 112 457 C 120 478 171 483 204 480 C 322 477 441 452 519 420 C 556 405 590 379 602 353 C 615 328 594 314 573 320 C 545 325 523 348 516 373 C 510 392 514 408 520 421 C 525 434 532 442 548 442 C 575 443 600 425 628 413 C 660 398 688 396 692 431 C 694 440 725 410 738 403 C 743 418 761 405 779 398 C 797 388 800 402 813 396 C 830 392 839 381 846 383 C 853 385 849 415 867 407 C 907 380 970 322 1012 313 C 1049 305 1001 344 971 365 C 916 405 842 449 776 485 C 758 495 766 503 783 501 C 850 486 965 460 1062 454";
 
 export function Signature({ anchor }: { anchor: number }) {
   const svgRef = useRef<SVGSVGElement>(null);
@@ -9,18 +11,18 @@ export function Signature({ anchor }: { anchor: number }) {
     const svg = svgRef.current;
     if (!svg) return;
     const strokes = Array.from(svg.querySelectorAll<SVGPathElement>(".signature-stroke"));
-    const tip = svg.querySelector<SVGCircleElement>(".signature-tip");
+    const tip = svg.querySelector<SVGPathElement>(".signature-tip");
+    const tipGradient = svg.querySelector<SVGLinearGradientElement>("#signature-tip-gradient");
     const drawing = svg.querySelector<SVGGElement>(".signature-drawing");
     const hero = svg.closest("#home");
-    if (!tip || !drawing || !hero) return;
+    if (!tip || !tipGradient || !drawing || !hero) return;
 
     const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
     const lengths = strokes.map((stroke) => stroke.getTotalLength());
     const totalLength = lengths.reduce((sum, length) => sum + length, 0);
-    const duration = 3800;
+    const duration = 3200;
     let frame = 0;
     let start: number | null = null;
-    let hasLeftHero = false;
     let isVisible = false;
 
     const showComplete = () => {
@@ -32,27 +34,51 @@ export function Signature({ anchor }: { anchor: number }) {
       });
     };
 
+    const positionTip = (elapsed: number) => {
+      if (elapsed < 0 || elapsed >= duration) {
+        tip.style.opacity = "0";
+        return;
+      }
+      const progress = elapsed / duration;
+      const distance = progress * progress * (3 - 2 * progress) * totalLength;
+      let remaining = distance;
+      for (let index = 0; index < strokes.length; index++) {
+        const length = lengths[index];
+        if (remaining < length) {
+          const point = strokes[index].getPointAtLength(remaining);
+          const before = strokes[index].getPointAtLength(Math.max(0, remaining - 1.5));
+          const after = strokes[index].getPointAtLength(Math.min(length, remaining + 1.5));
+          const angle = Math.atan2(after.y - before.y, after.x - before.x) * 180 / Math.PI;
+          tipGradient.setAttribute("gradientTransform", `translate(${point.x} ${point.y}) rotate(${angle})`);
+          const trailLength = 90;
+          tip.style.strokeDasharray = `${trailLength} ${length + trailLength}`;
+          tip.style.strokeDashoffset = `${trailLength - remaining}`;
+          const fade = Math.min(1, progress / 0.03, (1 - progress) / 0.08);
+          tip.style.opacity = String(fade * fade * (3 - 2 * fade));
+          return;
+        }
+        remaining -= length;
+      }
+      tip.style.opacity = "0";
+    };
+
     const render = (time: number) => {
       if (start === null) start = time;
       const elapsed = time - start;
-      let remaining = Math.min(elapsed / duration, 1) * totalLength;
-      let point: DOMPoint | undefined;
+      const progress = Math.min(elapsed / duration, 1);
+      // Ease the pen into and out of the stroke rather than moving at a fixed speed.
+      const signed = progress * progress * (3 - 2 * progress);
+      let remaining = signed * totalLength;
       strokes.forEach((stroke, index) => {
         const length = lengths[index];
         const drawn = Math.max(0, Math.min(length, remaining));
         stroke.style.strokeDasharray = `${length}`;
         stroke.style.strokeDashoffset = `${length - drawn}`;
-        if (remaining >= 0 && remaining < length) point = stroke.getPointAtLength(drawn);
         remaining -= length;
       });
-      if (point && elapsed < duration) {
-        tip.setAttribute("cx", String((point as DOMPoint).x));
-        tip.setAttribute("cy", String((point as DOMPoint).y));
-        tip.style.opacity = "1";
-      } else {
-        tip.style.opacity = "0";
-      }
+      positionTip(elapsed);
       if (elapsed < duration) frame = requestAnimationFrame(render);
+      else showComplete();
     };
 
     const play = () => {
@@ -66,46 +92,48 @@ export function Signature({ anchor }: { anchor: number }) {
         stroke.style.strokeDasharray = `${lengths[index]}`;
         stroke.style.strokeDashoffset = `${lengths[index]}`;
       });
+      tip.style.opacity = "0";
       drawing.style.opacity = "1";
       frame = requestAnimationFrame(render);
     };
 
     const observer = new IntersectionObserver(([entry]) => {
-      isVisible = entry.isIntersecting;
+      isVisible = entry.isIntersecting && entry.intersectionRatio >= 0.1;
       if (!isVisible) {
-        hasLeftHero = true;
         cancelAnimationFrame(frame);
         drawing.style.opacity = "0";
         tip.style.opacity = "0";
-      } else if (hasLeftHero) {
-        hasLeftHero = false;
+      } else if (document.documentElement.dataset.introComplete === "true") {
         play();
-      } else {
-        showComplete();
       }
     }, { threshold: 0.1 });
     observer.observe(hero);
-    const onMotionChange = () => { if (isVisible) play(); };
+    const onMotionChange = () => { if (isVisible && document.documentElement.dataset.introComplete === "true") play(); };
+    const onIntroComplete = () => { if (isVisible) play(); };
     motion.addEventListener("change", onMotionChange);
+    window.addEventListener("portfolio:intro-complete", onIntroComplete);
     return () => {
       cancelAnimationFrame(frame);
       observer.disconnect();
       motion.removeEventListener("change", onMotionChange);
+      window.removeEventListener("portfolio:intro-complete", onIntroComplete);
     };
   }, []);
 
   return (
-    <svg ref={svgRef} className="hero-signature" style={{ left: `${anchor * 100}%` }} viewBox="0 0 700 300" fill="none" aria-hidden="true">
+    <svg ref={svgRef} className="hero-signature" style={{ left: `${anchor * 100}%`, "--signature-anchor": `${anchor * 100}vw` } as CSSProperties} viewBox="85 200 1000 320" fill="none" aria-hidden="true">
+      <defs>
+        <linearGradient id="signature-tip-gradient" gradientUnits="userSpaceOnUse" x1="-90" y1="0" x2="0" y2="0">
+          <stop offset="0" stopColor="#fff" stopOpacity="0" />
+          <stop offset="0.55" stopColor="#fff" stopOpacity="0.3" />
+          <stop offset="1" stopColor="#fff" stopOpacity="1" />
+        </linearGradient>
+      </defs>
       <g className="signature-drawing">
-        <path className="signature-stroke" d="M 36 269 C 53 244 72 203 87 175 C 96 126 125 58 145 40 C 151 34 155 36 153 45 C 150 61 133 87 116 119 C 100 149 89 169 87 175 C 84 192 82 212 87 218 C 93 226 102 216 113 207 C 128 195 141 192 153 188 C 178 179 198 168 219 153" />
-        <path className="signature-stroke" d="M 199 131 l -3 4 l 5 1" />
-        <path className="signature-stroke" d="M 399 41 C 394 83 386 142 361 173" />
-        <path className="signature-stroke" d="M 326 135 C 310 141 324 120 335 112 C 354 99 365 95 373 110 C 382 128 390 127 410 116 C 434 103 445 97 464 98 C 495 100 519 89 551 84 C 586 79 611 75 645 67" />
-        <path className="signature-stroke" d="M 326 135 C 347 128 371 112 389 99 C 425 72 447 37 480 8" />
-        <path className="signature-stroke" d="M 102 265 C 149 246 168 229 222 208 C 322 170 463 123 640 109" />
-        <path className="signature-stroke" d="M 680 100 l 2 1" />
-        <path className="signature-stroke" d="M 693 102 l 5 -1" />
-        <circle className="signature-tip" r="2.5" />
+        <g className="signature-glow">
+            <path className="signature-stroke" d={SIGNATURE_PATH} />
+        </g>
+        <path className="signature-tip" d={SIGNATURE_PATH} />
       </g>
     </svg>
   );

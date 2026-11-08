@@ -230,7 +230,7 @@ export function Hero() {
               href="#contact"
               className="group w-[clamp(120px,38vw,160px)] h-12 rounded-full bg-transparent border border-[var(--dashed-borders)] text-[var(--primary-text)] font-mono text-[11px] min-[360px]:text-xs uppercase tracking-wider font-semibold whitespace-nowrap hover:bg-[var(--card-tint)] transition-colors flex items-center justify-center gap-2 cursor-pointer"
             >
-              About me
+              Get in touch
               <svg className="transition-transform duration-300 group-hover:rotate-45" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="5" y1="19" x2="17" y2="7"></line>
                 <polyline points="7 7 17 7 17 17"></polyline>

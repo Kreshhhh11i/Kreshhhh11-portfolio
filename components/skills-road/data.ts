@@ -40,8 +40,8 @@ export const SKILLS_ROAD_DATA: SkillItem[] = [
     lib: 'solid',
     color: '#10b981',
     height: 0.38,
-    tagline: 'Embark on the Journey',
-    description: 'Roll the dice or tap any tile to navigate my technical skills roadmap.',
+    tagline: 'Explore my skills',
+    description: 'Select a tile to see how I use each skill.',
   },
 
   // Languages (5)
@@ -54,8 +54,8 @@ export const SKILLS_ROAD_DATA: SkillItem[] = [
     lib: 'brands',
     color: '#f7df1e',
     height: LEVEL_HEIGHTS.daily,
-    tagline: 'ESNext & Async Runtimes',
-    description: 'Core web scripting, modern closures, event-loop profiling, and prototype mechanics.',
+    tagline: 'Interactive web experiences',
+    description: 'Build interactive web features with modern JavaScript and asynchronous APIs.',
   },
   {
     id: 'typescript',
@@ -66,8 +66,8 @@ export const SKILLS_ROAD_DATA: SkillItem[] = [
     lib: 'solid',
     color: '#3178c6',
     height: LEVEL_HEIGHTS.daily,
-    tagline: 'Strict Static Typing',
-    description: 'Generics, conditional types, discriminated unions, and compiler strictness.',
+    tagline: 'More dependable code',
+    description: 'Use types to make application code easier to understand and maintain.',
   },
   {
     id: 'python',
@@ -78,8 +78,8 @@ export const SKILLS_ROAD_DATA: SkillItem[] = [
     lib: 'brands',
     color: '#3776ab',
     height: LEVEL_HEIGHTS.daily,
-    tagline: 'Data Processing & Scripting',
-    description: 'Fast prototyping, automation pipelines, numerical computing, and AI integrations.',
+    tagline: 'Scripting and automation',
+    description: 'Write scripts for automation and data processing.',
   },
   {
     id: 'java',
@@ -90,8 +90,8 @@ export const SKILLS_ROAD_DATA: SkillItem[] = [
     lib: 'brands',
     color: '#e76f00',
     height: LEVEL_HEIGHTS.comfortable,
-    tagline: 'OOP & Concurrent Systems',
-    description: 'Strong object-oriented architecture, thread safety, and JVM ecosystems.',
+    tagline: 'Object-oriented programming',
+    description: 'Apply object-oriented programming to solve problems in Java.',
   },
   {
     id: 'cpp',
@@ -102,8 +102,8 @@ export const SKILLS_ROAD_DATA: SkillItem[] = [
     lib: 'solid',
     color: '#00599c',
     height: LEVEL_HEIGHTS.learning,
-    tagline: 'Low-Level Performance',
-    description: 'Manual memory management, pointers, and high-throughput computational primitives.',
+    tagline: 'Learning the fundamentals',
+    description: 'Learning C++ fundamentals, including pointers and memory management.',
   },
 
   // Frontend (5)
@@ -116,8 +116,8 @@ export const SKILLS_ROAD_DATA: SkillItem[] = [
     lib: 'brands',
     color: '#e34f26',
     height: LEVEL_HEIGHTS.daily,
-    tagline: 'Semantic Web Architecture',
-    description: 'Accessible semantic structures, WCAG 2.1 compliance, SEO microdata, and ARIA.',
+    tagline: 'Structure for the web',
+    description: 'Create meaningful page structures with accessibility in mind.',
   },
   {
     id: 'css',
@@ -128,8 +128,8 @@ export const SKILLS_ROAD_DATA: SkillItem[] = [
     lib: 'brands',
     color: '#264de4',
     height: LEVEL_HEIGHTS.daily,
-    tagline: 'Modern Cascading Styles',
-    description: 'Flexbox, subgrid, container queries, CSS variables, and fluid typography.',
+    tagline: 'Responsive interfaces',
+    description: 'Build layouts and interfaces that adapt to different screen sizes.',
   },
   {
     id: 'tailwind',
@@ -140,8 +140,8 @@ export const SKILLS_ROAD_DATA: SkillItem[] = [
     lib: 'solid',
     color: '#06b6d4',
     height: LEVEL_HEIGHTS.daily,
-    tagline: 'Utility-First Styling',
-    description: 'Rapid UI design systems, responsive variants, arbitrary values, and JIT compilation.',
+    tagline: 'Practical interface styling',
+    description: 'Create responsive interfaces using utility classes and reusable styles.',
   },
   {
     id: 'react',
@@ -152,8 +152,8 @@ export const SKILLS_ROAD_DATA: SkillItem[] = [
     lib: 'brands',
     color: '#61dafb',
     height: LEVEL_HEIGHTS.daily,
-    tagline: 'Declarative Reactive UI',
-    description: 'Component lifecycles, custom hooks, reconciliation optimization, and concurrent mode.',
+    tagline: 'Interactive interfaces',
+    description: 'Build interactive interfaces with components, state, and hooks.',
   },
   {
     id: 'nextjs',
@@ -164,8 +164,8 @@ export const SKILLS_ROAD_DATA: SkillItem[] = [
     lib: 'solid',
     color: '#f6eddc',
     height: LEVEL_HEIGHTS.daily,
-    tagline: 'Full-Stack React Framework',
-    description: 'App Router, Server Actions, streaming SSR, edge middleware, and ISR.',
+    tagline: 'Full-stack web applications',
+    description: 'Build React applications with routing and server-side features.',
   },
 
   // Backend (3)
@@ -178,8 +178,8 @@ export const SKILLS_ROAD_DATA: SkillItem[] = [
     lib: 'brands',
     color: '#539e43',
     height: LEVEL_HEIGHTS.daily,
-    tagline: 'Event-Driven Server Runtime',
-    description: 'Non-blocking I/O, Node streams, cluster worker threads, and microservices.',
+    tagline: 'JavaScript on the server',
+    description: 'Use JavaScript to build server-side applications.',
   },
   {
     id: 'express',
@@ -190,8 +190,8 @@ export const SKILLS_ROAD_DATA: SkillItem[] = [
     lib: 'solid',
     color: '#f6eddc',
     height: LEVEL_HEIGHTS.daily,
-    tagline: 'Lightweight HTTP Routing',
-    description: 'RESTful middleware pipelines, rate-limiting, authentication gates, and error handlers.',
+    tagline: 'APIs and server routes',
+    description: 'Build APIs with routes, middleware, and error handling.',
   },
   {
     id: 'socketio',
@@ -202,8 +202,8 @@ export const SKILLS_ROAD_DATA: SkillItem[] = [
     lib: 'solid',
     color: '#010101',
     height: LEVEL_HEIGHTS.comfortable,
-    tagline: 'Bi-Directional Realtime Comms',
-    description: 'WebSocket fallbacks, room broadcasting, low-latency state diffs, and heartbeats.',
+    tagline: 'Real-time communication',
+    description: 'Add real-time communication between an application and its users.',
   },
 
   // Databases (4)
@@ -216,8 +216,8 @@ export const SKILLS_ROAD_DATA: SkillItem[] = [
     lib: 'solid',
     color: '#4169e1',
     height: LEVEL_HEIGHTS.daily,
-    tagline: 'Relational Power & JSONB',
-    description: 'ACID transactions, foreign key constraints, complex joins, and query plan indexing.',
+    tagline: 'Relational data',
+    description: 'Organize application data and write queries to work with it.',
   },
   {
     id: 'mysql',
@@ -228,8 +228,8 @@ export const SKILLS_ROAD_DATA: SkillItem[] = [
     lib: 'solid',
     color: '#00758f',
     height: LEVEL_HEIGHTS.comfortable,
-    tagline: 'Enterprise Relational DB',
-    description: 'InnoDB engine internals, replication topologies, and structured tables.',
+    tagline: 'Relational databases',
+    description: 'Work with relational tables and SQL queries.',
   },
   {
     id: 'redis',
@@ -240,8 +240,8 @@ export const SKILLS_ROAD_DATA: SkillItem[] = [
     lib: 'solid',
     color: '#dc382d',
     height: LEVEL_HEIGHTS.comfortable,
-    tagline: 'In-Memory Cache & Pub/Sub',
-    description: 'Sub-millisecond latency, distributed locks, session persistence, and key expiration.',
+    tagline: 'Caching and fast data access',
+    description: 'Explore caching and short-lived data storage.',
   },
   {
     id: 'supabase',
@@ -252,8 +252,8 @@ export const SKILLS_ROAD_DATA: SkillItem[] = [
     lib: 'solid',
     color: '#3ecf8e',
     height: LEVEL_HEIGHTS.comfortable,
-    tagline: 'Open-Source Postgres & Auth',
-    description: 'Row-level security (RLS), auto-generated APIs, realtime changefeeds, and edge functions.',
+    tagline: 'A backend for web apps',
+    description: 'Work with hosted Postgres and backend features for web applications.',
   },
 
   // Tools (10)
@@ -266,8 +266,8 @@ export const SKILLS_ROAD_DATA: SkillItem[] = [
     lib: 'brands',
     color: '#f05032',
     height: LEVEL_HEIGHTS.daily,
-    tagline: 'Distributed Version Control',
-    description: 'Rebasing, interactive bisecting, hook automation, and branching models.',
+    tagline: 'Version control',
+    description: 'Track changes and manage branches while developing projects.',
   },
   {
     id: 'github',
@@ -278,8 +278,8 @@ export const SKILLS_ROAD_DATA: SkillItem[] = [
     lib: 'brands',
     color: '#f6eddc',
     height: LEVEL_HEIGHTS.daily,
-    tagline: 'Collaboration & CI/CD Actions',
-    description: 'Automated release workflows, code review pipelines, and package registries.',
+    tagline: 'Code and collaboration',
+    description: 'Host repositories and collaborate through branches and pull requests.',
   },
   {
     id: 'docker',
@@ -290,8 +290,8 @@ export const SKILLS_ROAD_DATA: SkillItem[] = [
     lib: 'brands',
     color: '#2496ed',
     height: LEVEL_HEIGHTS.comfortable,
-    tagline: 'Containerized Environments',
-    description: 'Multi-stage builds, compose networks, image size minimization, and isolated daemons.',
+    tagline: 'Consistent environments',
+    description: 'Create consistent development environments with containers.',
   },
   {
     id: 'postman',
@@ -302,8 +302,8 @@ export const SKILLS_ROAD_DATA: SkillItem[] = [
     lib: 'solid',
     color: '#ff6c37',
     height: LEVEL_HEIGHTS.daily,
-    tagline: 'API Prototyping & Testing',
-    description: 'Collection runners, pre-request script assertions, environment variables, and mocks.',
+    tagline: 'API testing',
+    description: 'Test API requests and inspect responses.',
   },
   {
     id: 'swagger',
@@ -314,8 +314,8 @@ export const SKILLS_ROAD_DATA: SkillItem[] = [
     lib: 'solid',
     color: '#85ea2d',
     height: LEVEL_HEIGHTS.comfortable,
-    tagline: 'OpenAPI Documentation',
-    description: 'Contract-first specs, automated schema generation, and interactive API playgrounds.',
+    tagline: 'Clear API documentation',
+    description: 'Document and explore APIs using OpenAPI.',
   },
   {
     id: 'npm',
@@ -326,8 +326,8 @@ export const SKILLS_ROAD_DATA: SkillItem[] = [
     lib: 'brands',
     color: '#cb3837',
     height: LEVEL_HEIGHTS.daily,
-    tagline: 'Package Ecosystem & Scripting',
-    description: 'Dependency resolution, workspace monorepos, security audits, and lifecycle hooks.',
+    tagline: 'Packages and scripts',
+    description: 'Manage project dependencies and development scripts.',
   },
   {
     id: 'render',
@@ -338,8 +338,8 @@ export const SKILLS_ROAD_DATA: SkillItem[] = [
     lib: 'solid',
     color: '#46e3b7',
     height: LEVEL_HEIGHTS.comfortable,
-    tagline: 'Cloud Service Infrastructure',
-    description: 'Managed web services, automated deployment triggers, and background cron jobs.',
+    tagline: 'Web hosting',
+    description: 'Deploy and manage web applications.',
   },
   {
     id: 'vercel',
@@ -350,8 +350,8 @@ export const SKILLS_ROAD_DATA: SkillItem[] = [
     lib: 'solid',
     color: '#f6eddc',
     height: LEVEL_HEIGHTS.daily,
-    tagline: 'Edge Deployment Platform',
-    description: 'Zero-config previews, serverless lambdas, global CDN caches, and web analytics.',
+    tagline: 'Web deployment',
+    description: 'A platform for deploying web applications and previewing changes.',
   },
   {
     id: 'antigravity',
@@ -362,8 +362,8 @@ export const SKILLS_ROAD_DATA: SkillItem[] = [
     lib: 'solid',
     color: '#f5643e',
     height: LEVEL_HEIGHTS.daily,
-    tagline: 'AI Agentic Coding Platform',
-    description: 'Autonomous agents, custom tools, multimodal workflows, and pair engineering.',
+    tagline: 'AI-assisted development',
+    description: 'Use AI-assisted tools to explore ideas and develop software.',
   },
   {
     id: 'codex',
@@ -374,8 +374,8 @@ export const SKILLS_ROAD_DATA: SkillItem[] = [
     lib: 'solid',
     color: '#10a37f',
     height: LEVEL_HEIGHTS.daily,
-    tagline: 'AI Code Synthesis',
-    description: 'Generative software modeling, context embeddings, algorithmic synthesis, and copilot agenting.',
+    tagline: 'AI coding assistant',
+    description: 'Use a coding assistant to help inspect, develop, and refine code.',
   },
 
   // FINISH tile
@@ -388,7 +388,7 @@ export const SKILLS_ROAD_DATA: SkillItem[] = [
     lib: 'solid',
     color: '#f5643e',
     height: 0.38,
-    tagline: 'Goal Achieved!',
-    description: 'You traveled across the full developer stack! Ready to build something together?',
+    tagline: 'Thanks for exploring.',
+    description: 'Have a project in mind? Let’s talk.',
   },
 ];
