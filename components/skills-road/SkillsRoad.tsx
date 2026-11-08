@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import dynamic from 'next/dynamic';
+import { useIntroFinished } from '@/components/shared/useIntroFinished';
 import './SkillsRoad.css';
 import {
   SKILLS_ROAD_DATA,
@@ -54,6 +55,7 @@ function CategoryIcon({ category }: { category: SkillCategory | 'All' }) {
 }
 
 export function SkillsRoad() {
+  const introFinished = useIntroFinished();
   const containerRef = useRef<HTMLDivElement>(null);
   const categoryMenuRef = useRef<HTMLDivElement>(null);
   const categoryButtonRef = useRef<HTMLButtonElement>(null);
@@ -389,7 +391,7 @@ export function SkillsRoad() {
 
       {/* 3D CANVAS VIEWPORT (Clean container without corner edges or hover glow) */}
       <div className="content-frame w-full h-[390px] sm:h-[520px] md:h-[620px] bg-[#0a0a0a] overflow-hidden">
-        <Scene
+        {introFinished && <Scene
           skills={SKILLS_ROAD_DATA}
           layoutPoints={currentLayoutPoints}
           currentIndex={currentIndex}
@@ -407,7 +409,7 @@ export function SkillsRoad() {
             setTargetIndex(idx);
           }}
           onTokenStepComplete={handleTokenStep}
-        />
+        />}
 
         <div
           aria-hidden="true"

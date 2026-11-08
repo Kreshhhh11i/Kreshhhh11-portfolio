@@ -38,6 +38,7 @@ export const metadata: Metadata = {
 
 import DotGrid from "@/components/shared/DotGrid";
 import { Navbar } from "@/components/Navbar/Navbar";
+import { OpeningSequence } from "@/components/shared/OpeningSequence";
 
 export default function RootLayout({
   children,
@@ -59,9 +60,11 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-full flex flex-col text-[var(--ink)] bg-[var(--bg)] font-sans overflow-x-hidden" suppressHydrationWarning>
-        <DotGrid />
-        <Navbar />
-        <div className="relative z-10 flex-1 pt-14 sm:pt-16 pb-32 sm:pb-24">{children}</div>
+        <OpeningSequence>
+          <DotGrid />
+          <Navbar />
+          <div className="relative z-10 flex-1 pt-14 sm:pt-16 pb-32 sm:pb-24">{children}</div>
+        </OpeningSequence>
       </body>
     </html>
   );

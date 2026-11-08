@@ -4,7 +4,8 @@ const fs = require('node:fs');
 const path = require('node:path');
 const zlib = require('node:zlib');
 
-const output = path.resolve('docs/perf-traces');
+const output = path.resolve(process.env.PERF_OUTPUT || 'docs/perf-traces');
+const url = process.env.PERF_URL || 'http://localhost:3000/';
 fs.mkdirSync(output, { recursive: true });
 
 async function main() {
@@ -54,7 +55,7 @@ async function main() {
     results.push({ name, ...snapshot });
     process.stdout.write(`${name}: ${JSON.stringify(snapshot)}\n`);
   }
-  await trace('intro', async () => { await page.goto('http://localhost:3000/', { waitUntil: 'commit' }); });
+  await trace('intro', async () => { await page.goto(url, { waitUntil: 'commit' }); });
   await trace('hero', async () => { await page.evaluate(() => window.scrollTo(0, 0)); });
   await trace('scroll', async () => {
     await page.evaluate(() => { const start = performance.now(); const from = scrollY; const distance = document.documentElement.scrollHeight - innerHeight - from; function step(t) { const p = Math.min((t-start)/4500, 1); scrollTo(0, from + distance * p); if (p < 1) requestAnimationFrame(step); } requestAnimationFrame(step); });

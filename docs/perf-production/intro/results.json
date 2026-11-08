@@ -1,0 +1,61 @@
+{
+  "browserVersion": "156.0.8078.80",
+  "cpuThrottle": 4,
+  "viewport": "1365x768",
+  "environment": {
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36",
+    "gpu": "ANGLE (NVIDIA, NVIDIA GeForce RTX 3060 (0x00002504) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+  },
+  "results": [
+    {
+      "name": "intro",
+      "elapsedMs": 5725.10000000149,
+      "fps": 94.24330479855492,
+      "over16_7": 24,
+      "intervals": 360,
+      "longTasks": 5,
+      "longestTaskMs": 177,
+      "shiftSum": 0.10424111841260106
+    },
+    {
+      "name": "hero",
+      "elapsedMs": 5506.5,
+      "fps": 138.34028068514846,
+      "over16_7": 0,
+      "intervals": 760,
+      "longTasks": 0,
+      "longestTaskMs": 0,
+      "shiftSum": 0
+    },
+    {
+      "name": "scroll",
+      "elapsedMs": 5518.699999999255,
+      "fps": 125.57639382506791,
+      "over16_7": 13,
+      "intervals": 689,
+      "longTasks": 2,
+      "longestTaskMs": 200,
+      "shiftSum": 0.018841699254565195
+    },
+    {
+      "name": "skills",
+      "elapsedMs": 6007.10000000149,
+      "fps": 66.23510961326706,
+      "over16_7": 42,
+      "intervals": 397,
+      "longTasks": 5,
+      "longestTaskMs": 457,
+      "shiftSum": 0.00016601444571911605
+    },
+    {
+      "name": "projects",
+      "elapsedMs": 6003.699999999255,
+      "fps": 132.4392568686142,
+      "over16_7": 5,
+      "intervals": 792,
+      "longTasks": 0,
+      "longestTaskMs": 0,
+      "shiftSum": 0.0021172365231431163
+    }
+  ]
+}

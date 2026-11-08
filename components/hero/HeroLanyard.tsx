@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
 import "./signature.css";
 import { Signature } from "./Signature";
+import { useIntroFinished } from "@/components/shared/useIntroFinished";
 
 const Lanyard = dynamic(() => import("@/components/Lanyard/Lanyard"), {
   ssr: false,
@@ -16,14 +17,17 @@ const Lanyard = dynamic(() => import("@/components/Lanyard/Lanyard"), {
 });
 
 export function HeroLanyard() {
+  const introFinished = useIntroFinished();
   const containerRef = useRef<HTMLDivElement>(null);
   // Keep the first client render identical to the server-rendered markup.
   // The effect below measures the viewport and updates both values afterwards.
   const [isDesktop, setIsDesktop] = useState(true);
-  const [anchor, setAnchor] = useState(0.73);
+  const [anchor, setAnchor] = useState(0.5);
   const [containerStyle, setContainerStyle] = useState<React.CSSProperties>({
-    position: "relative",
-    width: "100%",
+    position: "absolute",
+    top: 0,
+    left: "calc(50% - 50vw)",
+    width: "100vw",
     height: "100%",
   });
 
@@ -35,23 +39,20 @@ export function HeroLanyard() {
       if (containerRef.current) {
         const parent = containerRef.current.parentElement;
         if (parent) {
-          const rect = parent.getBoundingClientRect();
           const winWidth = window.innerWidth;
 
           // Full viewport breakout: span exactly 100vw from viewport left (0) to right (winWidth)
           setContainerStyle({
             position: "absolute",
             top: 0,
-            left: `${-rect.left}px`,
+            left: "calc(50% - 50vw)",
             width: "100vw",
             height: "100%",
           });
 
           // Calculate horizontal center of the right column across the 100vw canvas
           if (desktop && winWidth > 0) {
-            const colCenter = rect.left + rect.width / 2;
-            const computedAnchor = Math.max(0.1, Math.min(0.9, colCenter / winWidth));
-            setAnchor(computedAnchor);
+            setAnchor(0.5);
           } else {
             setAnchor(0.5);
           }
@@ -86,7 +87,7 @@ export function HeroLanyard() {
       <div className="signature-viewport" aria-hidden="true">
         <Signature anchor={anchor} />
       </div>
-      <Lanyard
+      {introFinished && <Lanyard
         frontImage="/lanyard/Portfolio-img.png"
         backImage="/lanyard/card-back.png"
         cardColor="#101010"
@@ -105,7 +106,7 @@ export function HeroLanyard() {
         breeze={0.35}
         interactive
         intro
-      />
+      />}
     </div>
   );
 }
