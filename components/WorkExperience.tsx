@@ -63,8 +63,8 @@ export function WorkExperience({ hideLabel, isOpen: controlledIsOpen, onToggle }
               <div
                 className={`exp-card group ${isOpen ? "is-open" : ""} ${
                   isHovered
-                    ? "is-hovered border-[var(--primary-text)] shadow-[0_0_24px_rgba(246,237,220,0.12)]"
-                    : "border-[var(--line)]"
+                    ? "is-hovered"
+                    : ""
                 }`}
                 onMouseEnter={() => setHoveredIndex(index)}
                 onMouseLeave={() => setHoveredIndex(null)}

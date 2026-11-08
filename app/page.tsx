@@ -81,7 +81,7 @@ export default function Home() {
             <span className="font-mono text-xs text-[var(--muted)] hidden sm:inline">merge: let&apos;s build</span>
           </div>
 
-          <div className="group rounded-xl border border-[var(--line)] bg-[var(--panel)]/40 p-6 sm:p-8 lg:p-10 transition-colors duration-300 hover:border-[var(--muted)]">
+          <div className="content-frame group bg-[var(--panel)]/40 p-6 sm:p-8 lg:p-10">
             <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8 lg:gap-12">
               <div className="max-w-2xl">
                 <h3 className="text-[clamp(1.75rem,3vw,2.75rem)] font-semibold leading-[1.15] tracking-tight text-[var(--ink)]">

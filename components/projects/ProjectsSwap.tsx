@@ -242,7 +242,7 @@ export default function ProjectsSwap() {
   return (
     <div
       ref={containerRef}
-      className="w-full relative rounded-[20px] border border-dashed border-[#2a2a2a] overflow-hidden flex flex-col"
+      className="content-frame w-full overflow-hidden flex flex-col"
       style={{
         background:
           "radial-gradient(ellipse at 70% 40%, rgba(245,100,62,0.09), transparent 60%) #0c0c0c",

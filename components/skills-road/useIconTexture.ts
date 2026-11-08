@@ -5,7 +5,7 @@ import * as THREE from 'three';
 import { TECH_SVGS } from './techSvgs';
 
 const textureCache = new Map<string, THREE.CanvasTexture>();
-const CACHE_VERSION = 'v5_react_atom_fixed';
+const CACHE_VERSION = 'v6_svg_root_dimensions';
 
 function drawRoundedRectPath(
   ctx: CanvasRenderingContext2D,
@@ -55,21 +55,14 @@ export function useIconTexture(
     const rawSvg = TECH_SVGS[skillId.toLowerCase()] || TECH_SVGS.start;
     if (!rawSvg || !ctx) return tex;
 
-    // Normalize SVG string for crisp 256x256 rendering
-    let preparedSvg = rawSvg;
-    if (!preparedSvg.includes('xmlns=')) {
-      preparedSvg = preparedSvg.replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"');
-    }
-    if (/width="[^"]*"/.test(preparedSvg)) {
-      preparedSvg = preparedSvg.replace(/width="[^"]*"/, 'width="256"');
-    } else {
-      preparedSvg = preparedSvg.replace('<svg', '<svg width="256"');
-    }
-    if (/height="[^"]*"/.test(preparedSvg)) {
-      preparedSvg = preparedSvg.replace(/height="[^"]*"/, 'height="256"');
-    } else {
-      preparedSvg = preparedSvg.replace('<svg', '<svg height="256"');
-    }
+    // Only alter the root SVG dimensions, never attributes such as stroke-width.
+    const preparedSvg = rawSvg.replace(/<svg\b[^>]*>/, (tag) => {
+      const root = tag
+        .replace(/\swidth="[^"]*"/g, '')
+        .replace(/\sheight="[^"]*"/g, '');
+      const namespace = /\sxmlns=/.test(root) ? '' : ' xmlns="http://www.w3.org/2000/svg"';
+      return root.replace('<svg', `<svg${namespace} width="256" height="256"`);
+    });
 
     const img = new Image();
     img.crossOrigin = 'anonymous';

@@ -110,12 +110,7 @@ export function PhotographyShowcase() {
   }, []);
 
   return (
-    <div className="group relative w-full h-full p-6 sm:p-8 border border-[var(--dashed-borders)] border-dashed bg-transparent rounded-sm font-mono text-[var(--secondary-text)] flex flex-col justify-between gap-6 transition-colors duration-300 hover:border-[var(--secondary-text)]">
-      {/* Corner Accents with Glow */}
-      <div className="corner-accent absolute top-[-2px] left-[-2px] w-3 h-3 border-t-2 border-l-2 border-[var(--primary-text)] opacity-40 group-hover:opacity-100 transition-all duration-300 pointer-events-none z-10 group-hover:drop-shadow-[0_0_8px_var(--primary-text)]" />
-      <div className="corner-accent absolute top-[-2px] right-[-2px] w-3 h-3 border-t-2 border-r-2 border-[var(--primary-text)] opacity-40 group-hover:opacity-100 transition-all duration-300 pointer-events-none z-10 group-hover:drop-shadow-[0_0_8px_var(--primary-text)]" />
-      <div className="corner-accent absolute bottom-[-2px] left-[-2px] w-3 h-3 border-b-2 border-l-2 border-[var(--primary-text)] opacity-40 group-hover:opacity-100 transition-all duration-300 pointer-events-none z-10 group-hover:drop-shadow-[0_0_8px_var(--primary-text)]" />
-      <div className="corner-accent absolute bottom-[-2px] right-[-2px] w-3 h-3 border-b-2 border-r-2 border-[var(--primary-text)] opacity-40 group-hover:opacity-100 transition-all duration-300 pointer-events-none z-10 group-hover:drop-shadow-[0_0_8px_var(--primary-text)]" />
+    <div className="content-frame group w-full h-full p-6 sm:p-8 bg-transparent font-mono text-[var(--secondary-text)] flex flex-col justify-between gap-6">
 
       {/* Header */}
       <div className="flex flex-wrap justify-between items-center gap-x-3 gap-y-2 text-xs tracking-wider border-b border-[var(--dashed-borders)] border-dashed pb-4">

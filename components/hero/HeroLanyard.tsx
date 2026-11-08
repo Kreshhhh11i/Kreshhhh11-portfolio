@@ -17,18 +17,10 @@ const Lanyard = dynamic(() => import("@/components/Lanyard/Lanyard"), {
 
 export function HeroLanyard() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [isDesktop, setIsDesktop] = useState<boolean>(() => {
-    if (typeof window !== "undefined") {
-      return window.innerWidth >= 1024;
-    }
-    return true;
-  });
-  const [anchor, setAnchor] = useState<number>(() => {
-    if (typeof window !== "undefined" && window.innerWidth < 1024) {
-      return 0.5;
-    }
-    return 0.73;
-  });
+  // Keep the first client render identical to the server-rendered markup.
+  // The effect below measures the viewport and updates both values afterwards.
+  const [isDesktop, setIsDesktop] = useState(true);
+  const [anchor, setAnchor] = useState(0.73);
   const [containerStyle, setContainerStyle] = useState<React.CSSProperties>({
     position: "relative",
     width: "100%",

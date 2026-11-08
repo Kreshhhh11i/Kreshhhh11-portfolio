@@ -131,7 +131,10 @@ export function Tile({
     <group
       ref={groupRef}
       onPointerOver={(e) => {
-        if (isDimmed) return;
+        e.stopPropagation();
+        onHover(skill.id);
+      }}
+      onPointerMove={(e) => {
         e.stopPropagation();
         onHover(skill.id);
       }}

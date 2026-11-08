@@ -66,6 +66,8 @@ interface SceneProps {
   isReducedMotion: boolean;
   introStarted: boolean;
   isInView?: boolean;
+  hoveredTileId: string | null;
+  onTileHover: (id: string | null) => void;
   onTileClick: (index: number) => void;
   onTokenStepComplete: (newIndex: number) => void;
 }
@@ -332,69 +334,6 @@ function TokenLabel({
   );
 }
 
-/**
- * Hover Tooltip: Appears smoothly over a hovered tile without hijacking the token badge.
- * When hover ends, it fades out in place (NEVER jumps to START!).
- */
-function HoverTooltip({
-  skill,
-  targetPoint,
-  isFlatView,
-  visible,
-}: {
-  skill: SkillItem | undefined;
-  targetPoint: { x: number; z: number };
-  isFlatView: boolean;
-  visible: boolean;
-}) {
-  const groupRef = useRef<THREE.Group>(null);
-  const posRef = useRef(new THREE.Vector3(targetPoint.x, 0, targetPoint.z));
-
-  const targetY = (skill?.height ?? 0.38) + (isFlatView ? 0.38 : 0.82);
-  const targetZ = targetPoint.z + (isFlatView ? -0.95 : -0.30);
-  const targetX = targetPoint.x + (isFlatView ? 0 : -0.06);
-
-  useFrame((_, delta) => {
-    if (!groupRef.current) return;
-    if (visible) {
-      easing.damp(posRef.current, 'x', targetX, 0.16, delta);
-      easing.damp(posRef.current, 'y', targetY, 0.16, delta);
-      easing.damp(posRef.current, 'z', targetZ, 0.16, delta);
-      groupRef.current.position.set(posRef.current.x, posRef.current.y, posRef.current.z);
-    }
-  });
-
-  return (
-    <group ref={groupRef} position={[targetX, targetY, targetZ]}>
-      <Html
-        center
-        distanceFactor={14}
-        style={{
-          pointerEvents: 'none',
-          transition: 'opacity 0.15s ease',
-          opacity: visible && skill ? 1 : 0,
-        }}
-      >
-        {skill && (
-          <div className="flex flex-col items-center pointer-events-none transition-all duration-200">
-            <div className="px-2 py-0.5 rounded-full bg-[#14120f]/90 border border-[var(--line)] shadow-lg backdrop-blur-md text-[#f6eddc] flex items-center gap-1.5 whitespace-nowrap text-[11px] font-mono">
-              <span
-                className="w-1.5 h-1.5 rounded-full shrink-0"
-                style={{ backgroundColor: skill.color }}
-              />
-              <span className="text-[#f6eddc] font-medium">{skill.name}</span>
-              <span className="text-[9px] text-[var(--muted)] capitalize">
-                • {skill.level}
-              </span>
-            </div>
-            <div className="w-1.5 h-1.5 rotate-45 bg-[#14120f] border-r border-b border-[var(--line)] -mt-1" />
-          </div>
-        )}
-      </Html>
-    </group>
-  );
-}
-
 export default function Scene({
   skills,
   layoutPoints,
@@ -406,24 +345,16 @@ export default function Scene({
   isReducedMotion,
   introStarted,
   isInView = true,
+  hoveredTileId,
+  onTileHover,
   onTileClick,
   onTokenStepComplete,
 }: SceneProps) {
-  const [hoveredTileId, setHoveredTileId] = useState<string | null>(null);
   const [dpr, setDpr] = useState(1.5);
 
   // Token's own active skill and point (never pulled away by hovering or transitions)
   const tokenSkill = skills[currentIndex];
   const tokenPoint = layoutPoints[currentIndex] ?? { x: 0, z: 0 };
-
-  // Hovered skill and point (only active if hovering a different tile that is not dimmed)
-  const hoveredIndex = hoveredTileId ? skills.findIndex((s) => s.id === hoveredTileId) : -1;
-  const isHoveredValid =
-    hoveredIndex !== -1 &&
-    hoveredIndex !== currentIndex &&
-    (activeCategory === 'All' || skills[hoveredIndex]?.category === activeCategory);
-  const hoveredSkill = isHoveredValid ? skills[hoveredIndex] : undefined;
-  const hoveredPoint = isHoveredValid ? (layoutPoints[hoveredIndex] ?? { x: 0, z: 0 }) : tokenPoint;
 
   return (
     <Canvas
@@ -509,7 +440,7 @@ export default function Scene({
               isDimmed={isDimmed}
               isReducedMotion={isReducedMotion}
               introStarted={introStarted}
-              onHover={setHoveredTileId}
+              onHover={onTileHover}
               onClick={onTileClick}
             />
           );
@@ -532,14 +463,6 @@ export default function Scene({
         skill={tokenSkill}
         targetPoint={tokenPoint}
         isFlatView={isFlatView}
-      />
-
-      {/* 2. Hover tooltip: appears over hovered tiles and fades in place without snapping */}
-      <HoverTooltip
-        skill={hoveredSkill}
-        targetPoint={hoveredPoint}
-        isFlatView={isFlatView}
-        visible={isHoveredValid}
       />
 
       {/* Postprocessing: ACES Bloom & Vignette */}

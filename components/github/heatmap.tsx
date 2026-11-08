@@ -185,8 +185,8 @@ export function GitHubHeatmap({ isOpen: controlledIsOpen, onToggle }: GitHubHeat
     <>
       <div
         className={`exp-card github-heatmap-card group w-full ${isOpen ? "is-open" : ""} ${isHovered
-            ? "is-hovered border-[var(--primary-text)] shadow-[0_0_24px_rgba(246,237,220,0.12)]"
-            : "border-[var(--line)]"
+            ? "is-hovered"
+            : ""
           }`}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => {

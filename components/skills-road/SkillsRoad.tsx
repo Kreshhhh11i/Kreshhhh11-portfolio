@@ -58,6 +58,8 @@ export function SkillsRoad() {
   const categoryMenuRef = useRef<HTMLDivElement>(null);
   const categoryButtonRef = useRef<HTMLButtonElement>(null);
   const [categoryMenuOpen, setCategoryMenuOpen] = useState(false);
+  const [hoveredTileId, setHoveredTileId] = useState<string | null>(null);
+  const hoveredSkill = SKILLS_ROAD_DATA.find((skill) => skill.id === hoveredTileId);
 
   // Layout mode: 'classic' | 'shuffle'
   const [layoutMode, setLayoutMode] = useState<'classic' | 'shuffle'>('classic');
@@ -386,7 +388,7 @@ export function SkillsRoad() {
       </div>
 
       {/* 3D CANVAS VIEWPORT (Clean container without corner edges or hover glow) */}
-      <div className="w-full h-[390px] sm:h-[520px] md:h-[620px] bg-[#0a0a0a] border border-[var(--line)] relative overflow-hidden">
+      <div className="content-frame w-full h-[390px] sm:h-[520px] md:h-[620px] bg-[#0a0a0a] overflow-hidden">
         <Scene
           skills={SKILLS_ROAD_DATA}
           layoutPoints={currentLayoutPoints}
@@ -398,12 +400,28 @@ export function SkillsRoad() {
           isReducedMotion={isReducedMotion}
           introStarted={introStarted}
           isInView={isInView}
+          hoveredTileId={hoveredTileId}
+          onTileHover={setHoveredTileId}
           onTileClick={(idx) => {
             setMoveMode('jump');
             setTargetIndex(idx);
           }}
           onTokenStepComplete={handleTokenStep}
         />
+
+        <div
+          aria-hidden="true"
+          className={`pointer-events-none absolute left-4 top-4 z-10 max-w-[55%] rounded-md border border-white/15 bg-[#141310]/95 px-3 py-2.5 font-mono shadow-lg transition-opacity duration-150 motion-reduce:transition-none ${hoveredSkill ? 'opacity-100' : 'opacity-0'}`}
+        >
+          <div className="flex items-center gap-2 text-[10px] uppercase tracking-wider text-[#aaa294]">
+            <span className="text-[#f5643e]">//</span> skill.inspect
+          </div>
+          <div className="mt-1 flex items-baseline gap-2 text-sm font-semibold text-[#f6eddc]">
+            <span className="text-[#f5643e]">&gt;</span>
+            <span>{hoveredSkill?.name}</span>
+          </div>
+          <div className="mt-1 pl-4 text-[10px] text-[#aaa294]">{hoveredSkill?.category}</div>
+        </div>
 
         {/* In-Canvas Floating Interactive Controls (Bottom Left) */}
         <div className="skills-board-controls">

@@ -319,7 +319,74 @@ body {
 .group:hover .corner-accent,
 .corner-accent-active {
   opacity: 1 !important;
-  filter: drop-shadow(0 0 6px var(--primary-text)) drop-shadow(0 0 12px var(--primary-text)) !important;
+  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--primary-text) 45%, transparent)) !important;
+}
+
+/* Match the heatmap's dashed frame and corner brackets on section cards. */
+.content-frame {
+  position: relative;
+  border: 1px solid transparent;
+  border-radius: 0;
+  transition: border-color 300ms ease;
+}
+
+.content-frame::before,
+.exp-card::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  z-index: 10;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(90deg, currentColor 0 3px, transparent 3px 6px) center top / calc(100% - 32px) 1px,
+    repeating-linear-gradient(90deg, currentColor 0 3px, transparent 3px 6px) center bottom / calc(100% - 32px) 1px,
+    repeating-linear-gradient(0deg, currentColor 0 3px, transparent 3px 6px) left center / 1px calc(100% - 32px),
+    repeating-linear-gradient(0deg, currentColor 0 3px, transparent 3px 6px) right center / 1px calc(100% - 32px);
+  background-repeat: no-repeat;
+  color: var(--primary-text);
+  opacity: .22;
+  transition: opacity 300ms ease;
+}
+
+.content-frame:hover::before,
+.exp-card:hover::before,
+.exp-card.is-hovered::before {
+  opacity: .4;
+}
+
+/* Keep the dashed line inside frames that clip their contents. */
+.content-frame::before {
+  inset: 0;
+}
+
+.content-frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 15;
+  pointer-events: none;
+  color: var(--primary-text);
+  opacity: .4;
+  background:
+    linear-gradient(currentColor, currentColor) left top / 12px 2px,
+    linear-gradient(currentColor, currentColor) left top / 2px 12px,
+    linear-gradient(currentColor, currentColor) right top / 12px 2px,
+    linear-gradient(currentColor, currentColor) right top / 2px 12px,
+    linear-gradient(currentColor, currentColor) left bottom / 12px 2px,
+    linear-gradient(currentColor, currentColor) left bottom / 2px 12px,
+    linear-gradient(currentColor, currentColor) right bottom / 12px 2px,
+    linear-gradient(currentColor, currentColor) right bottom / 2px 12px;
+  background-repeat: no-repeat;
+  transition: opacity 300ms ease, filter 300ms ease;
+}
+
+.content-frame:hover::after {
+  opacity: 1;
+  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--primary-text) 45%, transparent));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .content-frame, .content-frame::before, .content-frame::after, .exp-card::before { transition: none; }
 }
 
 /* Hero Social Icons & Buttons: Theme Switching, Outer Border Glow, and Shake Micro-interaction */

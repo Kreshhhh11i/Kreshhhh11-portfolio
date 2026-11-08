@@ -268,7 +268,7 @@ export function SigningBox() {
   return (
     <div
       ref={containerRef}
-      className="signing-box w-full h-full p-[18px] sm:p-6 rounded-[18px] border border-dashed border-[var(--sb-line)] bg-[var(--sb-surface)] flex flex-col justify-between font-sans transition-colors duration-200"
+      className="signing-box content-frame w-full h-full p-[18px] sm:p-6 bg-[var(--sb-surface)] flex flex-col justify-between font-sans"
     >
       <style>{`
         .signing-box {

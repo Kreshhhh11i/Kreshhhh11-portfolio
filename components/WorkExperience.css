@@ -87,7 +87,7 @@
 .exp-card {
   position: relative;
   background: var(--card);
-  border: 1px dashed var(--line);
+  border: 1px solid transparent;
   border-radius: 0;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
   box-sizing: border-box;
@@ -194,14 +194,14 @@
 
 .exp-card:hover,
 .exp-card.is-hovered {
-  border-color: var(--primary-text, #f6eddc);
-  box-shadow: 0 0 24px rgba(246, 237, 220, 0.12);
+  border-color: transparent;
+  box-shadow: none;
 }
 
 .exp-card:hover .corner-accent,
 .exp-card.is-hovered .corner-accent {
   opacity: 1 !important;
-  filter: drop-shadow(0 0 6px var(--primary-text, #f6eddc)) drop-shadow(0 0 12px var(--primary-text, #f6eddc)) !important;
+  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--primary-text) 45%, transparent)) !important;
 }
 
 /* Card Header Button */
