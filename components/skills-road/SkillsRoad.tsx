@@ -57,6 +57,7 @@ function CategoryIcon({ category }: { category: SkillCategory | 'All' }) {
 export function SkillsRoad() {
   const introFinished = useIntroFinished();
   const containerRef = useRef<HTMLDivElement>(null);
+  const diceIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const categoryMenuRef = useRef<HTMLDivElement>(null);
   const categoryButtonRef = useRef<HTMLButtonElement>(null);
   const [categoryMenuOpen, setCategoryMenuOpen] = useState(false);
@@ -168,6 +169,7 @@ export function SkillsRoad() {
       count++;
       if (count > 7) {
         clearInterval(interval);
+        diceIntervalRef.current = null;
         const finalRoll = Math.floor(Math.random() * 6) + 1;
         setDiceValue(finalRoll);
         setIsRolling(false);
@@ -199,7 +201,10 @@ export function SkillsRoad() {
         });
       }
     }, 60);
+    diceIntervalRef.current = interval;
   }, [isRolling, activeCategory]);
+
+  useEffect(() => () => { if (diceIntervalRef.current) clearInterval(diceIntervalRef.current); }, []);
 
   // Step prev / next respecting active category
   const stepPrev = useCallback(() => {

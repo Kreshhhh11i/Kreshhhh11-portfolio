@@ -118,6 +118,7 @@ export function SigningBox() {
   const [toast, setToast] = useState<string | null>(null);
 
   const currentStrokeRef = useRef<Stroke | null>(null);
+  const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const sizeRef = useRef<{ w: number; h: number }>({ w: 0, h: 0 });
 
   const getInkColor = useCallback(() => {
@@ -201,8 +202,11 @@ export function SigningBox() {
 
   const showToast = (msg: string) => {
     setToast(msg);
-    setTimeout(() => setToast((curr) => (curr === msg ? null : curr)), 2500);
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    toastTimerRef.current = setTimeout(() => setToast((curr) => (curr === msg ? null : curr)), 2500);
   };
+
+  useEffect(() => () => { if (toastTimerRef.current) clearTimeout(toastTimerRef.current); }, []);
 
   const saveWall = (items: SignatureItem[]) => {
     setSignatures(items);
