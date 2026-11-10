@@ -5,6 +5,8 @@ import Image from "next/image";
 import CardSwap, { Card } from "@/components/CardSwap/CardSwap";
 import ProjectTimeBar from "./ProjectTimeBar";
 import { projects } from "@/data/projects";
+import { ScrollLineReveal } from "@/components/motion/ScrollLineReveal";
+import { ChipReveal } from "@/components/motion/ChipReveal";
 import "./ProjectsSwap.css";
 
 interface CardDimensions {
@@ -282,7 +284,7 @@ export default function ProjectsSwap() {
             </div>
 
             <p className="mt-2 mb-3 max-w-md text-sm sm:text-base leading-relaxed text-[#b9b2a2]">
-              {currentProject.description}
+              <ScrollLineReveal text={currentProject.description} />
             </p>
 
             {/* 4. Tech stack tags */}
@@ -292,17 +294,18 @@ export default function ProjectsSwap() {
                 <svg className="project-stack-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9" /></svg>
               </button>
               <div id="project-stack-content" className={`project-stack-content ${stackOpen ? "is-open" : ""}`} inert={!stackOpen}>
-                <div><div className="project-stack-tags">{currentProject.tags.map((tag) => <span key={tag}>{tag}</span>)}</div></div>
+                <div><div className="project-stack-tags">{currentProject.tags.map((tag, index) => <ChipReveal key={tag} index={index}>{tag}</ChipReveal>)}</div></div>
               </div>
             </div>
             <div className="project-stack-desktop flex flex-row flex-wrap items-center justify-start gap-2 sm:gap-2.5 w-full mt-1">
-              {currentProject.tags.map((tag) => (
-                <span
+              {currentProject.tags.map((tag, index) => (
+                <ChipReveal
                   key={tag}
+                  index={index}
                   className="font-mono text-[12px] sm:text-[13px] text-[#b9b2a2] border border-[#2c2c2c] rounded-[4px] px-2.5 py-1.5 bg-[#141414]/60 whitespace-nowrap shrink-0"
                 >
                   {tag}
-                </span>
+                </ChipReveal>
               ))}
             </div>
 

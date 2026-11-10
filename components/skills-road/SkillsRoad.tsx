@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import dynamic from 'next/dynamic';
-import { useIntroFinished } from '@/components/shared/useIntroFinished';
 import './SkillsRoad.css';
 import {
   SKILLS_ROAD_DATA,
@@ -16,20 +15,27 @@ import {
   TileLayoutPoint,
 } from './layouts';
 
-// Dynamic import with SSR false and sleek skeleton fallback
+// Prepare the board behind the opening sequence; its frame loop pauses off-screen once ready.
 const Scene = dynamic(() => import('./Scene'), {
   ssr: false,
-  loading: () => (
-    <div className="w-full h-full flex flex-col items-center justify-center bg-[#0b0a08] rounded-2xl border border-[var(--line)]">
-      <div className="flex items-center gap-3">
-        <div className="w-4 h-4 rounded-full border-2 border-[var(--accent)] border-t-transparent animate-spin" />
-        <span className="font-mono text-xs text-[var(--muted)] tracking-wider uppercase">
-          Initializing 3D Board Engine...
-        </span>
-      </div>
-    </div>
-  ),
+  loading: () => null,
 });
+
+class SceneErrorBoundary extends React.Component<{ children: React.ReactNode; onError: () => void }, { failed: boolean }> {
+  state = { failed: false };
+
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+
+  componentDidCatch() {
+    this.props.onError();
+  }
+
+  render() {
+    return this.state.failed ? null : this.props.children;
+  }
+}
 
 const CATEGORIES: Array<SkillCategory | 'All'> = [
   'All',
@@ -55,7 +61,6 @@ function CategoryIcon({ category }: { category: SkillCategory | 'All' }) {
 }
 
 export function SkillsRoad() {
-  const introFinished = useIntroFinished();
   const containerRef = useRef<HTMLDivElement>(null);
   const diceIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const categoryMenuRef = useRef<HTMLDivElement>(null);
@@ -123,8 +128,12 @@ export function SkillsRoad() {
 
   // Viewport & performance
   const [isInView, setIsInView] = useState(true);
+  const [boardReady, setBoardReady] = useState(false);
   const [introStarted, setIntroStarted] = useState(false);
   const [isReducedMotion, setIsReducedMotion] = useState(false);
+  const boardLoading = !boardReady;
+  const handleBoardReady = useCallback(() => setBoardReady(true), []);
+  const handleBoardError = useCallback(() => setBoardReady(false), []);
 
   // Reduced motion preference
   useEffect(() => {
@@ -300,7 +309,7 @@ export function SkillsRoad() {
       </ul>
 
       {/* TOP CONTROLS BAR: Clean buttons without corner tick edges or hover glow */}
-      <div className="skills-toolbar">
+      <div className="skills-toolbar" data-reveal={introStarted ? 'visible' : undefined}>
         {/* Category Filter Chips */}
         <div className="skills-filters" role="group" aria-label="Filter skills by category">
           {CATEGORIES.map((cat) => {
@@ -396,7 +405,7 @@ export function SkillsRoad() {
 
       {/* 3D CANVAS VIEWPORT (Clean container without corner edges or hover glow) */}
       <div className="content-frame w-full h-[390px] sm:h-[520px] md:h-[620px] bg-[#0a0a0a] overflow-hidden">
-        {introFinished && <Scene
+        <SceneErrorBoundary onError={handleBoardError}><Scene
           skills={SKILLS_ROAD_DATA}
           layoutPoints={currentLayoutPoints}
           currentIndex={currentIndex}
@@ -406,7 +415,7 @@ export function SkillsRoad() {
           isFlatView={isFlatView}
           isReducedMotion={isReducedMotion}
           introStarted={introStarted}
-          isInView={isInView}
+          isInView={isInView || !boardReady}
           hoveredTileId={hoveredTileId}
           onTileHover={setHoveredTileId}
           onTileClick={(idx) => {
@@ -414,7 +423,12 @@ export function SkillsRoad() {
             setTargetIndex(idx);
           }}
           onTokenStepComplete={handleTokenStep}
-        />}
+          onReady={handleBoardReady}
+        /></SceneErrorBoundary>
+
+        <div className={`skills-board-loading${boardLoading ? '' : ' is-ready'}`} role="status" aria-live="polite" aria-hidden={!boardLoading}>
+          {boardLoading && 'Loading 3D engine…'}
+        </div>
 
         <div
           aria-hidden="true"

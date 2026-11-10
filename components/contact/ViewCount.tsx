@@ -27,5 +27,11 @@ export function ViewCount() {
     return () => { active = false; };
   }, []);
 
-  return <span aria-label={count === null ? "View count unavailable" : undefined} className="text-[var(--accent)]">{count === null ? "—" : count.toLocaleString()} views</span>;
+  return <span aria-label={count === null ? "Viewer count unavailable" : undefined} className="inline-flex items-center gap-1.5 text-[var(--accent)]">
+    <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z" />
+      <circle cx="12" cy="12" r="3" />
+    </svg>
+    <span>{count === null ? "—" : count.toLocaleString()} viewers</span>
+  </span>;
 }

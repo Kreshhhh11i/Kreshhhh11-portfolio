@@ -70,6 +70,20 @@ interface SceneProps {
   onTileHover: (id: string | null) => void;
   onTileClick: (index: number) => void;
   onTokenStepComplete: (newIndex: number) => void;
+  onReady: () => void;
+}
+
+// Signal only after the canvas has had an opportunity to draw its first frame.
+function FirstFrame({ onReady }: { onReady: () => void }) {
+  const reported = useRef(false);
+  const frame = useRef(0);
+  useFrame(() => {
+    if (reported.current) return;
+    reported.current = true;
+    frame.current = requestAnimationFrame(onReady);
+  });
+  useEffect(() => () => cancelAnimationFrame(frame.current), []);
+  return null;
 }
 
 /**
@@ -349,6 +363,7 @@ export default function Scene({
   onTileHover,
   onTileClick,
   onTokenStepComplete,
+  onReady,
 }: SceneProps) {
   const [dpr, setDpr] = useState(1.5);
 
@@ -376,6 +391,7 @@ export default function Scene({
       className={`w-full h-full ${isFlatView ? 'cursor-default' : 'cursor-grab active:cursor-grabbing'}`}
       style={{ touchAction: 'pan-y' }}
     >
+      <FirstFrame onReady={onReady} />
       <PerformanceMonitor onIncline={() => setDpr(2)} onDecline={() => setDpr(1)} />
 
       {/* Lighting Architecture */}

@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { MagnetLines } from "@/components/ui/magnet-lines";
 import { HeroLanyard } from "@/components/hero/HeroLanyard";
 import { HeroSocials } from "@/components/hero/HeroSocials";
+import { WordReveal } from "@/components/motion/WordReveal";
 
 // Switch between the interactive 3D Lanyard and the original photo orbit block
 const SHOW_LANYARD = true;
@@ -18,6 +19,11 @@ const playgroundData = [
 ];
 
 export function Hero() {
+  useEffect(() => {
+    document.documentElement.dataset.heroMotionReady = "true";
+    window.dispatchEvent(new Event("portfolio:motion-ready"));
+    return () => { delete document.documentElement.dataset.heroMotionReady; };
+  }, []);
   const [isPlaygroundActive, setIsPlaygroundActive] = useState(false);
   const [activeCard, setActiveCard] = useState<string | null>(null);
 
@@ -185,7 +191,7 @@ export function Hero() {
       <div className="relative z-10 flex-1 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center lg:items-start">
         {/* Left Column (Tagline & Bio) */}
         <div className="w-full order-2 lg:order-1 relative z-10 flex flex-col items-center lg:items-start text-center lg:text-left gap-5 sm:gap-6 justify-center lg:self-center lg:py-8">
-          <div className="flex flex-wrap items-center justify-center lg:justify-start gap-x-3 gap-y-1 max-w-full text-[11px] sm:text-xs text-[var(--secondary-text)] font-mono">
+          <div data-hero-label className="flex flex-wrap items-center justify-center lg:justify-start gap-x-3 gap-y-1 max-w-full text-[11px] sm:text-xs text-[var(--secondary-text)] font-mono">
             <div className="flex items-center gap-2 whitespace-nowrap">
               <span className="h-1.5 w-1.5 rounded-full bg-[#f5643e] shrink-0" />
               <span>Available for work</span>
@@ -198,24 +204,17 @@ export function Hero() {
           </div>
 
           <h1 className="w-full lg:w-[calc(100%+3rem)] text-center lg:text-left text-[clamp(1.75rem,8vw,2.25rem)] sm:text-[clamp(2.5rem,5.8vw,3rem)] lg:text-[clamp(2.875rem,4vw,3.25rem)] xl:text-[clamp(3.125rem,4vw,3.5rem)] 2xl:text-[clamp(3.5rem,4vw,4rem)] font-bold font-sans tracking-tight text-[var(--primary-text)] leading-[1.12] sm:leading-[1.1]">
-            <span className="block">Breaking systems to</span>
-            <span className="block mt-1 sm:mt-1.5 lg:mt-2">
-              <span
-                style={{ fontFamily: 'var(--font-ivyora), "IvyOra Display", "ivyora-display"' }}
-                className="font-ivyora italic font-normal tracking-normal text-[var(--primary-text)]"
-              >
-                Understand systems.
-              </span>
-            </span>
+            <WordReveal text="Breaking systems to" className="block" trigger="view" waitForHeroCue notifyHeroStart />
+            <WordReveal text="Understand systems." className="block mt-1 sm:mt-1.5 lg:mt-2 font-ivyora italic font-normal tracking-normal text-[var(--primary-text)]" trigger="view" waitForHeroCue delay={0.4} />
           </h1>
 
           {/* Bio Description (2 sentences) */}
-          <p className="text-[var(--secondary-text)] text-sm sm:text-base lg:text-[15px] xl:text-base leading-relaxed max-w-lg text-center lg:text-left">
-            I build, break, debug, and ship web applications with the <span className="text-[var(--primary-text)] font-medium">PERN stack</span>. When the editor closes, you&apos;ll probably find me exploring, gaming, or taking pictures.
+          <p data-hero-subtitle aria-label="I build, break, debug, and ship web applications with the PERN stack. When the editor closes, you'll probably find me exploring, gaming, or taking pictures." className="text-[var(--secondary-text)] text-sm sm:text-base lg:text-[15px] xl:text-base leading-relaxed max-w-lg text-center lg:text-left">
+            <span aria-hidden="true">{"I build, break, debug, and ship web applications with the PERN stack. When the editor closes, you'll probably find me exploring, gaming, or taking pictures.".split(" ").map((word, index) => <span key={index}><span data-hero-word className="inline-block">{word === "PERN" ? <span className="text-[var(--primary-text)] font-medium">PERN</span> : word === "stack." ? <><span className="text-[var(--primary-text)] font-medium">stack</span>.</> : word}</span>{" "}</span>)}</span>
           </p>
 
           {/* Action Buttons */}
-          <div className="flex flex-wrap justify-center lg:justify-start items-center gap-3 sm:gap-4 pt-1 z-20">
+          <div data-hero-actions className="flex flex-wrap justify-center lg:justify-start items-center gap-3 sm:gap-4 pt-1 z-20">
             <a
               href="#projects"
               className="group w-[clamp(120px,38vw,160px)] h-12 rounded-full border border-[var(--primary-text)] bg-[var(--primary-text)] text-[var(--background)] font-mono text-[11px] min-[360px]:text-xs uppercase tracking-wider font-semibold whitespace-nowrap hover:opacity-90 transition-opacity flex items-center justify-center gap-2 shadow-md cursor-pointer"

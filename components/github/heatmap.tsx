@@ -1,6 +1,10 @@
 "use client";
 
 import { useEffect, useState, useRef, useMemo } from "react";
+import { m, useReducedMotion } from "motion/react";
+import { ScrollWordReveal } from "@/components/motion/ScrollWordReveal";
+import { useIntroFinished } from "@/components/shared/useIntroFinished";
+import { EASE_OUT } from "@/lib/motion";
 import { GitHubContributionsResponse, ContributionCalendar, ContributionLevel } from "@/types/github";
 import { siteConfig } from "@/config/site";
 import "../WorkExperience.css";
@@ -49,9 +53,12 @@ const GITHUB_STYLE_BOXES = [
 export interface GitHubHeatmapProps {
   isOpen?: boolean;
   onToggle?: () => void;
+  revealEnabled?: boolean;
 }
 
-export function GitHubHeatmap({ isOpen: controlledIsOpen, onToggle }: GitHubHeatmapProps = {}) {
+export function GitHubHeatmap({ isOpen: controlledIsOpen, onToggle, revealEnabled = true }: GitHubHeatmapProps = {}) {
+  const reduced = useReducedMotion();
+  const introFinished = useIntroFinished();
   const [data, setData] = useState<ContributionCalendar | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -244,22 +251,26 @@ export function GitHubHeatmap({ isOpen: controlledIsOpen, onToggle }: GitHubHeat
                 style={{ fontFamily: 'var(--font-ivyora), "IvyOra Display", "ivyora-display"' }}
                 className="font-ivyora italic font-normal text-xl sm:text-2xl text-[var(--primary-text,#f6eddc)] tracking-tight leading-none"
               >
-                {totalCount}
+                <ScrollWordReveal text={totalCount} enabled={revealEnabled} delay={0.25} />
               </span>
               <span
                 style={{ fontFamily: 'var(--font-ivyora), "IvyOra Display", "ivyora-display"' }}
                 className="font-ivyora italic font-normal text-base sm:text-lg text-[var(--primary-text,#f6eddc)] tracking-normal leading-none"
               >
-                Contributions
+                <ScrollWordReveal text="Contributions" enabled={revealEnabled} delay={0.37} />
               </span>
             </div>
 
             {/* 5 GitHub style boxes as shown in Image 2 */}
             <div className="github-preview-boxes hidden md:flex items-center gap-[3px]" aria-hidden="true">
               {GITHUB_STYLE_BOXES.map((boxClass, idx) => (
-                <div
+                <m.div
                   key={idx}
                   className={`w-[11px] h-[11px] rounded-[3px] ${boxClass}`}
+                  initial={reduced ? { opacity: 0 } : { opacity: 0, y: 6 }}
+                  whileInView={introFinished && revealEnabled ? { opacity: 1, y: 0 } : undefined}
+                  viewport={{ once: true, amount: 0.2 }}
+                  transition={{ duration: reduced ? 0.3 : 0.6, delay: reduced ? 0 : 0.49 + idx * 0.08, ease: EASE_OUT }}
                 />
               ))}
             </div>

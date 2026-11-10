@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { CircularCarousel, CarouselItem } from "@/components/ui/circular-carousel";
 import { ProfileCard } from "@/components/ui/profile-card";
+import { ScrollWordReveal } from "@/components/motion/ScrollWordReveal";
 
 const photo = (id: string) => `https://images.unsplash.com/${id}?w=900&q=80&auto=format&fit=crop`;
 
@@ -119,7 +120,7 @@ export function PhotographyShowcase() {
             <CameraIcon />
           </span>
           <h3 className="font-ivyora italic font-normal tracking-normal text-[var(--primary-text)] text-lg sm:text-xl leading-tight">
-            Behind the lens
+            <ScrollWordReveal text="Behind the lens" />
           </h3>
           <span className="text-[10px] hidden sm:inline-block px-2 py-0.5 rounded-full border border-[var(--dashed-borders)] text-[var(--secondary-text)]">
             35MM / FRAMES

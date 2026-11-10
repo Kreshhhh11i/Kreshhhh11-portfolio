@@ -30,6 +30,11 @@ function getNowIST(): string {
 }
 
 export function Navbar() {
+  useEffect(() => {
+    document.documentElement.dataset.navMotionReady = "true";
+    window.dispatchEvent(new Event("portfolio:motion-ready"));
+    return () => { delete document.documentElement.dataset.navMotionReady; };
+  }, []);
   const [currentIdx, setCurrentIdx] = useState<number>(0);
   // Never render a placeholder like 00:00:00. Empty initially, populated in layout effect before paint.
   const [timeString, setTimeString] = useState<string>("");

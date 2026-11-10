@@ -1,3 +1,31 @@
+.skills-board-loading {
+  position: absolute;
+  inset: 1px;
+  z-index: 15;
+  display: grid;
+  place-items: center;
+  background: #0a0a0a;
+  color: var(--muted);
+  font: 12px var(--font-geist-mono), monospace;
+  letter-spacing: 0.04em;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 650ms cubic-bezier(0.22, 1, 0.36, 1), visibility 0s linear 650ms;
+}
+
+.skills-board-loading.is-ready {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skills-board-loading {
+    transition-duration: 300ms, 0s;
+    transition-delay: 0s, 300ms;
+  }
+}
+
 .skills-toolbar {
   position: relative;
   z-index: 20;
@@ -39,6 +67,38 @@
 
 .skills-category-icon { flex-shrink: 0; }
 .skills-category-option-label { display: inline-flex; align-items: center; gap: 9px; }
+
+/* Animate the existing controls only after the board reaches the viewport. */
+@keyframes skills-control-reveal {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .skills-toolbar[data-reveal="visible"] .skills-filter,
+  .skills-toolbar[data-reveal="visible"] .skills-category-trigger,
+  .skills-toolbar[data-reveal="visible"] .skills-view-button,
+  .skills-toolbar[data-reveal="visible"] .skills-view-toggle {
+    animation: skills-control-reveal 650ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .skills-toolbar[data-reveal="visible"] .skills-filter:nth-child(2) { animation-delay: 70ms; }
+  .skills-toolbar[data-reveal="visible"] .skills-filter:nth-child(3) { animation-delay: 140ms; }
+  .skills-toolbar[data-reveal="visible"] .skills-filter:nth-child(4) { animation-delay: 210ms; }
+  .skills-toolbar[data-reveal="visible"] .skills-filter:nth-child(5) { animation-delay: 280ms; }
+  .skills-toolbar[data-reveal="visible"] .skills-filter:nth-child(6) { animation-delay: 350ms; }
+  .skills-toolbar[data-reveal="visible"] .skills-view-button:first-child { animation-delay: 420ms; }
+  .skills-toolbar[data-reveal="visible"] .skills-view-button:last-child { animation-delay: 490ms; }
+  .skills-toolbar[data-reveal="visible"] .skills-view-toggle { animation-delay: 560ms; }
+
+  .skills-category-menu:not([hidden]) .skills-category-option {
+    animation: skills-control-reveal 380ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .skills-category-menu:not([hidden]) .skills-category-option:nth-child(2) { animation-delay: 35ms; }
+  .skills-category-menu:not([hidden]) .skills-category-option:nth-child(3) { animation-delay: 70ms; }
+  .skills-category-menu:not([hidden]) .skills-category-option:nth-child(4) { animation-delay: 105ms; }
+  .skills-category-menu:not([hidden]) .skills-category-option:nth-child(5) { animation-delay: 140ms; }
+  .skills-category-menu:not([hidden]) .skills-category-option:nth-child(6) { animation-delay: 175ms; }
+}
 
 .skills-filter::after {
   position: absolute;

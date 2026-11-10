@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { ScrollWordReveal } from "@/components/motion/ScrollWordReveal";
 
 const quotes = [
   {
@@ -33,6 +34,7 @@ const quotes = [
 export function DeveloperQuotes() {
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
+  const [hasRevealedQuote, setHasRevealedQuote] = useState(false);
 
   useEffect(() => {
     const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -67,7 +69,7 @@ export function DeveloperQuotes() {
         {quotes.map((quote, quoteIndex) => (
           <blockquote key={quote.text} className={`col-start-1 row-start-1 ${quoteIndex === index ? "visible" : "invisible"}`}>
             <p className="font-ivyora italic text-[clamp(1.125rem,2vw,2rem)] leading-[1.35] text-[var(--ink)]">
-              &ldquo;{quote.text}&rdquo;
+              {quoteIndex === index && !hasRevealedQuote ? <ScrollWordReveal key={`${index}-${quote.text}`} text={`“${quote.text}”`} onRevealComplete={() => setHasRevealedQuote(true)} /> : <>&ldquo;{quote.text}&rdquo;</>}
             </p>
             <footer className="mt-4 flex justify-center">
               <cite className="font-mono text-[11px] sm:text-xs uppercase tracking-[0.08em] leading-relaxed text-[var(--muted)] not-italic">

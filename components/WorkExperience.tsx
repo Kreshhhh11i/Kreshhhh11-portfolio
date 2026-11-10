@@ -3,6 +3,9 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { experiences } from "@/data/experience";
+import { ScrollLineReveal } from "@/components/motion/ScrollLineReveal";
+import { ScrollWordReveal } from "@/components/motion/ScrollWordReveal";
+import { ChipReveal } from "@/components/motion/ChipReveal";
 import "./WorkExperience.css";
 import "./experience/WorkExperienceTypography.css";
 
@@ -10,9 +13,10 @@ export interface WorkExperienceProps {
   hideLabel?: boolean;
   isOpen?: boolean;
   onToggle?: () => void;
+  revealEnabled?: boolean;
 }
 
-export function WorkExperience({ hideLabel, isOpen: controlledIsOpen, onToggle }: WorkExperienceProps = {}) {
+export function WorkExperience({ hideLabel, isOpen: controlledIsOpen, onToggle, revealEnabled = true }: WorkExperienceProps = {}) {
   // Start shrinked/collapsed by default
   const [internalOpenIndexes, setInternalOpenIndexes] = useState<number[]>([]);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
@@ -123,7 +127,7 @@ export function WorkExperience({ hideLabel, isOpen: controlledIsOpen, onToggle }
                   {/* Middle Block */}
                   <div className="exp-middle-block">
                     <div className="exp-company-row">
-                      <span className="exp-company-name">{exp.company}</span>
+                      <span className="exp-company-name"><ScrollWordReveal text={exp.company} enabled={revealEnabled} delay={0.2} /></span>
                     </div>
                     <div className="exp-role-row">
                       <span className="exp-role-title">{exp.role}</span>
@@ -168,17 +172,17 @@ export function WorkExperience({ hideLabel, isOpen: controlledIsOpen, onToggle }
                       <ul className="exp-bullet-list">
                         {exp.points.map((point, pIdx) => (
                           <li key={pIdx} className="exp-bullet-item">
-                            {point}
+                            <ScrollLineReveal text={point} />
                           </li>
                         ))}
                       </ul>
 
                       {/* Stack Tags */}
                       <div className="exp-stack-tags">
-                        {exp.stack.map((item) => (
-                          <span key={item} className="exp-stack-tag">
+                        {exp.stack.map((item, index) => (
+                          <ChipReveal key={item} index={index} className="exp-stack-tag">
                             {item}
-                          </span>
+                          </ChipReveal>
                         ))}
                       </div>
                     </div>

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useRef, useState, useEffect, useCallback } from 'react';
+import { ScrollWordReveal } from '@/components/motion/ScrollWordReveal';
 
 interface Point {
   x: number;
@@ -399,14 +400,14 @@ export function SigningBox() {
       <div className="flex flex-col gap-1 mb-4">
         <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
           <h3 className="font-ivyora italic font-normal text-2xl md:text-3xl text-[var(--sb-ink)] leading-tight">
-            Leave your mark.
+            <ScrollWordReveal text="Leave your mark." />
           </h3>
           <span className="ml-auto font-mono text-xs text-[var(--sb-accent)] font-semibold tracking-wider">
             Guestbook
           </span>
         </div>
         <p className="text-sm leading-relaxed text-[var(--sb-muted)]">
-          Sign your name, draw an icon, or leave a quick doodle. Your drawing will be visible to everyone.
+          <ScrollWordReveal text="Sign your name, draw an icon, or leave a quick doodle. Your drawing will be visible to everyone." delay={0.15} />
         </p>
       </div>
 

@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Keep local production profiling isolated from a running development server.
+  distDir: process.env.PORTFOLIO_PERF_BUILD === "1" ? "build" : ".next",
   /* config options here */
   allowedDevOrigins: [
     "192.168.0.246",

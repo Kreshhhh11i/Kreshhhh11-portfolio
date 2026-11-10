@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
+import { getPrecomputedEnvironment } from './precomputedEnvironment';
 
 import './Lanyard.css';
 
@@ -296,6 +297,17 @@ const buildBandGeometry = count => {
 };
 
 const buildEnvironment = renderer => {
+  const precomputed = getPrecomputedEnvironment();
+  // The baked CubeUV layout is tied to the installed Three.js revision.
+  if (precomputed && THREE.REVISION === '186') {
+    const texture = new THREE.DataTexture(precomputed, 768, 1024, THREE.RGBAFormat, THREE.HalfFloatType);
+    texture.mapping = THREE.CubeUVReflectionMapping;
+    texture.colorSpace = THREE.LinearSRGBColorSpace;
+    texture.magFilter = THREE.LinearFilter;
+    texture.minFilter = THREE.LinearFilter;
+    texture.needsUpdate = true;
+    return { texture, dispose: () => texture.dispose() };
+  }
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(0.035, 0.035, 0.04);
   const geometry = new THREE.PlaneGeometry(1, 1);
@@ -1209,6 +1221,8 @@ const Lanyard = ({
     try {
       renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
     } catch {
+      document.documentElement.dataset.lanyardReady = 'true';
+      window.dispatchEvent(new Event('portfolio:lanyard-ready'));
       return undefined;
     }
     renderer.setClearColor(0x000000, 0);
@@ -1319,6 +1333,10 @@ const Lanyard = ({
     let strapScale = STRAP_WIDTH;
     let tileRatio = 2;
     let raf = 0;
+    let shadersReady = false;
+    let facesReady = false;
+    let readySignaled = false;
+    let shaderTimeout = 0;
     let last = performance.now();
     let time = 0;
     let visible = false;
@@ -1330,6 +1348,14 @@ const Lanyard = ({
     let hovering = false;
     let press = null;
     let imageToken = 0;
+    const signalReady = () => {
+      if (!alive || readySignaled || !shadersReady || !facesReady) return;
+      readySignaled = true;
+      // Upload the finished textures and draw once before revealing the hero.
+      render();
+      document.documentElement.dataset.lanyardReady = 'true';
+      window.dispatchEvent(new Event('portfolio:lanyard-ready'));
+    };
     let hoveredTarget = null;
     let shakeStartTime = 0;
     let arrowProgress = 0;
@@ -1536,6 +1562,8 @@ const Lanyard = ({
           images.spotifyCode = spotifyCode;
           paintFaces();
           repaintStrap();
+          facesReady = true;
+          signalReady();
         });
       }
       const faceKey = `${layoutKey}|${s.cardColor}|${s.imageFit}`;
@@ -1656,6 +1684,7 @@ const Lanyard = ({
     };
 
     const render = () => {
+      if (!shadersReady) return;
       cardGroup.position.copy(sim.body.position);
       cardGroup.quaternion.copy(sim.body.quaternion);
       updateBand();
@@ -1722,7 +1751,7 @@ const Lanyard = ({
     };
 
     const start = () => {
-      if (raf || !visible || !alive || !introComplete || !placed) return;
+      if (raf || !visible || !alive || !introComplete || !placed || !shadersReady) return;
       if (!introStarted) {
         introStarted = true;
         introStartedAt = performance.now();
@@ -1935,9 +1964,33 @@ const Lanyard = ({
     applyRef.current = apply;
     resize();
 
+    const startWhenReady = () => {
+      if (!alive || shadersReady) return;
+      window.clearTimeout(shaderTimeout);
+      shadersReady = true;
+      signalReady();
+      if (visible) start();
+      else render();
+    };
+    // Avoid blocking the navbar and the first fall while the GPU compiles the
+    // card's materials. Browsers without parallel compilation use the original
+    // synchronous path, so the card remains available everywhere.
+    if (renderer.extensions.has('KHR_parallel_shader_compile')) {
+      shaderTimeout = window.setTimeout(startWhenReady, 4000);
+      try {
+        renderer.compileAsync(scene, camera).then(startWhenReady, startWhenReady);
+      } catch {
+        startWhenReady();
+      }
+    } else {
+      startWhenReady();
+    }
+
     return () => {
       alive = false;
+      delete document.documentElement.dataset.lanyardReady;
       cancelAnimationFrame(raf);
+      window.clearTimeout(shaderTimeout);
       applyRef.current = null;
       resizeObserver.disconnect();
       resolutionQuery?.removeEventListener('change', watchResolution);

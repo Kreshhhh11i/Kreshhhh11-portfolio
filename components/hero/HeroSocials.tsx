@@ -5,7 +5,6 @@ import React, { useEffect, useState } from "react";
 interface SocialLink {
   name: string;
   url: string;
-  dotColor: string;
   icon: React.ReactNode;
 }
 
@@ -13,7 +12,6 @@ const SOCIAL_LINKS: SocialLink[] = [
   {
     name: "GitHub",
     url: "https://github.com/Kreshhhh11i",
-    dotColor: "#ffffff",
     icon: (
       <svg
         className="w-[21px] h-[21px] hero-social-icon"
@@ -27,7 +25,6 @@ const SOCIAL_LINKS: SocialLink[] = [
   {
     name: "LinkedIn",
     url: "https://www.linkedin.com/in/srikresh11",
-    dotColor: "#0a66c2",
     icon: (
       <svg
         className="w-[20px] h-[20px] hero-social-icon"
@@ -41,7 +38,6 @@ const SOCIAL_LINKS: SocialLink[] = [
   {
     name: "LeetCode",
     url: "https://leetcode.com/u/kresh11i/",
-    dotColor: "#ffa116",
     icon: (
       <svg
         className="w-[21px] h-[21px] hero-social-icon"
@@ -55,7 +51,6 @@ const SOCIAL_LINKS: SocialLink[] = [
   {
     name: "Instagram",
     url: "https://www.instagram.com/kreshhhh11/",
-    dotColor: "#e1306c",
     icon: (
       <svg
         className="w-[20px] h-[20px] hero-social-icon"
@@ -100,15 +95,6 @@ export function HeroSocials() {
           className="relative group hero-social-btn"
         >
           {item.icon}
-
-          {/* Micro-interaction tooltip */}
-          <span className="absolute -bottom-9 left-1/2 -translate-x-1/2 flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[var(--panel)] border border-[var(--line)] text-[11px] font-mono text-[var(--ink)] shadow-xl whitespace-nowrap opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity duration-200 pointer-events-none z-50">
-            <span
-              className="w-1.5 h-1.5 rounded-full shrink-0"
-              style={{ backgroundColor: item.dotColor }}
-            />
-            <span>{item.name}</span>
-          </span>
         </a>
       ))}
     </div>
