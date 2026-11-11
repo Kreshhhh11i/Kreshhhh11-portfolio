@@ -1278,14 +1278,20 @@ const Lanyard = ({
     const frontMaterial = new THREE.MeshPhysicalMaterial({
       map: frontTexture,
       normalMap: grain,
-      normalScale: new THREE.Vector2(0.06, 0.06)
+      normalScale: new THREE.Vector2(0.06, 0.06),
+      polygonOffset: true,
+      polygonOffsetFactor: -1,
+      polygonOffsetUnits: -1
     });
     const backMaterial = new THREE.MeshPhysicalMaterial({
       map: backTexture,
       roughness: 0.95,
       metalness: 0,
       clearcoat: 0,
-      clearcoatRoughness: 0
+      clearcoatRoughness: 0,
+      polygonOffset: true,
+      polygonOffsetFactor: -1,
+      polygonOffsetUnits: -1
     });
     frontMaterial.onBeforeCompile = injectFoil;
     const edgeMaterial = new THREE.MeshPhysicalMaterial();
@@ -1598,7 +1604,9 @@ const Lanyard = ({
         clampMesh.geometry.dispose();
         clampMesh.geometry = buildClampGeometry(strapScale);
       }
-      canvas.style.touchAction = s.interactive ? 'pan-y' : 'auto';
+      // The canvas only captures pointer events over the card. Prevent the
+      // browser from cancelling a vertical card drag as a page-scroll gesture.
+      canvas.style.touchAction = s.interactive ? 'none' : 'auto';
 
       applied = { layoutKey, framingKey, imageKey, faceKey, strapColor: s.strapColor, strapScale };
       start();
@@ -1747,11 +1755,11 @@ const Lanyard = ({
         updateBackCanvas();
       }
       const resting = sim.calm > 1.2 && !sim.grab && current.breeze === 0 && !isShaking && !isButtonHovered && !isArrowAnimating;
-      if (visible && !resting) raf = requestAnimationFrame(tick);
+      if ((visible || sim.grab) && !resting) raf = requestAnimationFrame(tick);
     };
 
     const start = () => {
-      if (raf || !visible || !alive || !introComplete || !placed || !shadersReady) return;
+      if (raf || (!visible && !sim.grab) || !alive || !introComplete || !placed || !shadersReady) return;
       if (!introStarted) {
         introStarted = true;
         introStartedAt = performance.now();
@@ -1765,6 +1773,37 @@ const Lanyard = ({
 
     const raycaster = new THREE.Raycaster();
     const pointer = new THREE.Vector2();
+    let overlayStyle = null;
+
+    // Expand the drawing surface during a drag without changing the camera's
+    // apparent scale or the card's position on screen.
+    const showDragOverlay = () => {
+      const rect = canvas.getBoundingClientRect();
+      overlayStyle = canvas.style.cssText;
+      document.body.appendChild(canvas);
+      Object.assign(canvas.style, {
+        position: 'fixed', left: '0', top: '0', width: '100vw',
+        height: '100dvh', zIndex: '10001', pointerEvents: 'auto'
+      });
+      const width = document.documentElement.clientWidth;
+      const height = document.documentElement.clientHeight;
+      camera.setViewOffset(rect.width, rect.height, -rect.left, -rect.top, width, height);
+      camera.updateProjectionMatrix();
+      renderer.setSize(width, height, false);
+      render();
+    };
+
+    const hideDragOverlay = () => {
+      if (overlayStyle === null) return;
+      container.appendChild(canvas);
+      canvas.style.cssText = overlayStyle;
+      overlayStyle = null;
+      camera.clearViewOffset();
+      camera.aspect = view.width / view.height;
+      camera.updateProjectionMatrix();
+      renderer.setSize(view.width, view.height, false);
+      render();
+    };
 
     const toPointer = event => {
       const rect = canvas.getBoundingClientRect();
@@ -1810,6 +1849,7 @@ const Lanyard = ({
         target: hit.point.clone()
       };
       press = { x: event.clientX, y: event.clientY, time: performance.now(), point: hit.point.clone(), hit };
+      showDragOverlay();
       canvas.setPointerCapture?.(event.pointerId);
       canvas.style.pointerEvents = 'auto';
       setCursor('grabbing');
@@ -1860,6 +1900,7 @@ const Lanyard = ({
       }
       press = null;
       canvas.releasePointerCapture?.(event.pointerId);
+      hideDragOverlay();
       if (hovering && event.pointerType !== 'touch') {
         canvas.style.pointerEvents = 'auto';
         setCursor('grab');
@@ -1988,6 +2029,7 @@ const Lanyard = ({
 
     return () => {
       alive = false;
+      hideDragOverlay();
       delete document.documentElement.dataset.lanyardReady;
       cancelAnimationFrame(raf);
       window.clearTimeout(shaderTimeout);
