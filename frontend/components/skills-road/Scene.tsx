@@ -3,7 +3,7 @@
 import React, { useRef, useState, useEffect, useMemo } from 'react';
 import * as THREE from 'three';
 import { Canvas, useThree, useFrame } from '@react-three/fiber';
-import { OrbitControls, Environment, PerformanceMonitor, AdaptiveDpr, Html } from '@react-three/drei';
+import { OrbitControls, Environment, PerformanceMonitor, AdaptiveDpr } from '@react-three/drei';
 import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing';
 import { easing } from 'maath';
 import { SkillItem, SkillCategory } from './data';
@@ -303,66 +303,6 @@ function CameraRig({
   );
 }
 
-/**
- * Token Floating Badge: Always stays with the active moving token.
- * Positioned high enough so the moving token sphere is 100% visible and unobstructed.
- */
-function TokenLabel({
-  skill,
-  targetPoint,
-  isFlatView,
-}: {
-  skill: SkillItem | undefined;
-  targetPoint: { x: number; z: number };
-  isFlatView: boolean;
-}) {
-  const groupRef = useRef<THREE.Group>(null);
-  const posRef = useRef(new THREE.Vector3(targetPoint.x, 0, targetPoint.z));
-
-  const targetY = (skill?.height ?? 0.38) + (isFlatView ? 0.45 : 1.18);
-  const targetZ = targetPoint.z + (isFlatView ? -1.10 : -0.42);
-  const targetX = targetPoint.x + (isFlatView ? 0 : -0.10);
-
-  useFrame((_, delta) => {
-    if (!groupRef.current) return;
-    easing.damp(posRef.current, 'x', targetX, 0.18, delta);
-    easing.damp(posRef.current, 'y', targetY, 0.18, delta);
-    easing.damp(posRef.current, 'z', targetZ, 0.18, delta);
-    groupRef.current.position.set(posRef.current.x, posRef.current.y, posRef.current.z);
-  });
-
-  return (
-    <group ref={groupRef} position={[targetX, targetY, targetZ]}>
-      <Html
-        center
-        distanceFactor={14}
-        style={{
-          pointerEvents: 'none',
-          opacity: skill ? 1 : 0,
-          transition: 'opacity 0.2s ease',
-        }}
-      >
-        {skill && (
-          <div className="flex flex-col items-center pointer-events-none transition-all duration-200">
-            <div className="px-2.5 py-1 rounded-full bg-[#14120f]/95 border border-[var(--line)] shadow-xl backdrop-blur-md text-[#f6eddc] flex items-center gap-1.5 whitespace-nowrap text-xs font-mono font-medium">
-              <span
-                className="w-1.5 h-1.5 rounded-full shrink-0"
-                style={{ backgroundColor: skill.color }}
-              />
-              <span className="text-[#f6eddc] font-semibold">{skill.name}</span>
-              <span className="text-[10px] text-[var(--muted)] capitalize">
-                • {skill.level}
-              </span>
-            </div>
-            {/* Downward notch pointing cleanly above the token sphere */}
-            <div className="w-1.5 h-1.5 rotate-45 bg-[#14120f] border-r border-b border-[var(--line)] -mt-1" />
-          </div>
-        )}
-      </Html>
-    </group>
-  );
-}
-
 export default function Scene({
   skills,
   layoutPoints,
@@ -381,10 +321,6 @@ export default function Scene({
   onReady,
 }: SceneProps) {
   const [dpr, setDpr] = useState(1.25);
-
-  // Token's own active skill and point (never pulled away by hovering or transitions)
-  const tokenSkill = skills[currentIndex];
-  const tokenPoint = layoutPoints[currentIndex] ?? { x: 0, z: 0 };
 
   return (
     <Canvas
@@ -488,13 +424,6 @@ export default function Scene({
         skills={skills}
         isReducedMotion={isReducedMotion}
         onStepComplete={onTokenStepComplete}
-      />
-
-      {/* 1. Token's persistent message badge: stays with the moving token, never covers it, never flickers to start */}
-      <TokenLabel
-        skill={tokenSkill}
-        targetPoint={tokenPoint}
-        isFlatView={isFlatView}
       />
 
       {/* Postprocessing: ACES Bloom & Vignette */}

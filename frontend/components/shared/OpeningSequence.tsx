@@ -147,7 +147,6 @@ export function OpeningSequence({ children }: { children: ReactNode }) {
         if (showCurtain) {
           const introNav = screen.querySelector<HTMLElement>(".opening-nav")!;
           const brand = screen.querySelector<HTMLElement>(".opening-brand")!;
-          const brandText = brand.querySelector<HTMLElement>("span")!;
           const background = screen.querySelector<HTMLElement>(".opening-nav-bg")!;
           const steps = screen.querySelector<HTMLElement>(".opening-steps")!;
           const stepItems = Array.from(steps.querySelectorAll<HTMLElement>(".opening-step"));
@@ -160,8 +159,6 @@ export function OpeningSequence({ children }: { children: ReactNode }) {
           const stepOffsets = stepItems.map(item => origin - (steps.offsetLeft + item.offsetLeft + item.offsetWidth / 2));
           timeline.set(introNav, { opacity: 1 })
             .set(brand, { x: brandOffset })
-            .fromTo(brand, { scale: 1.4, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.42 }, 0)
-            .fromTo(brandText, { x: -12, opacity: 0 }, { x: 0, opacity: 1, duration: 0.34 }, 0.08)
             .to(brand, { x: 0, duration: 0.65 }, 0.44)
             .fromTo(background, { opacity: 0 }, { opacity: 1, duration: 0.55 }, 0.44)
             .fromTo(steps, { opacity: 0 }, { opacity: 1, duration: 0.08 }, 0.44)
