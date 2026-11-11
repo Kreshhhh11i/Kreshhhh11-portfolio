@@ -3,6 +3,7 @@
 import React, { useRef, useMemo, useEffect } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
+import { Billboard } from '@react-three/drei';
 import { easing } from 'maath';
 import { SkillItem } from './data';
 import { TileLayoutPoint } from './layouts';
@@ -56,7 +57,7 @@ export function Token({
 
     // Bright cream "K"
     ctx.fillStyle = '#f6eddc';
-    ctx.font = 'bold 136px Geist, system-ui, sans-serif';
+    ctx.font = 'bold 160px Geist, system-ui, sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText('K', 128, 134);
@@ -238,14 +239,18 @@ export function Token({
 
         {/* Monogram Medallion on Top Facing Camera */}
         {kTexture && (
-          <mesh position={[0, 0.22, 0]} rotation={[-Math.PI / 2.4, 0, 0]}>
-            <circleGeometry args={[0.15, 32]} />
-            <meshBasicMaterial
-              map={kTexture}
-              transparent
-              toneMapped={false}
-            />
-          </mesh>
+          <Billboard position={[0, 0.03, 0]}>
+            <mesh renderOrder={1}>
+              <circleGeometry args={[0.17, 32]} />
+              <meshBasicMaterial
+                map={kTexture}
+                transparent
+                depthTest={false}
+                depthWrite={false}
+                toneMapped={false}
+              />
+            </mesh>
+          </Billboard>
         )}
 
         {/* Ambient Warm Accent Point Light */}

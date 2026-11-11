@@ -54,7 +54,7 @@ export function OpeningSequence({ children }: { children: ReactNode }) {
     const skillsWarmupTimeout = setTimeout(() => { skillsWarmupTimedOut = true; checkSectionsReady(); }, 3500);
     image.onload = () => { void image.decode().catch(() => {}).finally(finishImage); };
     image.onerror = finishImage;
-    image.src = "/lanyard/Portfolio-img.png";
+    image.src = "/lanyard/Portfolio-img.webp";
     const preference = window.matchMedia("(prefers-reduced-motion: reduce)");
     const originalOverflow = document.body.style.overflow;
     const showCurtain = !preference.matches;

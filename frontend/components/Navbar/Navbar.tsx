@@ -80,6 +80,7 @@ export function Navbar() {
   const isCompactRef = useRef<boolean>(false);
   const hasMountedRef = useRef<boolean>(false);
   const toastTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const shownToastSectionsRef = useRef<Set<string>>(new Set());
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const isThemeTransitioningRef = useRef<boolean>(false);
 
@@ -326,13 +327,19 @@ export function Navbar() {
             );
           }
 
-          // Phone toast
-          setToastItem(NAV[idx]);
-          setShowToast(true);
-          if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
-          toastTimerRef.current = setTimeout(() => {
+          // Show each section's message once, while moving down the page.
+          if (window.innerWidth <= 1000 && idx > prevIdx && !shownToastSectionsRef.current.has(NAV[idx].id)) {
+            shownToastSectionsRef.current.add(NAV[idx].id);
+            setToastItem(NAV[idx]);
+            setShowToast(true);
+            if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+            toastTimerRef.current = setTimeout(() => {
+              setShowToast(false);
+            }, 1800);
+          } else if (idx < prevIdx) {
+            if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
             setShowToast(false);
-          }, 1800);
+          }
         }
       }
     };

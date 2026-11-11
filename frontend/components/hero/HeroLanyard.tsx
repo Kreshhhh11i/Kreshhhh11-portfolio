@@ -95,7 +95,7 @@ export function HeroLanyard() {
         <Signature anchor={anchor} />
       </div>
       {environmentReady && <Lanyard
-        frontImage="/lanyard/Portfolio-img.png"
+        frontImage="/lanyard/Portfolio-img.webp"
         backImage="/lanyard/card-back.png"
         cardColor="#101010"
         orientation="portrait"
