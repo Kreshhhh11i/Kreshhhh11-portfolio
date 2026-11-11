@@ -26,6 +26,8 @@ export function OpeningSequence({ children }: { children: ReactNode }) {
     let homeImageReady = false;
     let skillsWarmupTimedOut = false;
     let resolveSectionsReady = () => {};
+    let sectionsReadyToReveal = false;
+    let waitingForSections = false;
     let readinessTimeout: ReturnType<typeof setTimeout> | undefined;
     const image = new Image();
     const checkSectionsReady = () => {
@@ -92,7 +94,7 @@ export function OpeningSequence({ children }: { children: ReactNode }) {
 
     const onVisibility = () => {
       if (document.hidden) { timeline?.pause(); heroTimeline?.pause(); }
-      else { timeline?.resume(); if (headlineStarted) heroTimeline?.resume(); }
+      else { if (!waitingForSections) timeline?.resume(); if (headlineStarted) heroTimeline?.resume(); }
     };
     const onHeadlineStart = () => {
       headlineStarted = true;
@@ -119,10 +121,16 @@ export function OpeningSequence({ children }: { children: ReactNode }) {
         check();
       });
       const sectionsReady = new Promise<void>(resolve => {
-        resolveSectionsReady = resolve;
+        resolveSectionsReady = () => { sectionsReadyToReveal = true; resolve(); };
         checkSectionsReady();
       });
-      await Promise.all([document.fonts.ready, componentsReady, preference.matches ? Promise.resolve() : sectionsReady]);
+      void sectionsReady.then(() => {
+        if (waitingForSections && !disposed && !curtainFinished) {
+          waitingForSections = false;
+          if (!document.hidden) timeline?.play();
+        }
+      });
+      await Promise.all([document.fonts.ready, componentsReady]);
       if (disposed || curtainFinished) return;
       const navItems = gsap.utils.toArray<HTMLElement>(".nav-wrap .brand, .nav-wrap .step, .nav-wrap .tools");
       const socialIcons = gsap.utils.toArray<HTMLElement>(".hero-social-btn");
@@ -173,6 +181,12 @@ export function OpeningSequence({ children }: { children: ReactNode }) {
             if (index > 0) timeline!.to(step.querySelector(".opening-line-fill"), { scaleX: 1, duration: 0.13, ease: "none" }, at - 0.08);
           });
           timeline.call(() => {
+              if (!sectionsReadyToReveal) {
+                waitingForSections = true;
+                timeline?.pause();
+              }
+            }, [], 1.979)
+            .call(() => {
               const rect = last.getBoundingClientRect();
               gsap.set(portal, { left: rect.left + rect.width / 2, top: rect.top + rect.height / 2, xPercent: -50, yPercent: -50, opacity: 1 });
             }, [], 1.98)
