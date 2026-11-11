@@ -1,0 +1,21 @@
+.photography-carousel .circular-carousel__photo,
+.photo-profile .profile-card__photo {
+  object-fit: contain;
+}
+.photo-profile .profile-card__photo { inset: 0; width: 100%; height: 100%; object-position: center; transform: none; }
+
+.photo-gallery[open] { animation: photo-gallery-in 240ms ease-out both; }
+.photo-gallery::backdrop { background: rgb(0 0 0 / 75%); animation: photo-backdrop-in 240ms ease-out both; }
+.photo-gallery[data-closing] { animation: photo-gallery-out 240ms ease-in both; }
+.photo-gallery[data-closing]::backdrop { animation: photo-backdrop-out 240ms ease-in both; }
+.photo-lightbox { position: fixed; inset: 0; z-index: 2; display: grid; place-items: center; padding: 4rem 1rem; background: rgb(0 0 0 / 92%); animation: photo-gallery-in 240ms ease-out both; }
+.photo-lightbox[data-closing] { animation: photo-gallery-out 240ms ease-in both; }
+.photo-lightbox-image { display: flex; align-items: center; justify-content: center; width: min(90vw, 1100px); height: min(80vh, 850px); }
+.photo-lightbox-image img { display: block; max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; border-radius: 16px; }
+.photo-lightbox-close { position: absolute; z-index: 1; top: 1rem; right: 1rem; width: 2.5rem; height: 2.5rem; border: 1px solid rgba(255,255,255,.35); border-radius: 50%; color: white; background: rgba(0,0,0,.65); font-size: 1.5rem; cursor: pointer; }
+.photo-lightbox-close:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+@keyframes photo-gallery-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes photo-gallery-out { from { opacity: 1; } to { opacity: 0; } }
+@keyframes photo-backdrop-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes photo-backdrop-out { from { opacity: 1; } to { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .photo-gallery[open], .photo-gallery::backdrop, .photo-gallery[data-closing], .photo-gallery[data-closing]::backdrop, .photo-lightbox, .photo-lightbox[data-closing] { animation-duration: 1ms; } }

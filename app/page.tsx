@@ -12,8 +12,17 @@ import { Reveal } from "@/components/motion/Reveal";
 import { ActionReveal } from "@/components/motion/ActionReveal";
 import { SectionFade } from "@/components/motion/SectionFade";
 import { SectionLabel } from "@/components/motion/SectionLabel";
+import { readdirSync } from "node:fs";
+import path from "node:path";
 
 export default function Home() {
+  const photos = readdirSync(path.join(process.cwd(), "public", "photos"))
+    .filter((name) => /\.(jpe?g|png|webp|avif)$/i.test(name))
+    .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+    .map((name) => {
+      const title = name.replace(/\.[^.]+$/, "").replace(/[-_]+/g, " ");
+      return { src: `/photos/${encodeURIComponent(name)}`, alt: title, title, subtitle: "Photography" };
+    });
   return (
     <>
     <main className="flex min-h-screen flex-col items-center">
@@ -61,7 +70,7 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch w-full">
-            <Reveal className="min-w-0 h-full"><PhotographyShowcase /></Reveal>
+            <Reveal className="min-w-0 h-full"><PhotographyShowcase photos={photos} /></Reveal>
             <Reveal className="min-w-0 h-full"><SigningBox /></Reveal>
           </div>
         </SectionFade>
