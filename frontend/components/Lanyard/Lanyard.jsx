@@ -1295,6 +1295,9 @@ const Lanyard = ({
     });
     frontMaterial.onBeforeCompile = injectFoil;
     const edgeMaterial = new THREE.MeshPhysicalMaterial();
+    // The dedicated textured face meshes cover the extrusion caps. Drawing
+    // those caps too can cause depth fighting on mobile GPUs at grazing angles.
+    const hiddenCapMaterial = new THREE.MeshBasicMaterial({ visible: false });
     const metalMaterial = new THREE.MeshStandardMaterial({ metalness: 1 });
     const bandMaterial = new THREE.MeshPhysicalMaterial({
       map: strapTexture,
@@ -1308,7 +1311,7 @@ const Lanyard = ({
     });
 
     const cardGroup = new THREE.Group();
-    const bodyMesh = new THREE.Mesh(undefined, edgeMaterial);
+    const bodyMesh = new THREE.Mesh(undefined, [hiddenCapMaterial, edgeMaterial]);
     const frontMesh = new THREE.Mesh(undefined, frontMaterial);
     const backMesh = new THREE.Mesh(undefined, backMaterial);
     const ring = new THREE.Mesh(new THREE.TorusGeometry(RING_RADIUS, RING_TUBE, 18, 72), metalMaterial);
@@ -2048,7 +2051,7 @@ const Lanyard = ({
       window.removeEventListener('pointermove', onWindowPointerMove);
       window.removeEventListener('touchstart', onWindowTouchStart);
       [bodyMesh, frontMesh, backMesh, ring, clampMesh, eyelet, band].forEach(mesh => mesh.geometry?.dispose());
-      [frontMaterial, backMaterial, edgeMaterial, metalMaterial, bandMaterial].forEach(material => material.dispose());
+      [frontMaterial, backMaterial, edgeMaterial, hiddenCapMaterial, metalMaterial, bandMaterial].forEach(material => material.dispose());
       [frontTexture, backTexture, strapTexture, grain, weave].forEach(texture => texture.dispose());
       environment.dispose();
       renderer.dispose();

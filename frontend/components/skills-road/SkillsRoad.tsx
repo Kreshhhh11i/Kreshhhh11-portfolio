@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import dynamic from 'next/dynamic';
+import { useHeroSettled } from '@/components/shared/useHeroSettled';
 import './SkillsRoad.css';
 import {
   SKILLS_ROAD_DATA,
@@ -15,7 +16,7 @@ import {
   TileLayoutPoint,
 } from './layouts';
 
-// Prepare the board behind the opening sequence; its frame loop pauses off-screen once ready.
+// Keep WebGL initialization out of the opening and hero animations.
 const Scene = dynamic(() => import('./Scene'), {
   ssr: false,
   loading: () => null,
@@ -61,6 +62,7 @@ function CategoryIcon({ category }: { category: SkillCategory | 'All' }) {
 }
 
 export function SkillsRoad() {
+  const heroSettled = useHeroSettled();
   const containerRef = useRef<HTMLDivElement>(null);
   const diceIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const categoryMenuRef = useRef<HTMLDivElement>(null);
@@ -414,7 +416,7 @@ export function SkillsRoad() {
 
       {/* 3D CANVAS VIEWPORT (Clean container without corner edges or hover glow) */}
       <div className="content-frame w-full h-[390px] sm:h-[520px] md:h-[620px] bg-[#0a0a0a] overflow-hidden">
-        <SceneErrorBoundary onError={handleBoardError}><Scene
+        {heroSettled && <SceneErrorBoundary onError={handleBoardError}><Scene
           skills={SKILLS_ROAD_DATA}
           layoutPoints={currentLayoutPoints}
           currentIndex={currentIndex}
@@ -433,7 +435,7 @@ export function SkillsRoad() {
           }}
           onTokenStepComplete={handleTokenStep}
           onReady={handleBoardReady}
-        /></SceneErrorBoundary>
+        /></SceneErrorBoundary>}
 
         <div className={`skills-board-loading${boardLoading ? '' : ' is-ready'}`} role="status" aria-live="polite" aria-hidden={!boardLoading}>
           {boardLoading && 'Loading 3D engine…'}
