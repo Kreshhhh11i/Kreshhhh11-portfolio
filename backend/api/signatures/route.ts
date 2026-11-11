@@ -109,7 +109,7 @@ export async function POST(request: Request) {
     const previewPath = `${input.id}.png`;
     const upstream = await fetch(`${cfg.url}/rest/v1/rpc/signature_wall_submit_moderated`, { method: 'POST', headers: apiHeaders(cfg.key), body: JSON.stringify({ p_id: input.id, p_owner_hash: ownerHash, p_visitor_hash: visitorHash, p_drawing: input.drawing, p_owner_hashes: ownerHashes, p_preview_path: previewPath }), cache: 'no-store' });
     if (upstream.status === 404) {
-      console.error('Signature wall: the moderation database function is missing. Run supabase/signature-wall-moderation.sql in the Supabase SQL Editor.');
+      console.error('Signature wall: the moderation database function is missing. Run backend/supabase/signature-wall-moderation.sql in the Supabase SQL Editor.');
       return response({ error: 'The signature wall is being set up. Please try again later.' }, 503);
     }
     if (!upstream.ok) throw new Error('database');

@@ -1,4 +1,4 @@
-import { adminConfig, issueSession, json, loginAllowed, passwordMatches, sameOrigin, sessionCookie, smallJson, validSession } from '@/lib/signature-admin';
+import { adminConfig, issueSession, json, loginAllowed, passwordMatches, sameOrigin, sessionCookie, smallJson, validSession } from '@backend/lib/signature-admin';
 
 export async function GET(request: Request) {
   const cfg = adminConfig();

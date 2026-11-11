@@ -2,9 +2,9 @@
 
 The wall uses a private server-side Supabase REST connection. No Supabase key is sent to visitors.
 
-1. Create a Supabase project, then open its SQL Editor and run `supabase/signature-wall.sql`, `supabase/signature-wall-one-per-browser.sql`, and `supabase/signature-wall-moderation.sql` in that order. For an existing wall, run the new moderation file. Existing drawings stay approved; new ones are private until approved.
+1. Create a Supabase project, then open its SQL Editor and run `backend/supabase/signature-wall.sql`, `backend/supabase/signature-wall-one-per-browser.sql`, and `backend/supabase/signature-wall-moderation.sql` in that order. For an existing wall, run the new moderation file. Existing drawings stay approved; new ones are private until approved.
 2. In Supabase **Storage**, create a bucket named `signature-previews` and leave it **private**. The app generates PNGs from the stored strokes on the server and saves them in this bucket. Never make this bucket public: it contains unapproved drawings.
-3. Fill in `.env.local` at the project root:
+3. Fill in `frontend/.env.local`:
    - `SUPABASE_URL`: the project's URL, e.g. `https://your-project.supabase.co`.
    - `SUPABASE_SECRET_KEY`: the project's **secret** API key (`sb_secret_...`), not its publishable key. Keep it private.
    - `SIGNATURE_RATE_LIMIT_SECRET`: a unique random secret of at least 32 characters. Generate one locally with `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`.
@@ -30,6 +30,6 @@ The API limits each visitor identifier to five successful new drawings per hour.
 
 Each browser can have one active drawing. Its anonymous identity is stored locally; clearing browser data, using another browser or device, or modifying client storage creates a new identity. Without login, it cannot guarantee one drawing per person. Older drawings remain in the gallery and can be deleted using their original browser's saved tokens.
 
-Existing installations created without a primary key on `signature_wall_rate_limits` can run `supabase/signature-wall-rate-limit-id.sql` to add one without removing rows. New installations get the key from the initial setup script.
+Existing installations created without a primary key on `signature_wall_rate_limits` can run `backend/supabase/signature-wall-rate-limit-id.sql` to add one without removing rows. New installations get the key from the initial setup script.
 
 Previous browser-only drawings in `portfolio_signingbox_wall` are left untouched and are not automatically published. The wall reads only the new shared entries. Supabase must be configured for the wall to load; failure leaves the drawing on the pad so the visitor can retry.

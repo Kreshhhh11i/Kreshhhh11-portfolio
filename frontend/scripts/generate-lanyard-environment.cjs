@@ -8,7 +8,7 @@ const zlib = require('node:zlib');
 
 async function main() {
   const root = path.resolve(__dirname, '..');
-  const modules = path.join(root, 'node_modules', 'three', 'build');
+  const modules = path.dirname(require.resolve('three'));
   const server = http.createServer((request, response) => {
     const files = { '/three.module.js': 'three.module.js', '/three.core.js': 'three.core.js' };
     const file = files[request.url];
