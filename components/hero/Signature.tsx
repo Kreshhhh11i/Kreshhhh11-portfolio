@@ -18,7 +18,6 @@ export function Signature({ anchor }: { anchor: number }) {
     if (!tip || !tipGradient || !drawing || !hero) return;
 
     const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const desktop = window.matchMedia("(min-width: 1024px)");
     const lengths = strokes.map((stroke) => stroke.getTotalLength());
     const totalLength = lengths.reduce((sum, length) => sum + length, 0);
     const duration = 3200;
@@ -85,9 +84,6 @@ export function Signature({ anchor }: { anchor: number }) {
     const play = () => {
       cancelAnimationFrame(frame);
       start = null;
-      // The signature is hidden below this breakpoint; avoid drawing an
-      // invisible path on the main thread while the lanyard is loading.
-      if (!desktop.matches) return;
       if (motion.matches) {
         showComplete();
         return;
@@ -114,22 +110,12 @@ export function Signature({ anchor }: { anchor: number }) {
     observer.observe(hero);
     const onMotionChange = () => { if (isVisible && document.documentElement.dataset.introComplete === "true") play(); };
     const onIntroComplete = () => { if (isVisible) play(); };
-    const onDesktopChange = () => {
-      if (desktop.matches && isVisible && document.documentElement.dataset.introComplete === "true") play();
-      else if (!desktop.matches) {
-        cancelAnimationFrame(frame);
-        drawing.style.opacity = "0";
-        tip.style.opacity = "0";
-      }
-    };
     motion.addEventListener("change", onMotionChange);
-    desktop.addEventListener("change", onDesktopChange);
     window.addEventListener("portfolio:intro-complete", onIntroComplete);
     return () => {
       cancelAnimationFrame(frame);
       observer.disconnect();
       motion.removeEventListener("change", onMotionChange);
-      desktop.removeEventListener("change", onDesktopChange);
       window.removeEventListener("portfolio:intro-complete", onIntroComplete);
     };
   }, []);

@@ -240,8 +240,8 @@ export function Hero() {
 
         {/* Right Column (Interactive 3D Lanyard or Original Photo & Orbit Effect) */}
         {SHOW_LANYARD ? (
-          <div className="order-1 lg:order-2 relative z-30 lg:z-auto w-full h-[440px] sm:h-[460px] lg:h-[720px] flex items-start justify-center pt-0 overflow-visible lg:-mt-20">
-            <div className="absolute z-30 lg:z-auto -top-[76px] sm:-top-[80px] lg:-top-[132px] left-0 w-full h-[140%] lg:h-[1312px] pointer-events-none overflow-visible">
+          <div className="order-1 lg:order-2 relative z-30 w-full h-[440px] sm:h-[460px] lg:h-[720px] flex items-start justify-center pt-0 overflow-visible lg:-mt-20">
+            <div className="absolute z-30 -top-[76px] sm:-top-[80px] lg:-top-[132px] left-0 w-full h-[140%] lg:h-[1312px] pointer-events-none overflow-visible">
               <HeroLanyard />
             </div>
           </div>

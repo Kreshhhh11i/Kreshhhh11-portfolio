@@ -53,8 +53,11 @@ html.light .hero-signature {
 }
 
 @media (max-width: 1023px) {
-  .signature-viewport {
-    display: none;
+  .hero-signature {
+    top: 30%;
+    width: 155vw;
+    max-width: none;
+    transform: translateX(-50%) rotate(-22deg);
   }
 }
 

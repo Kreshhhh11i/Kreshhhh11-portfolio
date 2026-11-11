@@ -29,6 +29,7 @@ export function HeroLanyard() {
   // The effect below measures the viewport and updates both values afterwards.
   const [isDesktop, setIsDesktop] = useState(true);
   const [anchor, setAnchor] = useState(0.5);
+  const [canvasScale, setCanvasScale] = useState(1);
   const [containerStyle, setContainerStyle] = useState<React.CSSProperties>({
     position: "absolute",
     top: 0,
@@ -46,22 +47,22 @@ export function HeroLanyard() {
         const parent = containerRef.current.parentElement;
         if (parent) {
           const winWidth = window.innerWidth;
+          const bounds = parent.getBoundingClientRect();
+          const hero = parent.closest("#home")?.getBoundingClientRect();
+          const baseHeight = parent.clientHeight;
+          const canvasHeight = !desktop && hero ? Math.max(baseHeight, hero.bottom - bounds.top) : baseHeight;
+          const scale = canvasHeight > 0 ? baseHeight / canvasHeight : 1;
 
           // Full viewport breakout: span exactly 100vw from viewport left (0) to right (winWidth)
           setContainerStyle({
             position: "absolute",
             top: 0,
-            left: "calc(50% - 50vw)",
+            left: -bounds.left,
             width: "100vw",
-            height: "100%",
+            height: canvasHeight,
           });
-
-          // Calculate horizontal center of the right column across the 100vw canvas
-          if (desktop && winWidth > 0) {
-            setAnchor(0.5);
-          } else {
-            setAnchor(0.5);
-          }
+          setCanvasScale(scale);
+          setAnchor(desktop && winWidth > 0 ? (bounds.left + bounds.width / 2) / winWidth : 0.5);
         }
       }
     };
@@ -100,9 +101,9 @@ export function HeroLanyard() {
         orientation="portrait"
         finish="matte"
         cornerRadius={0.3}
-        size={isDesktop ? 0.38 : 0.66}
+        size={isDesktop ? 0.38 : 0.66 * canvasScale}
         anchor={anchor}
-        strapLength={isDesktop ? 0.42 : 0.25}
+        strapLength={isDesktop ? 0.42 : Math.max(0, Math.min(1, (0.195 * canvasScale - 0.12) / 0.3))}
         strapColor="#f5643e"
         strapWidth={0.65}
         metal="silver"

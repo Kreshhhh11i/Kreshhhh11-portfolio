@@ -72,6 +72,7 @@ export function OpeningSequence({ children }: { children: ReactNode }) {
     const finishCurtain = () => {
       if (curtainFinished || disposed) return;
       curtainFinished = true;
+      if (readinessTimeout) clearTimeout(readinessTimeout);
       document.body.style.overflow = originalOverflow;
       document.documentElement.dataset.introComplete = "true";
       setCurtainDone(true);
@@ -123,7 +124,6 @@ export function OpeningSequence({ children }: { children: ReactNode }) {
       });
       await Promise.all([document.fonts.ready, componentsReady, preference.matches ? Promise.resolve() : sectionsReady]);
       if (disposed || curtainFinished) return;
-      if (readinessTimeout) clearTimeout(readinessTimeout);
       const navItems = gsap.utils.toArray<HTMLElement>(".nav-wrap .brand, .nav-wrap .step, .nav-wrap .tools");
       const socialIcons = gsap.utils.toArray<HTMLElement>(".hero-social-btn");
       const subtitle = document.querySelector<HTMLElement>("[data-hero-subtitle]");
@@ -155,6 +155,9 @@ export function OpeningSequence({ children }: { children: ReactNode }) {
           const portal = screen.querySelector<HTMLElement>(".opening-portal")!;
           const brandOffset = introNav.offsetWidth / 2 - (brand.offsetLeft + brand.offsetWidth / 2);
           const origin = brand.offsetLeft + brand.offsetWidth / 2 + brandOffset;
+          // Measure before the timeline makes any changes, rather than forcing
+          // layout as each dot begins to move.
+          const stepOffsets = stepItems.map(item => origin - (steps.offsetLeft + item.offsetLeft + item.offsetWidth / 2));
           timeline.set(introNav, { opacity: 1 })
             .set(brand, { x: brandOffset })
             .fromTo(brand, { scale: 1.4, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.42 }, 0)
@@ -162,7 +165,7 @@ export function OpeningSequence({ children }: { children: ReactNode }) {
             .to(brand, { x: 0, duration: 0.65 }, 0.44)
             .fromTo(background, { opacity: 0 }, { opacity: 1, duration: 0.55 }, 0.44)
             .fromTo(steps, { opacity: 0 }, { opacity: 1, duration: 0.08 }, 0.44)
-            .fromTo(stepItems, { x: (_, item) => origin - (steps.offsetLeft + item.offsetLeft + item.offsetWidth / 2) }, { x: 0, duration: 0.65 }, 0.44);
+            .fromTo(stepItems, { x: index => stepOffsets[index] }, { x: 0, duration: 0.65, force3D: true }, 0.44);
           SECTION_IDS.forEach((_, index) => {
             const at = 1.12 + index * 0.13;
             const step = stepItems[index];
