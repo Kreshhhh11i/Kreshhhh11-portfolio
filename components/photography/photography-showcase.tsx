@@ -92,7 +92,7 @@ export function PhotographyShowcase({ photos }: { photos: CarouselItem[] }) {
   }, []);
 
   return (
-    <div className="content-frame group w-full h-full p-6 sm:p-8 bg-transparent font-mono text-[var(--secondary-text)] flex flex-col justify-between gap-6">
+    <div className="content-frame group w-full h-full min-h-[560px] md:min-h-0 p-6 sm:p-8 bg-transparent font-mono text-[var(--secondary-text)] flex flex-col justify-between gap-6">
 
       {/* Header */}
       <div className="flex flex-wrap justify-between items-center gap-x-3 gap-y-2 text-xs tracking-wider border-b border-[var(--dashed-borders)] border-dashed pb-4">
@@ -114,13 +114,13 @@ export function PhotographyShowcase({ photos }: { photos: CarouselItem[] }) {
       </div>
 
       {/* Circular Carousel Stage */}
-      <div className="photography-carousel relative w-full flex-1 min-h-[440px] sm:min-h-[500px] overflow-hidden rounded-sm bg-[var(--background)]">
+      <div className="photography-carousel relative w-full flex-1 min-h-[300px] md:min-h-[500px] overflow-hidden rounded-sm bg-[var(--background)]">
         {photos.length ? <CircularCarousel
           items={photos.slice(0, 8)}
           preset="orbit"
           intro="rise"
           cardWidth={200}
-          aspectRatio={0.75}
+          aspectRatio={0.8}
           gap={20}
           tilt={-14}
           speed={9}
@@ -129,7 +129,7 @@ export function PhotographyShowcase({ photos }: { photos: CarouselItem[] }) {
           pauseOnHover={true}
           autoplay={zoomedItem || galleryOpen ? "off" : "drift"}
           fadeColor="var(--background)"
-          cornerRadius={8}
+          cornerRadius={14}
           onItemClick={(item) => handleOpenZoom(item)}
         /> : <div className="flex h-full min-h-[440px] items-center justify-center text-xs text-[var(--secondary-text)]">Photos coming soon.</div>}
       </div>
@@ -153,7 +153,7 @@ export function PhotographyShowcase({ photos }: { photos: CarouselItem[] }) {
             <ProfileCard
               avatarUrl={displayItem.src}
               name={displayItem.title}
-              title={displayItem.subtitle}
+              title={displayItem.subtitle ?? ""}
               handle="srikesh.raw"
               status="Shot on Nothing 4a"
               statusColor="#f5643e"
@@ -172,10 +172,10 @@ export function PhotographyShowcase({ photos }: { photos: CarouselItem[] }) {
           )}
 
           {/* Dismiss button & instruction */}
-          <div className="mt-3 flex items-center gap-2 font-mono text-[10px] text-[var(--secondary-text)]">
+          <div className="mt-5 flex items-center gap-2 font-mono text-[11px] text-[var(--primary-text)]">
             <button
               onClick={handleCloseZoom}
-              className="px-3.5 py-1.5 rounded-full border border-[var(--dashed-borders)] hover:border-[var(--primary-text)] hover:text-[var(--primary-text)] bg-[var(--background)]/90 transition-colors flex items-center gap-1.5 cursor-pointer shadow-lg"
+              className="px-4 py-2 rounded-full border border-[var(--dashed-borders)] hover:border-[var(--primary-text)] bg-[var(--background)]/90 transition-colors flex items-center gap-2 cursor-pointer shadow-lg"
             >
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -198,7 +198,7 @@ export function PhotographyShowcase({ photos }: { photos: CarouselItem[] }) {
       </div>
       <dialog ref={galleryRef} aria-labelledby="photo-gallery-title" onClose={() => setGalleryOpen(false)} onCancel={event => { event.preventDefault(); if (selectedPhoto) closePhoto(); else closeGallery(); }} onClick={event => { if (event.target === event.currentTarget) { if (selectedPhoto) closePhoto(); else closeGallery(); } }} data-closing={galleryClosing || undefined} className="photo-gallery m-auto w-[min(92vw,850px)] max-h-[min(85vh,760px)] rounded-xl border border-[var(--line)] bg-[var(--panel)] p-5 text-[var(--ink)] sm:p-8">
         <div className="mb-6 flex items-center justify-between gap-4"><div><h3 id="photo-gallery-title" className="font-ivyora text-2xl italic">Photo gallery</h3><p className="mt-1 text-sm text-[var(--muted)]">Moments behind the lens.</p></div><button type="button" onClick={closeGallery} aria-label="Close photo gallery" className="h-10 w-10 cursor-pointer rounded-full border border-[var(--line)] text-xl">×</button></div>
-        {photos.length ? <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">{photos.map(photo => <button key={photo.src} type="button" onClick={event => { photoButtonRef.current = event.currentTarget; setSelectedPhoto(photo); }} aria-label={`View ${photo.alt || "photograph"}`} className="relative aspect-square cursor-pointer overflow-hidden rounded-xl border border-[var(--line)] bg-[var(--bg)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--accent)]"><Image src={photo.src} alt={photo.alt || "Photograph"} fill sizes="(max-width: 640px) 44vw, 260px" className="object-contain" /></button>)}</div> : <p className="py-10 text-center text-sm text-[var(--muted)]">Photos coming soon.</p>}
+        {photos.length ? <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">{photos.map(photo => <button key={photo.src} type="button" onClick={event => { photoButtonRef.current = event.currentTarget; setSelectedPhoto(photo); }} aria-label={`View ${photo.alt || "photograph"}`} className="relative aspect-[4/5] cursor-pointer overflow-hidden rounded-xl border border-[var(--line)] bg-[var(--bg)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--accent)]"><Image src={photo.src} alt={photo.alt || "Photograph"} fill sizes="(max-width: 640px) 44vw, 260px" className="object-cover" /></button>)}</div> : <p className="py-10 text-center text-sm text-[var(--muted)]">Photos coming soon.</p>}
         {selectedPhoto && <div className="photo-lightbox" data-closing={photoClosing || undefined} role="group" aria-label="Enlarged photo" onClick={closePhoto}><button type="button" autoFocus onClick={event => { event.stopPropagation(); closePhoto(); }} aria-label="Close enlarged photo" className="photo-lightbox-close">×</button><div className="photo-lightbox-image" onClick={event => event.stopPropagation()}>{/* Preserve the image's intrinsic proportions so rounding follows its actual edges. */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={selectedPhoto.src} alt={selectedPhoto.alt || "Photograph"} decoding="async" />

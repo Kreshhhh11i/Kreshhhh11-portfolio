@@ -15,13 +15,25 @@ import { SectionLabel } from "@/components/motion/SectionLabel";
 import { readdirSync } from "node:fs";
 import path from "node:path";
 
+const photoDetails: Record<string, { title: string; subtitle: string }> = {
+  "1.webp": { title: "Before the Rain", subtitle: "Christ Church" },
+  "2.webp": { title: "Colours of the Gopuram", subtitle: "Madurai Meenakshi Temple" },
+  "3.webp": { title: "Leaning Palm", subtitle: "Coconut Tree" },
+  "4.webp": { title: "The Junction Statue", subtitle: "Anna Salai Statue" },
+  "5.webp": { title: "Street Cat", subtitle: "A Curious Stray" },
+  "6.webp": { title: "Red in the Green", subtitle: "Gulmohar Tree" },
+  "7.webp": { title: "Behind the Palms", subtitle: "Small Temple" },
+  "8.webp": { title: "Cloud and Fence", subtitle: "Afternoon Sky" },
+};
+
 export default function Home() {
   const photos = readdirSync(path.join(process.cwd(), "public", "photos"))
     .filter((name) => /\.(jpe?g|png|webp|avif)$/i.test(name))
     .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
     .map((name) => {
-      const title = name.replace(/\.[^.]+$/, "").replace(/[-_]+/g, " ");
-      return { src: `/photos/${encodeURIComponent(name)}`, alt: title, title, subtitle: "Photography" };
+      const details = photoDetails[name];
+      const title = details?.title ?? name.replace(/\.[^.]+$/, "").replace(/[-_]+/g, " ");
+      return { src: `/photos/${encodeURIComponent(name)}`, alt: title, title, subtitle: details?.subtitle };
     });
   return (
     <>

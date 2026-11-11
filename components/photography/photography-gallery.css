@@ -4,6 +4,10 @@
 }
 .photo-profile .profile-card__photo { inset: 0; width: 100%; height: 100%; object-position: center; transform: none; }
 
+@media (max-width: 767px) {
+  .photography-carousel .circular-carousel__stage { scale: 1.06; }
+}
+
 .photo-gallery[open] { animation: photo-gallery-in 240ms ease-out both; }
 .photo-gallery::backdrop { background: rgb(0 0 0 / 75%); animation: photo-backdrop-in 240ms ease-out both; }
 .photo-gallery[data-closing] { animation: photo-gallery-out 240ms ease-in both; }
