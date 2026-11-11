@@ -32,7 +32,7 @@ const ivyOraDisplay = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "SRIKESH TR | Software Developer",
+  title: "Srikresh - Software Engineer",
   description: "Portfolio of Srikesh TR, Software Developer.",
 };
 
