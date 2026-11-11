@@ -24,11 +24,12 @@ export function OpeningSequence({ children }: { children: ReactNode }) {
     let cancelReadyWait = () => {};
     const readySections = new Set<string>();
     let homeImageReady = false;
+    let skillsWarmupTimedOut = false;
     let resolveSectionsReady = () => {};
     let readinessTimeout: ReturnType<typeof setTimeout> | undefined;
     const image = new Image();
     const checkSectionsReady = () => {
-      if (SECTION_IDS.every(id => readySections.has(id)) && homeImageReady && document.documentElement.dataset.lanyardReady === "true") {
+      if (SECTION_IDS.every(id => readySections.has(id)) && homeImageReady && document.documentElement.dataset.lanyardReady === "true" && (skillsWarmupTimedOut || !!document.documentElement.dataset.skillsWarmup)) {
         resolveSectionsReady();
       }
     };
@@ -39,6 +40,7 @@ export function OpeningSequence({ children }: { children: ReactNode }) {
     };
     window.addEventListener("portfolio:section-ready", onSectionReady);
     window.addEventListener("portfolio:lanyard-ready", checkSectionsReady);
+    window.addEventListener("portfolio:skills-warmup", checkSectionsReady);
     for (const id of SECTION_IDS) {
       if (document.getElementById(id)?.dataset.introReady === "true") readySections.add(id);
     }
@@ -49,6 +51,7 @@ export function OpeningSequence({ children }: { children: ReactNode }) {
       checkSectionsReady();
     };
     const imageTimeout = setTimeout(finishImage, 2000);
+    const skillsWarmupTimeout = setTimeout(() => { skillsWarmupTimedOut = true; checkSectionsReady(); }, 3500);
     image.onload = () => { void image.decode().catch(() => {}).finally(finishImage); };
     image.onerror = finishImage;
     image.src = "/lanyard/Portfolio-img.png";
@@ -197,11 +200,13 @@ export function OpeningSequence({ children }: { children: ReactNode }) {
       cancelReadyWait();
       resolveSectionsReady();
       clearTimeout(imageTimeout);
+      clearTimeout(skillsWarmupTimeout);
       if (readinessTimeout) clearTimeout(readinessTimeout);
       image.onload = null;
       image.onerror = null;
       window.removeEventListener("portfolio:section-ready", onSectionReady);
       window.removeEventListener("portfolio:lanyard-ready", checkSectionsReady);
+      window.removeEventListener("portfolio:skills-warmup", checkSectionsReady);
       context.revert();
       document.body.style.overflow = originalOverflow;
       delete document.documentElement.dataset.heroCue;

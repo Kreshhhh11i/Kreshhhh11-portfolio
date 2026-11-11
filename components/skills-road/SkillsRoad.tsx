@@ -132,8 +132,17 @@ export function SkillsRoad() {
   const [introStarted, setIntroStarted] = useState(false);
   const [isReducedMotion, setIsReducedMotion] = useState(false);
   const boardLoading = !boardReady;
-  const handleBoardReady = useCallback(() => setBoardReady(true), []);
-  const handleBoardError = useCallback(() => setBoardReady(false), []);
+  const handleBoardReady = useCallback(() => {
+    setBoardReady(true);
+    document.documentElement.dataset.skillsWarmup = 'ready';
+    window.dispatchEvent(new Event('portfolio:skills-warmup'));
+  }, []);
+  const handleBoardError = useCallback(() => {
+    setBoardReady(false);
+    document.documentElement.dataset.skillsWarmup = 'failed';
+    window.dispatchEvent(new Event('portfolio:skills-warmup'));
+  }, []);
+  useEffect(() => () => { delete document.documentElement.dataset.skillsWarmup; }, []);
 
   // Reduced motion preference
   useEffect(() => {

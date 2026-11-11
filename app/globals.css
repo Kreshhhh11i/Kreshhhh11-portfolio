@@ -20,7 +20,7 @@
   font-family: var(--font-ivyora), "IvyOra Display", "ivyora-display";
 }
 
-/* View Transitions API - Circular theme ripple */
+/* View Transitions API - circular theme reveal */
 ::view-transition {
   pointer-events: none !important;
 }
@@ -30,7 +30,6 @@
   animation: none;
   mix-blend-mode: normal;
   pointer-events: none !important;
-  will-change: clip-path;
   transform: translateZ(0);
   backface-visibility: hidden;
 }
@@ -41,6 +40,7 @@
 
 ::view-transition-new(root) {
   z-index: 99999;
+  will-change: clip-path;
 }
 
 :root {

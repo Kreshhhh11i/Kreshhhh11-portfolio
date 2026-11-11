@@ -3,7 +3,7 @@
 import React, { useRef, useState, useEffect, useMemo } from 'react';
 import * as THREE from 'three';
 import { Canvas, useThree, useFrame } from '@react-three/fiber';
-import { OrbitControls, Environment, PerformanceMonitor, Html } from '@react-three/drei';
+import { OrbitControls, Environment, PerformanceMonitor, AdaptiveDpr, Html } from '@react-three/drei';
 import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing';
 import { easing } from 'maath';
 import { SkillItem, SkillCategory } from './data';
@@ -83,6 +83,21 @@ function FirstFrame({ onReady }: { onReady: () => void }) {
     frame.current = requestAnimationFrame(onReady);
   });
   useEffect(() => () => cancelAnimationFrame(frame.current), []);
+  return null;
+}
+
+function AnimateOnChange({ values }: { values: readonly unknown[] }) {
+  const invalidate = useThree(state => state.invalidate);
+  const until = useRef(0);
+  useEffect(() => {
+    until.current = performance.now() + 4000;
+    invalidate();
+  // values contains the scene inputs that can start an animation.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [invalidate, ...values]);
+  useFrame(() => {
+    if (performance.now() < until.current) invalidate();
+  });
   return null;
 }
 
@@ -365,7 +380,7 @@ export default function Scene({
   onTokenStepComplete,
   onReady,
 }: SceneProps) {
-  const [dpr, setDpr] = useState(1.5);
+  const [dpr, setDpr] = useState(1.25);
 
   // Token's own active skill and point (never pulled away by hovering or transitions)
   const tokenSkill = skills[currentIndex];
@@ -373,8 +388,7 @@ export default function Scene({
 
   return (
     <Canvas
-      frameloop={isInView ? 'always' : 'never'}
-      shadows="percentage"
+      frameloop={isInView ? 'demand' : 'never'}
       dpr={dpr}
       gl={{
         antialias: true,
@@ -392,7 +406,9 @@ export default function Scene({
       style={{ touchAction: 'pan-y' }}
     >
       <FirstFrame onReady={onReady} />
-      <PerformanceMonitor onIncline={() => setDpr(2)} onDecline={() => setDpr(1)} />
+      <AnimateOnChange values={[layoutPoints, currentIndex, targetIndex, activeCategory, isFlatView, hoveredTileId, introStarted, isInView]} />
+      <PerformanceMonitor onIncline={() => setDpr(1.25)} onDecline={() => setDpr(1)} />
+      <AdaptiveDpr />
 
       {/* Lighting Architecture */}
       <ambientLight intensity={0.45} />
@@ -483,12 +499,7 @@ export default function Scene({
 
       {/* Postprocessing: ACES Bloom & Vignette */}
       <EffectComposer enableNormalPass={false} multisampling={0}>
-        <Bloom
-          mipmapBlur
-          intensity={0.52}
-          luminanceThreshold={0.72}
-          luminanceSmoothing={0.3}
-        />
+        <Bloom mipmapBlur intensity={0.52} luminanceThreshold={0.72} luminanceSmoothing={0.3} />
         <Vignette eskil={false} offset={0.16} darkness={0.82} />
       </EffectComposer>
     </Canvas>

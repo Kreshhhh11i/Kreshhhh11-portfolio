@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
+import { flushSync } from "react-dom";
 import { motion } from "framer-motion";
 import { NAV, NavItem } from "@/lib/nav-config";
 import "./Navbar.css";
@@ -361,11 +362,12 @@ export function Navbar() {
     window.addEventListener("resize", measureTops, { passive: true });
     window.addEventListener("load", measureTops, { passive: true });
     window.addEventListener("pagehide", onPageHide);
+    window.addEventListener("portfolio:theme-settled", measureTops);
 
     let resizeObserver: ResizeObserver | null = null;
     if (typeof ResizeObserver !== "undefined") {
       resizeObserver = new ResizeObserver(() => {
-        measureTops();
+        if (!isThemeTransitioningRef.current) measureTops();
       });
       resizeObserver.observe(document.body);
     }
@@ -376,6 +378,7 @@ export function Navbar() {
       window.removeEventListener("resize", measureTops);
       window.removeEventListener("load", measureTops);
       window.removeEventListener("pagehide", onPageHide);
+      window.removeEventListener("portfolio:theme-settled", measureTops);
       if (resizeObserver) resizeObserver.disconnect();
       if (rafIdRef.current !== null) cancelAnimationFrame(rafIdRef.current);
       if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
@@ -384,6 +387,7 @@ export function Navbar() {
   }, [animationsReady]);
 
   const toggleTheme = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    if (isThemeTransitioningRef.current) return;
     isThemeTransitioningRef.current = true;
     e.currentTarget.blur();
     const nextTheme = theme === "dark" ? "light" : "dark";
@@ -398,7 +402,7 @@ export function Navbar() {
         document.documentElement.classList.remove("light");
         document.documentElement.classList.add("dark");
       }
-      localStorage.setItem("portfolio-theme", nextTheme);
+      try { localStorage.setItem("portfolio-theme", nextTheme); } catch {}
     };
 
     if (
@@ -409,6 +413,7 @@ export function Navbar() {
       updateDOM();
       setTimeout(() => {
         isThemeTransitioningRef.current = false;
+        window.dispatchEvent(new Event("portfolio:theme-settled"));
       }, 100);
       return;
     }
@@ -416,17 +421,15 @@ export function Navbar() {
     const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX || rect.left + rect.width / 2;
     const y = e.clientY || rect.top + rect.height / 2;
-
     const endRadius = Math.hypot(
       Math.max(x, window.innerWidth - x),
       Math.max(y, window.innerHeight - y)
     );
 
-    const transition = document.startViewTransition(() => {
-      updateDOM();
-    });
-
     try {
+      const transition = document.startViewTransition(() => {
+        flushSync(updateDOM);
+      });
       await transition.ready;
       const anim = document.documentElement.animate(
         {
@@ -436,17 +439,19 @@ export function Navbar() {
           ],
         },
         {
-          duration: 750,
+          duration: 850,
           easing: "cubic-bezier(0.25, 1, 0.4, 1)",
           pseudoElement: "::view-transition-new(root)",
         }
       );
       await anim.finished;
     } catch {
-      // Fallback
+      // Keep the toggle usable if a browser cannot start a view transition.
+      if (document.documentElement.dataset.theme !== nextTheme) updateDOM();
     } finally {
       setTimeout(() => {
         isThemeTransitioningRef.current = false;
+        window.dispatchEvent(new Event("portfolio:theme-settled"));
         if (navRef.current && !navRef.current.matches(":hover")) {
           if (isCompactRef.current) {
             setIsHoverExpanded(false);

@@ -35,6 +35,7 @@ html {
 /* Base Wrapper */
 .nav-wrap {
   position: fixed;
+  contain: layout style;
   top: 14px;
   left: 0;
   right: 0;
