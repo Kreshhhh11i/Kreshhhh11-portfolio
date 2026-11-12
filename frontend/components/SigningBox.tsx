@@ -184,7 +184,9 @@ export function SigningBox() {
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(false);
   const [galleryOpen, setGalleryOpen] = useState(false);
+  const [galleryClosing, setGalleryClosing] = useState(false);
   const [selectedSignature, setSelectedSignature] = useState<SignatureItem | null>(null);
+  const [previewClosing, setPreviewClosing] = useState(false);
   const [removing, setRemoving] = useState<string | null>(null);
 
   const currentStrokeRef = useRef<Stroke | null>(null);
@@ -296,10 +298,33 @@ export function SigningBox() {
     });
     return () => { active = false; };
   }, [checkOwnership, loadWall]);
+  const closeGallery = useCallback(() => {
+    const dialog = dialogRef.current;
+    if (!dialog || galleryClosing) return;
+    setGalleryClosing(true);
+    setTimeout(() => {
+      if (dialog.open) dialog.close();
+      setGalleryOpen(false);
+      setGalleryClosing(false);
+    }, 220);
+  }, [galleryClosing]);
+
+  const closePreview = useCallback(() => {
+    const dialog = previewDialogRef.current;
+    if (!dialog || previewClosing) return;
+    setPreviewClosing(true);
+    setTimeout(() => {
+      if (dialog.open) dialog.close();
+      setSelectedSignature(null);
+      setPreviewClosing(false);
+    }, 220);
+  }, [previewClosing]);
+
   useEffect(() => {
     const dialog = dialogRef.current;
     if (!dialog || !galleryOpen) return;
     const returnFocus = galleryButtonRef.current;
+    setGalleryClosing(false);
     dialog.showModal();
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
@@ -309,6 +334,7 @@ export function SigningBox() {
   useEffect(() => {
     const dialog = previewDialogRef.current;
     if (!dialog || !selectedSignature) return;
+    setPreviewClosing(false);
     dialog.showModal();
     return () => { if (dialog.open) dialog.close(); };
   }, [selectedSignature]);
@@ -428,11 +454,11 @@ export function SigningBox() {
     finally { setSaving(false); }
   };
 
-  const renderTile = (sig: SignatureItem, compact = false) => <div key={sig.id} className={`sb-tile group relative min-w-0 min-h-0 ${compact ? 'w-full h-full' : 'aspect-[2/1]'} rounded-lg border border-dashed border-[var(--sb-line)] bg-[var(--sb-surface)] flex items-center justify-center p-2.5`}>
+  const renderTile = (sig: SignatureItem, compact = false) => <div key={sig.id} className={`group relative min-w-0 min-h-0 ${compact ? 'w-full h-full' : 'aspect-[2/1]'} rounded-lg border border-[var(--sb-line)] bg-[var(--sb-surface)] flex items-center justify-center p-2.5`}>
     <button type="button" onClick={() => setSelectedSignature(sig)} aria-label="Enlarge visitor drawing" className="w-full h-full min-h-0 cursor-pointer rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--sb-accent)]">
       <SignaturePreview drawing={sig.drawing} />
     </button>
-    {ownership[sig.id] && <button type="button" onClick={() => void removeSignature(sig.id)} disabled={removing === sig.id} aria-label="Remove your drawing" className="absolute top-1 right-1 w-7 h-7 flex items-center justify-center rounded-full bg-[var(--sb-bg)] text-[var(--sb-muted)] hover:text-[var(--sb-accent)] transition-opacity font-mono text-sm border border-[var(--sb-line)] cursor-pointer disabled:opacity-40">×</button>}
+    {ownership[sig.id] && <button type="button" onClick={() => void removeSignature(sig.id)} disabled={removing === sig.id} aria-label="Remove your drawing" className="absolute top-1 right-1 w-7 h-7 flex items-center justify-center rounded-full bg-[var(--sb-bg)] text-[var(--sb-muted)] hover:text-[var(--sb-ink)] font-mono text-sm border border-[var(--sb-line)] cursor-pointer disabled:opacity-40">×</button>}
   </div>;
 
   return (
@@ -462,17 +488,83 @@ export function SigningBox() {
           from { opacity: 0; transform: translateY(10px); }
           to { opacity: 1; transform: translateY(0); }
         }
-        @keyframes sbPopIn {
-          from { opacity: 0; transform: scale(0.94); }
-          to { opacity: 1; transform: scale(1); }
-        }
         .sb-toast { animation: sbSlideUp 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-        .sb-tile { animation: sbPopIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         .sb-scroll::-webkit-scrollbar { width: 4px; }
         .sb-scroll::-webkit-scrollbar-track { background: transparent; }
         .sb-scroll::-webkit-scrollbar-thumb { background: var(--sb-line); border-radius: 4px; }
+
+        /* Smooth Fade-in and Fade-out for Signature Preview & Gallery Dialogs */
+        .sb-dialog {
+          border: 1px solid var(--sb-line);
+          outline: none;
+        }
+        .sb-dialog[open] {
+          animation: sbDialogFadeIn 0.26s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .sb-dialog[open]::backdrop {
+          animation: sbBackdropFadeIn 0.26s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          background: rgba(0, 0, 0, 0.78);
+          backdrop-filter: blur(6px);
+          -webkit-backdrop-filter: blur(6px);
+        }
+        .sb-dialog.is-closing {
+          animation: sbDialogFadeOut 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+        }
+        .sb-dialog.is-closing::backdrop {
+          animation: sbBackdropFadeOut 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+        }
+        @keyframes sbDialogFadeIn {
+          0% {
+            opacity: 0;
+            transform: scale(0.94) translateY(12px);
+          }
+          100% {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+          }
+        }
+        @keyframes sbBackdropFadeIn {
+          0% {
+            opacity: 0;
+          }
+          100% {
+            opacity: 1;
+          }
+        }
+        @keyframes sbDialogFadeOut {
+          0% {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+          }
+          100% {
+            opacity: 0;
+            transform: scale(0.96) translateY(8px);
+          }
+        }
+        @keyframes sbBackdropFadeOut {
+          0% {
+            opacity: 1;
+          }
+          100% {
+            opacity: 0;
+          }
+        }
+        .sb-preview-body {
+          animation: sbSignatureFadeIn 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        @keyframes sbSignatureFadeIn {
+          from {
+            opacity: 0;
+            transform: scale(0.95);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+
         @media (prefers-reduced-motion: reduce) {
-          .signing-box *, .sb-toast, .sb-tile {
+          .signing-box *, .sb-toast, .sb-tile, .sb-dialog[open], .sb-dialog.is-closing, .sb-dialog[open]::backdrop, .sb-dialog.is-closing::backdrop, .sb-preview-body {
             animation-duration: 0.01ms !important;
             transition-duration: 0.01ms !important;
           }
@@ -596,7 +688,7 @@ export function SigningBox() {
       {ownershipStatus === 'error' && <p className="mt-3 text-xs text-[var(--sb-muted)]">Unable to check your drawing. <button type="button" className="underline" onClick={() => void checkOwnership(identity, ownership)}>Try again</button></p>}
 
       {/* Signature Wall */}
-      <div className="mt-6 pt-5 border-t border-dashed border-[var(--sb-line)]">
+      <div className="mt-6 pt-5 border-t border-[var(--sb-line)]">
         <div className="flex items-center justify-between mb-3 font-mono text-xs">
           <span className="text-[var(--sb-muted)]">Signature Wall</span>
           {(signatures.length > 4 || hasMore) && <button ref={galleryButtonRef} type="button" onClick={() => setGalleryOpen(true)} className="text-[var(--sb-muted)] hover:text-[var(--sb-ink)] underline underline-offset-4">View more <span aria-hidden="true">↗</span></button>}
@@ -604,7 +696,7 @@ export function SigningBox() {
 
         <div className="h-[160px] sm:h-[81px] overflow-hidden">
           {wallLoading ? <div className="h-[81px] flex items-center justify-center font-mono text-xs text-[var(--sb-muted)]">Loading drawings…</div> : wallError && signatures.length === 0 ? <div className="h-[81px] flex flex-col gap-2 items-center justify-center font-mono text-xs text-[var(--sb-muted)]"><span>{wallError}</span><button type="button" onClick={() => void loadWall()} className="underline">Try again</button></div> : signatures.length === 0 ? (
-            <div className="h-[81px] w-full flex items-center justify-center text-center font-mono text-xs text-[var(--sb-muted)] border border-dashed border-[var(--sb-line)] rounded-lg select-none">
+            <div className="h-[81px] w-full flex items-center justify-center text-center font-mono text-xs text-[var(--sb-muted)] border border-[var(--sb-line)] rounded-lg select-none">
               No signatures yet. Be the first.
             </div>
           ) : (
@@ -615,16 +707,40 @@ export function SigningBox() {
         </div>
       </div>
 
-      <dialog ref={dialogRef} aria-labelledby="signature-gallery-title" onClose={() => setGalleryOpen(false)} onClick={event => { if (event.target === event.currentTarget) event.currentTarget.close(); }} className="sb-gallery m-auto w-[min(92vw,850px)] max-h-[min(85vh,760px)] rounded-xl border border-[var(--sb-line)] bg-[var(--sb-surface)] text-[var(--sb-ink)] p-5 sm:p-8 backdrop:bg-black/75">
-        <div className="flex items-center justify-between gap-4 mb-6"><div><h3 id="signature-gallery-title" className="font-ivyora italic text-2xl">Signature gallery</h3><p className="text-sm text-[var(--sb-muted)] mt-1">Marks left by visitors.</p></div><button type="button" onClick={() => dialogRef.current?.close()} aria-label="Close signature gallery" className="w-10 h-10 rounded-full border border-[var(--sb-line)] text-xl">×</button></div>
+      <dialog
+        ref={dialogRef}
+        aria-labelledby="signature-gallery-title"
+        onCancel={(e) => { e.preventDefault(); closeGallery(); }}
+        onClose={() => { setGalleryOpen(false); setGalleryClosing(false); }}
+        onClick={(event) => { if (event.target === event.currentTarget) closeGallery(); }}
+        className={`sb-dialog sb-gallery m-auto w-[min(92vw,850px)] max-h-[min(85vh,760px)] rounded-xl bg-[var(--sb-surface)] text-[var(--sb-ink)] p-5 sm:p-8 ${galleryClosing ? 'is-closing' : ''}`}
+      >
+        <div className="flex items-center justify-between gap-4 mb-6">
+          <div>
+            <h3 id="signature-gallery-title" className="font-ivyora italic text-2xl">Signature gallery</h3>
+            <p className="text-sm text-[var(--sb-muted)] mt-1">Marks left by visitors.</p>
+          </div>
+          <button type="button" onClick={closeGallery} aria-label="Close signature gallery" className="w-10 h-10 rounded-full border border-[var(--sb-line)] hover:bg-[var(--sb-line)]/30 text-xl cursor-pointer transition-colors">×</button>
+        </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">{signatures.map(sig => renderTile(sig))}</div>
         {wallError && <p role="alert" className="text-sm text-[var(--sb-muted)] mt-4">{wallError}</p>}
         {hasMore && <button type="button" disabled={loadingMore} onClick={() => void loadWall(signatures.length)} className="mt-6 rounded-full border border-[var(--sb-line)] px-5 py-2 text-xs font-mono disabled:opacity-50">{loadingMore ? 'Loading…' : 'Load more'}</button>}
       </dialog>
 
-      <dialog ref={previewDialogRef} aria-label="Visitor drawing" onClose={() => setSelectedSignature(null)} onClick={event => { if (event.target === event.currentTarget) event.currentTarget.close(); }} className="m-auto w-[min(92vw,720px)] rounded-xl border border-[var(--sb-line)] bg-[var(--sb-surface)] text-[var(--sb-ink)] p-5 sm:p-8 backdrop:bg-black/75">
-        <div className="flex justify-end mb-4"><button type="button" onClick={() => previewDialogRef.current?.close()} aria-label="Close drawing" className="w-10 h-10 rounded-full border border-[var(--sb-line)] text-xl cursor-pointer">×</button></div>
-        <div className="h-[min(48vh,360px)] w-full">{selectedSignature && <SignaturePreview drawing={selectedSignature.drawing} />}</div>
+      <dialog
+        ref={previewDialogRef}
+        aria-label="Visitor drawing"
+        onCancel={(e) => { e.preventDefault(); closePreview(); }}
+        onClose={() => { setSelectedSignature(null); setPreviewClosing(false); }}
+        onClick={(event) => { if (event.target === event.currentTarget) closePreview(); }}
+        className={`sb-dialog sb-preview-dialog m-auto w-[min(92vw,720px)] rounded-xl bg-[var(--sb-surface)] text-[var(--sb-ink)] p-5 sm:p-8 ${previewClosing ? 'is-closing' : ''}`}
+      >
+        <div className="flex justify-end mb-4">
+          <button type="button" onClick={closePreview} aria-label="Close drawing" className="w-10 h-10 rounded-full border border-[var(--sb-line)] hover:bg-[var(--sb-line)]/30 text-xl cursor-pointer transition-colors">×</button>
+        </div>
+        <div className="sb-preview-body h-[min(48vh,360px)] w-full flex items-center justify-center">
+          {selectedSignature && <SignaturePreview drawing={selectedSignature.drawing} />}
+        </div>
       </dialog>
 
       {/* Toast Notification */}

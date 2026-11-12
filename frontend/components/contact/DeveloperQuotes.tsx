@@ -4,31 +4,13 @@ import { useEffect, useState } from "react";
 import { ScrollWordReveal } from "@/components/motion/ScrollWordReveal";
 
 const quotes = [
-  {
-    text: "Programs must be written for people to read, and only incidentally for machines to execute.",
-    author: "Harold Abelson & Gerald Jay Sussman",
-    source: "https://dspace.mit.edu/entities/publication/72d5df5e-0034-440f-b1f5-5e0bd45308d8",
-  },
-  {
-    text: "A good programming language should, like oil paint, make it easy to change your mind.",
-    author: "Paul Graham",
-    source: "https://paulgraham.com/hp.html",
-  },
-  {
-    text: "The price of reliability is the pursuit of the utmost simplicity.",
-    author: "C. A. R. Hoare",
-    source: "https://www.cs.utexas.edu/~EWD/transcriptions/EWD13xx/EWD1304.html",
-  },
-  {
-    text: "Program testing can be used to show the presence of bugs, but never to show their absence!",
-    author: "Edsger W. Dijkstra",
-    source: "https://www.cs.utexas.edu/~EWD/ewd02xx/EWD249.PDF",
-  },
-  {
-    text: "The Best Code is No Code At All",
-    author: "Jeff Atwood",
-    source: "https://blog.codinghorror.com/the-best-code-is-no-code-at-all/",
-  },
+  { text: "I never lose. I either win or learn.", author: "Nelson Mandela" },
+  { text: "You only live once, but if you do it right, once is enough.", author: "Mae West" },
+  { text: "Make it work, make it right, make it fast.", author: "Kent Beck" },
+  { text: "Life isn't about finding yourself. Life is about creating yourself.", author: "George Bernard Shaw" },
+  { text: "Talk is cheap. Show me the code.", author: "Linus Torvalds" },
+  { text: "You don't take a photograph, you make it.", author: "Ansel Adams" },
+  { text: "The best way to predict the future is to invent it.", author: "Alan Kay" },
 ];
 
 export function DeveloperQuotes() {
@@ -73,9 +55,13 @@ export function DeveloperQuotes() {
             </p>
             <footer className="mt-4 flex justify-center">
               <cite className="font-mono text-[11px] sm:text-xs uppercase tracking-[0.08em] leading-relaxed text-[var(--muted)] not-italic">
-                <a href={quote.source} target="_blank" rel="noopener noreferrer" className="hover:text-[var(--ink)] transition-colors">
-                  ~ {quote.author}
-                </a>
+                {'source' in quote && quote.source ? (
+                  <a href={quote.source as string} target="_blank" rel="noopener noreferrer" className="hover:text-[var(--ink)] transition-colors">
+                    ~ {quote.author}
+                  </a>
+                ) : (
+                  <span>~ {quote.author}</span>
+                )}
               </cite>
             </footer>
           </blockquote>

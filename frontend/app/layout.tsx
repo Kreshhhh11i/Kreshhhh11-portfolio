@@ -37,6 +37,7 @@ export const metadata: Metadata = {
 };
 
 import { SiteShell } from "@/components/shared/SiteShell";
+import { Analytics } from "@vercel/analytics/next";
 
 export default function RootLayout({
   children,
@@ -59,6 +60,7 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col text-[var(--ink)] bg-[var(--bg)] font-sans overflow-x-hidden" suppressHydrationWarning>
         <SiteShell>{children}</SiteShell>
+        <Analytics />
       </body>
     </html>
   );

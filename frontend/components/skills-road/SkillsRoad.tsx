@@ -137,16 +137,26 @@ export function SkillsRoad() {
   // Viewport & performance
   const [isInView, setIsInView] = useState(true);
   const [boardReady, setBoardReady] = useState(false);
+  const [boardFailed, setBoardFailed] = useState(false);
+  const [takingLonger, setTakingLonger] = useState(false);
   const [introStarted, setIntroStarted] = useState(false);
   const [isReducedMotion, setIsReducedMotion] = useState(false);
-  const boardLoading = !boardReady;
+
+  useEffect(() => {
+    if (boardReady || boardFailed) return;
+    const timer = setTimeout(() => {
+      setTakingLonger(true);
+    }, 5000);
+    return () => clearTimeout(timer);
+  }, [boardReady, boardFailed]);
+
   const handleBoardReady = useCallback(() => {
     setBoardReady(true);
     document.documentElement.dataset.skillsWarmup = 'ready';
     window.dispatchEvent(new Event('portfolio:skills-warmup'));
   }, []);
   const handleBoardError = useCallback(() => {
-    setBoardReady(true);
+    setBoardFailed(true);
     document.documentElement.dataset.skillsWarmup = 'failed';
     window.dispatchEvent(new Event('portfolio:skills-warmup'));
   }, []);
@@ -443,8 +453,40 @@ export function SkillsRoad() {
           onReady={handleBoardReady}
         /></SceneErrorBoundary>}
 
-        <div className={`skills-board-loading${boardLoading ? '' : ' is-ready'}`} role="status" aria-live="polite" aria-hidden={!boardLoading}>
-          <span className="sr-only">Loading skills board…</span>
+        <div className={`skills-board-loading${boardReady && !boardFailed ? ' is-ready' : ''}`} role="status" aria-live="polite">
+          <div className="flex flex-col items-center justify-center gap-2.5 px-4 text-center font-mono text-xs">
+            {boardFailed ? (
+              <>
+                <p className="text-[var(--muted)]">Unable to load the 3D engine.</p>
+                <button
+                  type="button"
+                  onClick={() => window.location.reload()}
+                  className="mt-1 px-4 py-1.5 rounded-full border border-[var(--line)] bg-[var(--surface)] text-[var(--ink)] hover:border-[var(--accent)] hover:text-[var(--accent)] transition-colors cursor-pointer text-xs"
+                >
+                  Refresh the page
+                </button>
+              </>
+            ) : (
+              <>
+                <div className="flex items-center gap-2 text-[var(--muted)]">
+                  <span className="skills-loading-dot" />
+                  <span>Loading 3D engine…</span>
+                </div>
+                {takingLonger && (
+                  <p className="mt-1 text-[11px] text-[var(--muted)]">
+                    Taking longer than expected.{' '}
+                    <button
+                      type="button"
+                      onClick={() => window.location.reload()}
+                      className="text-[var(--ink)] underline hover:text-[var(--accent)] cursor-pointer"
+                    >
+                      Refresh the page
+                    </button>
+                  </p>
+                )}
+              </>
+            )}
+          </div>
         </div>
 
         <div
