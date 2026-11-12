@@ -596,6 +596,9 @@ const CardSwap = forwardRef(
           active: false,
           samples: []
         };
+        try {
+          root.setPointerCapture?.(event.pointerId);
+        } catch {}
         s.onInteractionChange?.(true);
         schedule();
       };
@@ -606,11 +609,11 @@ const CardSwap = forwardRef(
         state.drag = null;
         settingsRef.current.onInteractionChange?.(false);
         root.style.cursor = '';
+        try { root.releasePointerCapture?.(event.pointerId); } catch {}
         if (!drag.active) {
           schedule();
           return;
         }
-        root.releasePointerCapture?.(event.pointerId);
         const s = settingsRef.current;
         const card = deck[drag.index];
         const base = slot(0, s);

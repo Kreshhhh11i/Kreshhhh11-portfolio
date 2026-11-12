@@ -1,4 +1,13 @@
 /* Scoped overrides for React Bits CardSwap inside projects section */
+.projects-swap,
+.projects-swap .card-swap-stage {
+  touch-action: pan-y !important;
+}
+
+.projects-swap .card-swap-slot {
+  touch-action: none !important;
+}
+
 .projects-swap .card-swap-card {
   background: linear-gradient(180deg, #141414, #0e0e0e) !important;
 }

@@ -278,6 +278,14 @@ html.light .skills-detail-category { color: #5b5142; }
 .skills-detail-tagline { color: var(--ink); }
 .skills-detail-aside { flex-shrink: 0; color: var(--muted); font: 12px var(--font-jetbrains-mono), monospace; }
 .skills-detail-aside kbd { color: var(--ink); font: inherit; }
+.skills-space-instruction { display: inline; }
+@media (max-width: 768px) {
+  .skills-space-instruction { display: none; }
+}
+.skills-road canvas,
+.content-frame canvas {
+  touch-action: none !important;
+}
 .skills-contact-link { color: var(--ink); text-decoration: none; }
 .skills-contact-link:hover { color: var(--accent); }
 

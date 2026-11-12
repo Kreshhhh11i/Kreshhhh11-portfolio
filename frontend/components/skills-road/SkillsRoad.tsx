@@ -431,7 +431,7 @@ export function SkillsRoad() {
       </div>
 
       {/* 3D CANVAS VIEWPORT (Clean container without corner edges or hover glow) */}
-      <div className="content-frame w-full h-[390px] sm:h-[520px] md:h-[620px] bg-[#0a0a0a] overflow-hidden">
+      <div className="content-frame w-full h-[390px] sm:h-[520px] md:h-[620px] bg-[#0a0a0a] overflow-hidden touch-none">
         {boardMounted && <SceneErrorBoundary onError={handleBoardError}><Scene
           skills={SKILLS_ROAD_DATA}
           layoutPoints={currentLayoutPoints}
@@ -572,7 +572,10 @@ export function SkillsRoad() {
             </a>
           ) : (
             <span>
-              Select a tile <span aria-hidden="true">·</span> Press <kbd>Space</kbd> to roll
+              Select a tile
+              <span className="skills-space-instruction hidden md:inline">
+                {' '}<span aria-hidden="true">·</span> Press <kbd>Space</kbd> to roll
+              </span>
             </span>
           )}
         </div>

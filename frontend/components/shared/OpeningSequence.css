@@ -1,20 +1,22 @@
 .opening-screen { position: fixed; inset: 0; z-index: 9999; display: grid; place-items: center; background: #0c0b0a; color: #f6eddc; }
-.opening-nav { position: relative; display: flex; align-items: center; gap: 12px; height: 56px; padding: 0 14px 0 8px; border-radius: 9999px; }
-.opening-nav-bg { position: absolute; inset: 0; border: 1px solid var(--line); border-radius: inherit; background: var(--nav-bg); box-shadow: 0 14px 34px -14px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.04); opacity: 0; }
-.opening-brand { position: relative; z-index: 2; display: flex; align-items: center; flex-shrink: 0; gap: 7px; height: 38px; padding: 0 12px; border-radius: 9999px; background: var(--ink); color: var(--bg); font-size: 14px; font-weight: 700; white-space: nowrap; transform: translateX(calc(63px + clamp(30px, 10vw, 65px))); }
+.opening-nav { position: relative; display: flex; align-items: center; gap: 12px; height: 56px; padding: 0 14px 0 8px; border-radius: 9999px; opacity: 0; will-change: opacity, transform; transform: translateZ(0); }
+.opening-nav-bg { position: absolute; inset: 0; border: 1px solid var(--line); border-radius: inherit; background: var(--nav-bg); box-shadow: 0 14px 34px -14px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.04); opacity: 0; will-change: opacity; }
+.opening-brand { position: relative; z-index: 2; display: flex; align-items: center; flex-shrink: 0; gap: 7px; height: 38px; padding: 0 12px; border-radius: 9999px; background: var(--ink); color: var(--bg); font-size: 14px; font-weight: 700; white-space: nowrap; will-change: transform; transform: translateZ(0); }
 .opening-steps, .opening-step { position: relative; display: flex; align-items: center; }
-.opening-steps { z-index: 1; opacity: 0; }
+.opening-steps { z-index: 1; opacity: 0; will-change: opacity; }
+.opening-step { will-change: transform; transform: translateZ(0); }
 .opening-line { width: clamp(12px, 4vw, 26px); height: 2px; background: var(--line); }
-.opening-line-fill { display: block; height: 100%; background: var(--accent); transform: scaleX(0); transform-origin: left; }
-.opening-dot { position: relative; display: grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; color: var(--bg); background: var(--bg); }
-.opening-dot-outline { position: absolute; inset: 0; border: 1px solid var(--muted); border-radius: inherit; }
-.opening-dot-fill, .opening-dot-glow { position: absolute; inset: 0; border-radius: inherit; background: var(--accent); transform: scale(0); }
-.opening-dot-glow { transform: none; opacity: 0; box-shadow: 0 0 9px var(--glow); }
+.opening-line-fill { display: block; height: 100%; background: var(--accent); transform: scaleX(0); transform-origin: left; will-change: transform; }
+.opening-dot { position: relative; display: grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; color: var(--bg); background: var(--bg); transform: translateZ(0); }
+.opening-dot-outline { position: absolute; inset: 0; border: 1px solid var(--muted); border-radius: inherit; will-change: opacity; }
+.opening-dot-fill, .opening-dot-glow { position: absolute; inset: 0; border-radius: inherit; background: var(--accent); transform: scale(0); will-change: transform, opacity; }
+.opening-dot-glow { transform: none; opacity: 0; box-shadow: 0 0 12px var(--glow); pointer-events: none; }
 .opening-dot svg { position: relative; width: 12px; height: 12px; }
-.opening-check { stroke-dasharray: 1; stroke-dashoffset: 1; }
-.opening-status { position: absolute; top: calc(100% + 20px); left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 8px; font-family: var(--font-jetbrains-mono, monospace); font-size: 11px; font-weight: 500; letter-spacing: 0.06em; color: var(--muted); white-space: nowrap; pointer-events: none; opacity: 0; }
-.opening-status-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 8px var(--glow); opacity: 0.9; animation: openingPulse 1.4s ease-in-out infinite; }
+.opening-check { stroke-dasharray: 1; stroke-dashoffset: 1; will-change: stroke-dashoffset; }
+.opening-status { position: absolute; top: calc(100% + 18px); left: 50%; transform: translateX(-50%) translateZ(0); display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-family: var(--font-jetbrains-mono, monospace); font-size: 11px; font-weight: 500; letter-spacing: 0.06em; color: var(--muted); white-space: nowrap; pointer-events: none; opacity: 0; will-change: opacity, transform; }
+.opening-status-dot { width: 5px; height: 5px; flex-shrink: 0; border-radius: 50%; background: var(--accent); box-shadow: 0 0 8px var(--glow); opacity: 0.9; animation: openingPulse 1.4s ease-in-out infinite; }
+.opening-status-label { display: inline-block; text-align: center; will-change: opacity; }
 @keyframes openingPulse { 0%, 100% { opacity: 0.4; transform: scale(0.85); } 50% { opacity: 1; transform: scale(1.15); } }
-.opening-portal { position: fixed; width: 18px; height: 18px; border-radius: 50%; background: var(--accent); opacity: 0; pointer-events: none; }
+.opening-portal { position: fixed; width: 18px; height: 18px; border-radius: 50%; background: var(--accent); opacity: 0; pointer-events: none; will-change: transform, opacity; transform: translateZ(0); transform-origin: center center; }
 .opening-skip { position: fixed; bottom: 24px; right: 24px; border: 1px solid var(--line); border-radius: 999px; background: var(--nav-bg); color: var(--ink); padding: 8px 14px; font: inherit; font-size: 12px; cursor: pointer; }
 .opening-skip:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }

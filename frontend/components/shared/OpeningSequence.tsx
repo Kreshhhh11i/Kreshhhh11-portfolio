@@ -161,6 +161,11 @@ export function OpeningSequence({ children }: { children: ReactNode }) {
           };
 
           const animateStep = (index: number) => {
+            const isCatchingUp = targetMilestone - index > 0;
+            const lineDur = isCatchingUp ? 0.05 : 0.08;
+            const fillDur = isCatchingUp ? 0.06 : 0.09;
+            const checkDur = isCatchingUp ? 0.06 : 0.09;
+
             const step = stepItems[index];
             const stepTL = gsap.timeline({
               defaults: { ease: easeOut },
@@ -178,7 +183,7 @@ export function OpeningSequence({ children }: { children: ReactNode }) {
             if (index > 0) {
               const line = step.querySelector<HTMLElement>(".opening-line-fill");
               if (line) {
-                stepTL.to(line, { scaleX: 1, duration: 0.14, ease: "none" });
+                stepTL.to(line, { scaleX: 1, duration: lineDur, ease: "power1.inOut" });
               }
             }
 
@@ -187,26 +192,28 @@ export function OpeningSequence({ children }: { children: ReactNode }) {
             const check = step.querySelector<HTMLElement>(".opening-check");
             const glow = step.querySelector<HTMLElement>(".opening-dot-glow");
 
-            if (fill) stepTL.to(fill, { scale: 1, duration: 0.16 }, index > 0 ? ">-0.03" : 0);
-            if (outline) stepTL.to(outline, { opacity: 0, duration: 0.1 }, "<");
-            if (check) stepTL.to(check, { strokeDashoffset: 0, duration: 0.14 }, ">-0.03");
-            if (glow) stepTL.to(glow, { opacity: 0.6, duration: 0.08, yoyo: true, repeat: 1 }, "<");
+            if (fill) stepTL.to(fill, { scale: 1, duration: fillDur, ease: "power2.out" }, index > 0 ? ">-0.02" : 0);
+            if (outline) stepTL.to(outline, { opacity: 0, duration: 0.05 }, "<");
+            if (check) stepTL.to(check, { strokeDashoffset: 0, duration: checkDur, ease: "power2.out" }, ">-0.02");
+            if (glow) {
+              stepTL.fromTo(glow, { opacity: 0, scale: 0.8 }, { opacity: 0.45, scale: 1.2, duration: 0.1, ease: "power2.out" }, "<")
+                .to(glow, { opacity: 0, duration: 0.1, ease: "power2.in" });
+            }
 
             if (statusLabel && index < STATUS_MESSAGES.length) {
               stepTL.to(statusLabel, {
                 opacity: 0,
-                y: -2,
-                duration: 0.06,
+                duration: 0.04,
+                ease: "power1.out",
                 onComplete: () => {
                   statusLabel.textContent = STATUS_MESSAGES[index];
                 }
               }, 0)
               .to(statusLabel, {
                 opacity: 1,
-                y: 0,
-                duration: 0.12,
+                duration: 0.07,
                 ease: "power2.out"
-              }, ">");
+              }, 0.04);
             }
 
             activeTimelines.push(stepTL);
@@ -242,15 +249,18 @@ export function OpeningSequence({ children }: { children: ReactNode }) {
               top: rect.top + rect.height / 2,
               xPercent: -50,
               yPercent: -50,
-              opacity: 1
+              opacity: 1,
+              scale: 1,
+              force3D: true
             })
-            .set(introNav, { opacity: 0 })
+            .to(introNav, { opacity: 0, duration: 0.2, ease: "power2.out" }, 0)
             .to(portal, {
               scale: Math.ceil(Math.hypot(innerWidth, innerHeight) * 2 / 18),
-              duration: 0.65,
-              ease: "power2.in"
-            })
-            .to(screen, { opacity: 0, duration: 0.25, ease: "power2.in" }, ">-0.2")
+              duration: 0.52,
+              ease: "power2.in",
+              force3D: true
+            }, 0.03)
+            .to(screen, { opacity: 0, duration: 0.2, ease: "power2.in" }, ">-0.16")
             .call(finishCurtain);
 
             portalTL.fromTo(navItems, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.55, stagger: STAGGER.nav, clearProps: "opacity,transform" }, "+=0.1");
@@ -286,45 +296,54 @@ export function OpeningSequence({ children }: { children: ReactNode }) {
           // Pacer interval checks real component readiness regularly
           pacerInterval = setInterval(checkComponentProgress, 100);
 
-          // Initial entrance: Brand slides in from 0.44s to ~1.0s
-          timeline.set(introNav, { opacity: 1 })
-            .set(brand, { x: brandOffset })
-            .to(brand, { x: 0, duration: 0.65 }, 0.44)
-            .fromTo(background, { opacity: 0 }, { opacity: 1, duration: 0.55 }, 0.44)
-            .fromTo(steps, { opacity: 0 }, { opacity: 1, duration: 0.08 }, 0.44)
-            .fromTo(stepItems, { x: index => stepOffsets[index] }, { x: 0, duration: 0.65, force3D: true }, 0.44);
+          // Initial entrance: Brand slides in from the center offset smoothly
+          timeline.set(brand, { x: brandOffset, force3D: true })
+            .fromTo(introNav, { opacity: 0 }, { opacity: 1, duration: 0.25, ease: "power2.out" }, 0.06)
+            .to(brand, { x: 0, duration: 0.45, ease: "power3.out", force3D: true }, 0.08)
+            .fromTo(background, { opacity: 0 }, { opacity: 1, duration: 0.35, ease: "power2.out" }, 0.08)
+            .fromTo(steps, { opacity: 0 }, { opacity: 1, duration: 0.15, ease: "power2.out" }, 0.08)
+            .fromTo(stepItems, { x: index => stepOffsets[index] }, { x: 0, duration: 0.45, ease: "power3.out", force3D: true }, 0.08);
 
           if (statusEl) {
-            timeline.fromTo(statusEl, { opacity: 0, y: 6 }, { opacity: 1, y: 0, duration: 0.4 }, 0.55);
+            timeline.fromTo(statusEl, { opacity: 0, y: 4 }, { opacity: 1, y: 0, duration: 0.25, ease: "power2.out" }, 0.2);
           }
 
           timeline.call(() => {
               // Brand settled in position: Milestone 0 (System Init)
               advanceMilestone(0);
               checkComponentProgress();
-            }, [], 1.0)
+            }, [], 0.35)
             .call(() => {
               // Milestone 1 (Asset Preload Active)
               advanceMilestone(1);
               checkComponentProgress();
-            }, [], 1.18)
+            }, [], 0.52)
             .call(() => {
               // Milestone 2 (3D Canvases Mounted)
               advanceMilestone(2);
               checkComponentProgress();
-            }, [], 1.34)
+            }, [], 0.69)
             .call(() => {
               // Milestone 3 (Shaders & Geometries Active)
               advanceMilestone(3);
               checkComponentProgress();
-            }, [], 1.50);
+            }, [], 0.86)
+            .call(() => {
+              // Milestone 4 (Component Readiness)
+              advanceMilestone(4);
+              checkComponentProgress();
+            }, [], 1.03)
+            .call(() => {
+              // Milestone 5 (Final Engine Ready)
+              advanceMilestone(5);
+            }, [], 1.20);
 
-          // Safety guard: if something is delayed or fails on a low-end phone, advance after 6s
+          // Safety guard: if something is delayed or fails on a low-end phone, advance after 2.8s
           fallbackTimer = setTimeout(() => {
             if (!curtainFinished && !disposed) {
               advanceMilestone(5);
             }
-          }, 6000);
+          }, 2800);
         } else {
           gsap.set(screen, { display: "none" });
           timeline.call(finishCurtain, [], 0);

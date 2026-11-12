@@ -345,8 +345,8 @@ export default function Scene({
         near: 0.1,
         far: 100,
       }}
-      className={`w-full h-full ${isFlatView ? 'cursor-default' : 'cursor-grab active:cursor-grabbing'}`}
-      style={{ touchAction: 'pan-y' }}
+      className={`w-full h-full touch-none ${isFlatView ? 'cursor-default' : 'cursor-grab active:cursor-grabbing'}`}
+      style={{ touchAction: 'none' }}
     >
       <FirstFrame onReady={handleReady} />
       <AnimateOnChange values={[layoutPoints, currentIndex, targetIndex, activeCategory, isFlatView, hoveredTileId, introStarted, isInView]} />

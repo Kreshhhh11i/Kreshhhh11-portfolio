@@ -4,6 +4,7 @@
   height: 100%;
   outline: none;
   -webkit-tap-highlight-color: transparent;
+  touch-action: pan-y;
 }
 
 .card-swap-sizer {
@@ -44,7 +45,7 @@
   pointer-events: auto;
   user-select: none;
   -webkit-user-select: none;
-  touch-action: pan-y;
+  touch-action: none !important;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
 }
