@@ -6,14 +6,14 @@ import "./globals.css";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
-  display: "block",
+  display: "swap",
   preload: true,
 });
 
 const jetBrainsMono = JetBrains_Mono({
   variable: "--font-jetbrains-mono",
   subsets: ["latin"],
-  display: "block",
+  display: "swap",
   preload: true,
 });
 

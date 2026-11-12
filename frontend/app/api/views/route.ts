@@ -1,1 +1,1 @@
-export { POST } from '@backend/api/views/route';
+export { GET, POST } from '@backend/api/views/route';

@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import { useHeroSettled } from '@/components/shared/useHeroSettled';
+import { useIntroFinished } from '@/components/shared/useIntroFinished';
 import './SkillsRoad.css';
 import {
   SKILLS_ROAD_DATA,
@@ -63,6 +64,33 @@ function CategoryIcon({ category }: { category: SkillCategory | 'All' }) {
 
 export function SkillsRoad() {
   const heroSettled = useHeroSettled();
+  const introFinished = useIntroFinished();
+  const [cardReady, setCardReady] = useState(false);
+  useEffect(() => {
+    if (!introFinished || !heroSettled) return;
+    const ready = () => setCardReady(true);
+    if (document.documentElement.dataset.lanyardSettled === 'true') {
+      ready();
+      return;
+    }
+    window.addEventListener('portfolio:lanyard-settled', ready);
+    const onLanyardReady = () => {
+      // Allow the ID card to smoothly swing and settle before mounting the skill board
+      window.setTimeout(ready, 2200);
+    };
+    if (document.documentElement.dataset.lanyardReady === 'true') {
+      onLanyardReady();
+    } else {
+      window.addEventListener('portfolio:lanyard-ready', onLanyardReady, { once: true });
+    }
+    // A failed WebGL context or image must not prevent the board from loading.
+    const timeout = window.setTimeout(ready, 6000);
+    return () => {
+      window.removeEventListener('portfolio:lanyard-settled', ready);
+      window.removeEventListener('portfolio:lanyard-ready', onLanyardReady);
+      window.clearTimeout(timeout);
+    };
+  }, [introFinished, heroSettled]);
   const containerRef = useRef<HTMLDivElement>(null);
   const diceIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const categoryMenuRef = useRef<HTMLDivElement>(null);
@@ -416,7 +444,7 @@ export function SkillsRoad() {
 
       {/* 3D CANVAS VIEWPORT (Clean container without corner edges or hover glow) */}
       <div className="content-frame w-full h-[390px] sm:h-[520px] md:h-[620px] bg-[#0a0a0a] overflow-hidden">
-        {heroSettled && <SceneErrorBoundary onError={handleBoardError}><Scene
+        {introFinished && heroSettled && cardReady && <SceneErrorBoundary onError={handleBoardError}><Scene
           skills={SKILLS_ROAD_DATA}
           layoutPoints={currentLayoutPoints}
           currentIndex={currentIndex}

@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import "./signature.css";
 import { Signature } from "./Signature";
 import { preloadEnvironment } from "@/components/Lanyard/precomputedEnvironment";
+import { useIntroFinished } from "@/components/shared/useIntroFinished";
 
 const Lanyard = dynamic(() => import("@/components/Lanyard/Lanyard"), {
   ssr: false,
@@ -17,13 +18,24 @@ const Lanyard = dynamic(() => import("@/components/Lanyard/Lanyard"), {
 });
 
 export function HeroLanyard() {
+  const introFinished = useIntroFinished();
   const [environmentReady, setEnvironmentReady] = useState(false);
+
   useEffect(() => {
-    let active = true;
-    const timer = window.setTimeout(() => { if (active) setEnvironmentReady(true); }, 1600);
-    void preloadEnvironment().finally(() => { if (active) setEnvironmentReady(true); });
-    return () => { active = false; window.clearTimeout(timer); };
+    // Preload environment data and card image in background during opening sequence
+    void preloadEnvironment();
+    if (typeof window !== "undefined") {
+      const img = new Image();
+      img.src = "/lanyard/Portfolio-img.webp";
+    }
   }, []);
+
+  useEffect(() => {
+    if (!introFinished) return;
+    let active = true;
+    void preloadEnvironment().finally(() => { if (active) setEnvironmentReady(true); });
+    return () => { active = false; };
+  }, [introFinished]);
   const containerRef = useRef<HTMLDivElement>(null);
   // Keep the first client render identical to the server-rendered markup.
   // The effect below measures the viewport and updates both values afterwards.
@@ -96,7 +108,6 @@ export function HeroLanyard() {
       </div>
       {environmentReady && <Lanyard
         frontImage="/lanyard/Portfolio-img.webp"
-        backImage="/lanyard/card-back.png"
         cardColor="#101010"
         orientation="portrait"
         finish="matte"

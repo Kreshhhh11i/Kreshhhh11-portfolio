@@ -93,6 +93,7 @@ export function SigningBox() {
   const padRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const previewDialogRef = useRef<HTMLDialogElement>(null);
   const galleryButtonRef = useRef<HTMLButtonElement>(null);
 
   const [strokes, setStrokes] = useState<Stroke[]>([]);
@@ -111,6 +112,7 @@ export function SigningBox() {
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(false);
   const [galleryOpen, setGalleryOpen] = useState(false);
+  const [selectedSignature, setSelectedSignature] = useState<SignatureItem | null>(null);
   const [removing, setRemoving] = useState<string | null>(null);
 
   const currentStrokeRef = useRef<Stroke | null>(null);
@@ -232,6 +234,13 @@ export function SigningBox() {
     return () => { if (dialog.open) dialog.close(); document.body.style.overflow = previousOverflow; returnFocus?.focus(); };
   }, [galleryOpen]);
 
+  useEffect(() => {
+    const dialog = previewDialogRef.current;
+    if (!dialog || !selectedSignature) return;
+    dialog.showModal();
+    return () => { if (dialog.open) dialog.close(); };
+  }, [selectedSignature]);
+
   const showToast = (msg: string) => {
     setToast(msg);
     if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
@@ -348,7 +357,9 @@ export function SigningBox() {
   };
 
   const renderTile = (sig: SignatureItem, compact = false) => <div key={sig.id} className={`sb-tile group relative min-w-0 min-h-0 ${compact ? 'w-full h-full' : 'aspect-[2/1]'} rounded-lg border border-dashed border-[var(--sb-line)] bg-[var(--sb-surface)] flex items-center justify-center p-2.5`}>
-    <SignaturePreview drawing={sig.drawing} />
+    <button type="button" onClick={() => setSelectedSignature(sig)} aria-label="Enlarge visitor drawing" className="w-full h-full min-h-0 cursor-pointer rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--sb-accent)]">
+      <SignaturePreview drawing={sig.drawing} />
+    </button>
     {ownership[sig.id] && <button type="button" onClick={() => void removeSignature(sig.id)} disabled={removing === sig.id} aria-label="Remove your drawing" className="absolute top-1 right-1 w-7 h-7 flex items-center justify-center rounded-full bg-[var(--sb-bg)] text-[var(--sb-muted)] hover:text-[var(--sb-accent)] transition-opacity font-mono text-sm border border-[var(--sb-line)] cursor-pointer disabled:opacity-40">×</button>}
   </div>;
 
@@ -537,6 +548,11 @@ export function SigningBox() {
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">{signatures.map(sig => renderTile(sig))}</div>
         {wallError && <p role="alert" className="text-sm text-[var(--sb-muted)] mt-4">{wallError}</p>}
         {hasMore && <button type="button" disabled={loadingMore} onClick={() => void loadWall(signatures.length)} className="mt-6 rounded-full border border-[var(--sb-line)] px-5 py-2 text-xs font-mono disabled:opacity-50">{loadingMore ? 'Loading…' : 'Load more'}</button>}
+      </dialog>
+
+      <dialog ref={previewDialogRef} aria-label="Visitor drawing" onClose={() => setSelectedSignature(null)} onClick={event => { if (event.target === event.currentTarget) event.currentTarget.close(); }} className="m-auto w-[min(92vw,720px)] rounded-xl border border-[var(--sb-line)] bg-[var(--sb-surface)] text-[var(--sb-ink)] p-5 sm:p-8 backdrop:bg-black/75">
+        <div className="flex justify-end mb-4"><button type="button" onClick={() => previewDialogRef.current?.close()} aria-label="Close drawing" className="w-10 h-10 rounded-full border border-[var(--sb-line)] text-xl cursor-pointer">×</button></div>
+        <div className="h-[min(48vh,360px)] w-full">{selectedSignature && <SignaturePreview drawing={selectedSignature.drawing} />}</div>
       </dialog>
 
       {/* Toast Notification */}

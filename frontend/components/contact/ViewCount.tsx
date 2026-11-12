@@ -2,18 +2,24 @@
 
 import { useEffect, useState } from "react";
 
-// Reuse the request when React re-runs effects in development.
-let viewRequest: Promise<number | null> | undefined;
+declare global {
+  interface Window {
+    __portfolio_view_promise__?: Promise<number | null>;
+  }
+}
 
 function recordView() {
-  viewRequest ??= fetch("/api/views", { method: "POST" })
-    .then(async (response) => {
-      if (!response.ok) return null;
-      const data: { count?: unknown } = await response.json();
-      return typeof data.count === "number" ? data.count : null;
-    })
-    .catch(() => null);
-  return viewRequest;
+  if (typeof window === "undefined") return Promise.resolve(null);
+  if (!window.__portfolio_view_promise__) {
+    window.__portfolio_view_promise__ = fetch("/api/views", { method: "POST" })
+      .then(async (response) => {
+        if (!response.ok) return null;
+        const data: { count?: unknown } = await response.json();
+        return typeof data.count === "number" ? data.count : null;
+      })
+      .catch(() => null);
+  }
+  return window.__portfolio_view_promise__;
 }
 
 export function ViewCount() {

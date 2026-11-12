@@ -199,9 +199,12 @@ const traceRoundedRect = (path, x, y, width, height, radius) => {
   path.bezierCurveTo(x, y + k, x + k, y, x + r, y);
 };
 
-const loadImage = (cache, url) => {
+const lanyardImageCache = new Map();
+
+const loadImage = (cache = lanyardImageCache, url) => {
   if (!url) return Promise.resolve(null);
-  const cached = cache.get(url);
+  const cacheMap = cache || lanyardImageCache;
+  const cached = cacheMap.get(url);
   if (cached) return cached;
   const promise = new Promise(resolve => {
     const image = new Image();
@@ -211,7 +214,7 @@ const loadImage = (cache, url) => {
     image.onerror = () => resolve(null);
     image.src = url;
   });
-  cache.set(url, promise);
+  cacheMap.set(url, promise);
   return promise;
 };
 
@@ -1233,6 +1236,8 @@ const Lanyard = ({
     canvas.className = 'lanyard-canvas';
     canvas.style.pointerEvents = 'none';
     canvas.setAttribute('aria-hidden', 'true');
+    canvas.style.opacity = '0';
+    canvas.style.transition = 'opacity 0.25s ease-out';
     container.appendChild(canvas);
 
     const anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
@@ -1362,6 +1367,7 @@ const Lanyard = ({
       readySignaled = true;
       // Upload the finished textures and draw once before revealing the hero.
       render();
+      canvas.style.opacity = '1';
       document.documentElement.dataset.lanyardReady = 'true';
       window.dispatchEvent(new Event('portfolio:lanyard-ready'));
     };
@@ -1485,12 +1491,6 @@ const Lanyard = ({
       start();
     };
 
-    if (typeof document !== 'undefined' && document.fonts?.ready) {
-      document.fonts.ready.then(() => {
-        if (alive) paintFaces();
-      });
-    }
-
     const repaintStrap = () => {
       const s = settingsRef.current;
       tileRatio = paintStrap(strapCanvas, images.strap, parseColor(s.strapColor, [0.07, 0.07, 0.07]));
@@ -1562,7 +1562,8 @@ const Lanyard = ({
           loadImage(imageCache, s.frontImage),
           loadImage(imageCache, s.backImage),
           loadImage(imageCache, s.strapImage),
-          loadImage(imageCache, SPOTIFY_CONFIG.codeImage)
+          loadImage(imageCache, SPOTIFY_CONFIG.codeImage),
+          typeof document !== 'undefined' && document.fonts?.ready ? document.fonts.ready : Promise.resolve()
         ]).then(([front, back, strap, spotifyCode]) => {
           if (!alive || token !== imageToken) return;
           images.front = front;
@@ -1573,6 +1574,7 @@ const Lanyard = ({
           repaintStrap();
           facesReady = true;
           signalReady();
+          start();
         });
       }
       const faceKey = `${layoutKey}|${s.cardColor}|${s.imageFit}`;
@@ -1757,12 +1759,16 @@ const Lanyard = ({
       if (isShaking || isButtonHovered || isArrowAnimating || (prevArrowProgress !== arrowProgress)) {
         updateBackCanvas();
       }
+      if (introStarted && performance.now() - introStartedAt > 2200 && !document.documentElement.dataset.lanyardSettled) {
+        document.documentElement.dataset.lanyardSettled = 'true';
+        window.dispatchEvent(new Event('portfolio:lanyard-settled'));
+      }
       const resting = sim.calm > 1.2 && !sim.grab && current.breeze === 0 && !isShaking && !isButtonHovered && !isArrowAnimating;
       if ((visible || sim.grab) && !resting) raf = requestAnimationFrame(tick);
     };
 
     const start = () => {
-      if (raf || (!visible && !sim.grab) || !alive || !introComplete || !placed || !shadersReady) return;
+      if (raf || (!visible && !sim.grab) || !alive || !introComplete || !placed || !shadersReady || !facesReady) return;
       if (!introStarted) {
         introStarted = true;
         introStartedAt = performance.now();
@@ -2034,6 +2040,7 @@ const Lanyard = ({
       alive = false;
       hideDragOverlay();
       delete document.documentElement.dataset.lanyardReady;
+      delete document.documentElement.dataset.lanyardSettled;
       cancelAnimationFrame(raf);
       window.clearTimeout(shaderTimeout);
       applyRef.current = null;

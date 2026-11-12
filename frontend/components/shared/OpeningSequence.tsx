@@ -22,38 +22,7 @@ export function OpeningSequence({ children }: { children: ReactNode }) {
     let heroTimeline: gsap.core.Timeline | undefined;
     let headlineStarted = false;
     let cancelReadyWait = () => {};
-    const readySections = new Set<string>();
-    let homeImageReady = false;
-    let resolveSectionsReady = () => {};
-    let sectionsReadyToReveal = false;
-    let waitingForSections = false;
     let readinessTimeout: ReturnType<typeof setTimeout> | undefined;
-    const image = new Image();
-    const checkSectionsReady = () => {
-      if (SECTION_IDS.every(id => readySections.has(id)) && homeImageReady && document.documentElement.dataset.lanyardReady === "true") {
-        resolveSectionsReady();
-      }
-    };
-    const onSectionReady = (event: Event) => {
-      const id = (event as CustomEvent<string>).detail;
-      if (SECTION_IDS.some(section => section === id)) readySections.add(id);
-      checkSectionsReady();
-    };
-    window.addEventListener("portfolio:section-ready", onSectionReady);
-    window.addEventListener("portfolio:lanyard-ready", checkSectionsReady);
-    for (const id of SECTION_IDS) {
-      if (document.getElementById(id)?.dataset.introReady === "true") readySections.add(id);
-    }
-    // Prepare the card image alongside its scene while the intro is visible.
-    const finishImage = () => {
-      clearTimeout(imageTimeout);
-      homeImageReady = true;
-      checkSectionsReady();
-    };
-    const imageTimeout = setTimeout(finishImage, 2000);
-    image.onload = () => { void image.decode().catch(() => {}).finally(finishImage); };
-    image.onerror = finishImage;
-    image.src = "/lanyard/Portfolio-img.webp";
     const preference = window.matchMedia("(prefers-reduced-motion: reduce)");
     const originalOverflow = document.body.style.overflow;
     const showCurtain = !preference.matches;
@@ -82,7 +51,6 @@ export function OpeningSequence({ children }: { children: ReactNode }) {
       timeline?.kill();
       heroTimeline?.kill();
       context.revert();
-      resolveSectionsReady();
       cueHeadline();
       finishCurtain();
       finishHero();
@@ -91,7 +59,7 @@ export function OpeningSequence({ children }: { children: ReactNode }) {
 
     const onVisibility = () => {
       if (document.hidden) { timeline?.pause(); heroTimeline?.pause(); }
-      else { if (!waitingForSections) timeline?.resume(); if (headlineStarted) heroTimeline?.resume(); }
+      else { timeline?.resume(); if (headlineStarted) heroTimeline?.resume(); }
     };
     const onHeadlineStart = () => {
       headlineStarted = true;
@@ -117,17 +85,7 @@ export function OpeningSequence({ children }: { children: ReactNode }) {
         window.addEventListener("portfolio:motion-ready", check);
         check();
       });
-      const sectionsReady = new Promise<void>(resolve => {
-        resolveSectionsReady = () => { sectionsReadyToReveal = true; resolve(); };
-        checkSectionsReady();
-      });
-      void sectionsReady.then(() => {
-        if (waitingForSections && !disposed && !curtainFinished) {
-          waitingForSections = false;
-          if (!document.hidden) timeline?.play();
-        }
-      });
-      await Promise.all([document.fonts.ready, componentsReady]);
+      await componentsReady;
       if (disposed || curtainFinished) return;
       const navItems = gsap.utils.toArray<HTMLElement>(".nav-wrap .brand, .nav-wrap .step, .nav-wrap .tools");
       const socialIcons = gsap.utils.toArray<HTMLElement>(".hero-social-btn");
@@ -178,12 +136,6 @@ export function OpeningSequence({ children }: { children: ReactNode }) {
             if (index > 0) timeline!.to(step.querySelector(".opening-line-fill"), { scaleX: 1, duration: 0.13, ease: "none" }, at - 0.08);
           });
           timeline.call(() => {
-              if (!sectionsReadyToReveal) {
-                waitingForSections = true;
-                timeline?.pause();
-              }
-            }, [], 1.979)
-            .call(() => {
               const rect = last.getBoundingClientRect();
               gsap.set(portal, { left: rect.left + rect.width / 2, top: rect.top + rect.height / 2, xPercent: -50, yPercent: -50, opacity: 1 });
             }, [], 1.98)
@@ -209,13 +161,7 @@ export function OpeningSequence({ children }: { children: ReactNode }) {
     return () => {
       disposed = true;
       cancelReadyWait();
-      resolveSectionsReady();
-      clearTimeout(imageTimeout);
       if (readinessTimeout) clearTimeout(readinessTimeout);
-      image.onload = null;
-      image.onerror = null;
-      window.removeEventListener("portfolio:section-ready", onSectionReady);
-      window.removeEventListener("portfolio:lanyard-ready", checkSectionsReady);
       context.revert();
       document.body.style.overflow = originalOverflow;
       delete document.documentElement.dataset.heroCue;
