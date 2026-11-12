@@ -12,6 +12,9 @@
 .opening-dot-glow { transform: none; opacity: 0; box-shadow: 0 0 9px var(--glow); }
 .opening-dot svg { position: relative; width: 12px; height: 12px; }
 .opening-check { stroke-dasharray: 1; stroke-dashoffset: 1; }
+.opening-status { position: absolute; top: calc(100% + 20px); left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 8px; font-family: var(--font-jetbrains-mono, monospace); font-size: 11px; font-weight: 500; letter-spacing: 0.06em; color: var(--muted); white-space: nowrap; pointer-events: none; opacity: 0; }
+.opening-status-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 8px var(--glow); opacity: 0.9; animation: openingPulse 1.4s ease-in-out infinite; }
+@keyframes openingPulse { 0%, 100% { opacity: 0.4; transform: scale(0.85); } 50% { opacity: 1; transform: scale(1.15); } }
 .opening-portal { position: fixed; width: 18px; height: 18px; border-radius: 50%; background: var(--accent); opacity: 0; pointer-events: none; }
 .opening-skip { position: fixed; bottom: 24px; right: 24px; border: 1px solid var(--line); border-radius: 999px; background: var(--nav-bg); color: var(--ink); padding: 8px 14px; font: inherit; font-size: 12px; cursor: pointer; }
 .opening-skip:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }

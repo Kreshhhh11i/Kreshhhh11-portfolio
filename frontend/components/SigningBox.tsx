@@ -36,14 +36,86 @@ function ownerTokens(identity: string, entries: Record<string, string>) {
   return [...new Set([identity, ...Object.values(entries)].filter(token => tokenPattern.test(token)))].slice(0, 100);
 }
 
+export function straightenStrokes(strokes: Stroke[]): Stroke[] {
+  const allPoints = strokes.flatMap(s => s.points);
+  if (allPoints.length < 4) return strokes;
+
+  let sumX = 0, sumY = 0;
+  for (const p of allPoints) {
+    sumX += p.x;
+    sumY += p.y;
+  }
+  const cx = sumX / allPoints.length;
+  const cy = sumY / allPoints.length;
+
+  let varX = 0, varY = 0, covXY = 0;
+  for (const p of allPoints) {
+    const dx = p.x - cx;
+    const dy = p.y - cy;
+    varX += dx * dx;
+    varY += dy * dy;
+    covXY += dx * dy;
+  }
+
+  const diff = varX - varY;
+  const discriminant = Math.sqrt(diff * diff + 4 * covXY * covXY);
+  const lambda1 = (varX + varY + discriminant) / 2;
+  const lambda2 = (varX + varY - discriminant) / 2;
+  if (lambda1 / (lambda2 || 1) < 1.35) {
+    return strokes;
+  }
+
+  const theta = 0.5 * Math.atan2(2 * covXY, diff);
+  const deg = (theta * 180) / Math.PI;
+  if (Math.abs(deg) < 12) {
+    return strokes;
+  }
+
+  const cosT = Math.cos(-theta);
+  const sinT = Math.sin(-theta);
+
+  const sampleCount = Math.max(1, Math.floor(allPoints.length * 0.25));
+  let startX = 0, endX = 0;
+  for (let i = 0; i < sampleCount; i++) {
+    const p = allPoints[i];
+    const dx = p.x - cx, dy = p.y - cy;
+    startX += dx * cosT - dy * sinT;
+  }
+  startX /= sampleCount;
+
+  for (let i = allPoints.length - sampleCount; i < allPoints.length; i++) {
+    const p = allPoints[i];
+    const dx = p.x - cx, dy = p.y - cy;
+    endX += dx * cosT - dy * sinT;
+  }
+  endX /= sampleCount;
+
+  const finalAngle = startX > endX ? -theta + Math.PI : -theta;
+  const finalCos = Math.cos(finalAngle);
+  const finalSin = Math.sin(finalAngle);
+
+  return strokes.map(stroke => ({
+    ...stroke,
+    points: stroke.points.map(p => {
+      const dx = p.x - cx;
+      const dy = p.y - cy;
+      return {
+        x: Math.round((cx + (dx * finalCos - dy * finalSin)) * 10) / 10,
+        y: Math.round((cy + (dx * finalSin + dy * finalCos)) * 10) / 10,
+      };
+    }),
+  }));
+}
+
 function SignaturePreview({ drawing }: { drawing: SignatureItem['drawing'] }) {
-  const all = drawing.strokes.flatMap(s => s.points);
+  const straightened = React.useMemo(() => straightenStrokes(drawing.strokes), [drawing.strokes]);
+  const all = straightened.flatMap(s => s.points);
   if (!all.length) return null;
   const xs = all.map(p => p.x), ys = all.map(p => p.y);
   const minX = Math.min(...xs) - 10, minY = Math.min(...ys) - 10;
   const width = Math.max(20, Math.max(...xs) - minX + 10), height = Math.max(20, Math.max(...ys) - minY + 10);
   return <svg role="img" aria-label="Visitor drawing" viewBox={`${minX} ${minY} ${width} ${height}`} className="max-w-full max-h-full w-full h-full" preserveAspectRatio="xMidYMid meet">
-    {drawing.strokes.map((stroke, i) => stroke.points.length === 1
+    {straightened.map((stroke, i) => stroke.points.length === 1
       ? <circle key={i} cx={stroke.points[0].x} cy={stroke.points[0].y} r={stroke.width / 2} fill={stroke.color === 'ink' ? 'var(--sb-ink)' : stroke.color} />
       : <polyline key={i} points={stroke.points.map(p => `${p.x},${p.y}`).join(' ')} fill="none" stroke={stroke.color === 'ink' ? 'var(--sb-ink)' : stroke.color} strokeWidth={stroke.width} strokeLinecap="round" strokeLinejoin="round" />)}
   </svg>;

@@ -52,21 +52,102 @@ function validDrawing(value: unknown): boolean {
   return true;
 }
 function apiHeaders(key: string) { return { apikey: key, 'Content-Type': 'application/json' }; }
-type Drawing = { width: number; height: number; strokes: { color: string; width: number; points: { x: number; y: number }[] }[] };
+type Stroke = { color: string; width: number; points: { x: number; y: number }[] };
+type Drawing = { width: number; height: number; strokes: Stroke[] };
+
+function straightenStrokes(strokes: Stroke[]): Stroke[] {
+  const allPoints = strokes.flatMap(s => s.points);
+  if (allPoints.length < 4) return strokes;
+
+  let sumX = 0, sumY = 0;
+  for (const p of allPoints) {
+    sumX += p.x;
+    sumY += p.y;
+  }
+  const cx = sumX / allPoints.length;
+  const cy = sumY / allPoints.length;
+
+  let varX = 0, varY = 0, covXY = 0;
+  for (const p of allPoints) {
+    const dx = p.x - cx;
+    const dy = p.y - cy;
+    varX += dx * dx;
+    varY += dy * dy;
+    covXY += dx * dy;
+  }
+
+  const diff = varX - varY;
+  const discriminant = Math.sqrt(diff * diff + 4 * covXY * covXY);
+  const lambda1 = (varX + varY + discriminant) / 2;
+  const lambda2 = (varX + varY - discriminant) / 2;
+  if (lambda1 / (lambda2 || 1) < 1.35) {
+    return strokes;
+  }
+
+  const theta = 0.5 * Math.atan2(2 * covXY, diff);
+  const deg = (theta * 180) / Math.PI;
+  if (Math.abs(deg) < 12) {
+    return strokes;
+  }
+
+  const cosT = Math.cos(-theta);
+  const sinT = Math.sin(-theta);
+
+  const sampleCount = Math.max(1, Math.floor(allPoints.length * 0.25));
+  let startX = 0, endX = 0;
+  for (let i = 0; i < sampleCount; i++) {
+    const p = allPoints[i];
+    const dx = p.x - cx, dy = p.y - cy;
+    startX += dx * cosT - dy * sinT;
+  }
+  startX /= sampleCount;
+
+  for (let i = allPoints.length - sampleCount; i < allPoints.length; i++) {
+    const p = allPoints[i];
+    const dx = p.x - cx, dy = p.y - cy;
+    endX += dx * cosT - dy * sinT;
+  }
+  endX /= sampleCount;
+
+  const finalAngle = startX > endX ? -theta + Math.PI : -theta;
+  const finalCos = Math.cos(finalAngle);
+  const finalSin = Math.sin(finalAngle);
+
+  return strokes.map(stroke => ({
+    ...stroke,
+    points: stroke.points.map(p => {
+      const dx = p.x - cx;
+      const dy = p.y - cy;
+      return {
+        x: Math.round((cx + (dx * finalCos - dy * finalSin)) * 10) / 10,
+        y: Math.round((cy + (dx * finalSin + dy * finalCos)) * 10) / 10,
+      };
+    }),
+  }));
+}
+
 async function createPreview(drawing: Drawing) {
-  // Drawing is validated before this function is called. Only numeric coordinates
-  // and a fixed color palette enter the SVG, which is rasterized on the server.
-  const shapes = drawing.strokes.map(stroke => {
+  // Drawing is validated before this function is called.
+  // Straighten any tilted or mobile vertical strokes before rasterizing.
+  const straightened = straightenStrokes(drawing.strokes);
+  const allPts = straightened.flatMap(s => s.points);
+  const xs = allPts.map(p => p.x), ys = allPts.map(p => p.y);
+  const minX = allPts.length ? Math.min(...xs) - 10 : 0;
+  const minY = allPts.length ? Math.min(...ys) - 10 : 0;
+  const w = allPts.length ? Math.max(20, Math.max(...xs) - minX + 10) : drawing.width;
+  const h = allPts.length ? Math.max(20, Math.max(...ys) - minY + 10) : drawing.height;
+
+  const shapes = straightened.map(stroke => {
     const color = stroke.color === 'ink' ? '#1b1712' : stroke.color;
     const points = stroke.points.map(point => `${point.x},${point.y}`).join(' ');
     return stroke.points.length === 1
       ? `<circle cx="${stroke.points[0].x}" cy="${stroke.points[0].y}" r="${stroke.width / 2}" fill="${color}"/>`
       : `<polyline points="${points}" fill="none" stroke="${color}" stroke-width="${stroke.width}" stroke-linecap="round" stroke-linejoin="round"/>`;
   }).join('');
-  const scale = Math.min(1, 800 / drawing.width, 500 / drawing.height);
-  const width = Math.max(1, Math.round(drawing.width * scale));
-  const height = Math.max(1, Math.round(drawing.height * scale));
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${drawing.width} ${drawing.height}"><rect width="100%" height="100%" fill="#fff"/>${shapes}</svg>`;
+  const scale = Math.min(1, 800 / w, 500 / h);
+  const width = Math.max(1, Math.round(w * scale));
+  const height = Math.max(1, Math.round(h * scale));
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="${minX} ${minY} ${w} ${h}"><rect x="${minX}" y="${minY}" width="${w}" height="${h}" fill="#fff"/>${shapes}</svg>`;
   return sharp(Buffer.from(svg)).png().toBuffer();
 }
 export async function GET(request: Request) {

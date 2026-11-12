@@ -63,28 +63,11 @@ function CategoryIcon({ category }: { category: SkillCategory | 'All' }) {
 
 export function SkillsRoad() {
   const introFinished = useIntroFinished();
-  const [boardMounted, setBoardMounted] = useState(false);
+  const [boardMounted, setBoardMounted] = useState(true);
 
   useEffect(() => {
-    // Preload Scene chunk in background while intro plays so it is cached when the last circle ticks
+    // Preload Scene chunk in background while intro plays
     void import('./Scene');
-  }, []);
-
-  useEffect(() => {
-    const mount = () => setBoardMounted(true);
-    if (
-      document.documentElement.dataset.startBackgroundRender === "true" ||
-      document.documentElement.dataset.introComplete === "true"
-    ) {
-      setBoardMounted(true);
-      return;
-    }
-    window.addEventListener("portfolio:start-background-render", mount, { once: true });
-    window.addEventListener("portfolio:intro-complete", mount, { once: true });
-    return () => {
-      window.removeEventListener("portfolio:start-background-render", mount);
-      window.removeEventListener("portfolio:intro-complete", mount);
-    };
   }, []);
   const containerRef = useRef<HTMLDivElement>(null);
   const diceIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);

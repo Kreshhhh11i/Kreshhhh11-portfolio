@@ -23,8 +23,7 @@ export function OpeningSequence({ children }: { children: ReactNode }) {
     let headlineStarted = false;
     let cancelReadyWait = () => {};
     let readinessTimeout: ReturnType<typeof setTimeout> | undefined;
-    let isHoldingForComponents = false;
-    let holdSafetyTimer: ReturnType<typeof setTimeout> | undefined;
+    const activeTimelines: gsap.core.Timeline[] = [];
     let cleanHoldListeners = () => {};
     const preference = window.matchMedia("(prefers-reduced-motion: reduce)");
     const originalOverflow = document.body.style.overflow;
@@ -44,7 +43,6 @@ export function OpeningSequence({ children }: { children: ReactNode }) {
       if (curtainFinished || disposed) return;
       curtainFinished = true;
       if (readinessTimeout) clearTimeout(readinessTimeout);
-      if (holdSafetyTimer) clearTimeout(holdSafetyTimer);
       cleanHoldListeners();
       document.body.style.overflow = originalOverflow;
       document.documentElement.dataset.introComplete = "true";
@@ -53,10 +51,10 @@ export function OpeningSequence({ children }: { children: ReactNode }) {
     };
     const skip = () => {
       if (disposed) return;
-      if (holdSafetyTimer) clearTimeout(holdSafetyTimer);
       cleanHoldListeners();
       timeline?.kill();
       heroTimeline?.kill();
+      activeTimelines.forEach(t => t.kill());
       context.revert();
       cueHeadline();
       finishCurtain();
@@ -68,8 +66,10 @@ export function OpeningSequence({ children }: { children: ReactNode }) {
       if (document.hidden) {
         timeline?.pause();
         heroTimeline?.pause();
+        activeTimelines.forEach(t => t.pause());
       } else {
-        if (!isHoldingForComponents) timeline?.resume();
+        timeline?.resume();
+        activeTimelines.forEach(t => t.resume());
         if (headlineStarted) heroTimeline?.resume();
       }
     };
@@ -106,12 +106,6 @@ export function OpeningSequence({ children }: { children: ReactNode }) {
       const label = document.querySelector<HTMLElement>("[data-hero-label]");
       const buttons = gsap.utils.toArray<HTMLElement>("[data-hero-actions] > a");
       const easeOut = cubicBezier(...EASE_OUT);
-      const atLastTick = 2.0;
-      const portalStart = 2.05;
-      const portalDuration = 0.65;
-      const screenFadeDuration = 0.25;
-      const curtainFinishAt = portalStart + 0.9;
-      const revealStart = showCurtain ? curtainFinishAt : 0;
 
       context.add(() => {
         // Translate/opacity only: layout and interactive hero artwork stay untouched.
@@ -132,96 +126,209 @@ export function OpeningSequence({ children }: { children: ReactNode }) {
           const stepItems = Array.from(steps.querySelectorAll<HTMLElement>(".opening-step"));
           const last = screen.querySelector<HTMLElement>(".opening-dot--last")!;
           const portal = screen.querySelector<HTMLElement>(".opening-portal")!;
+          const statusEl = screen.querySelector<HTMLElement>(".opening-status");
+          const statusLabel = screen.querySelector<HTMLElement>(".opening-status-label");
           const brandOffset = introNav.offsetWidth / 2 - (brand.offsetLeft + brand.offsetWidth / 2);
           const origin = brand.offsetLeft + brand.offsetWidth / 2 + brandOffset;
           // Measure before the timeline makes any changes, rather than forcing
           // layout as each dot begins to move.
           const stepOffsets = stepItems.map(item => origin - (steps.offsetLeft + item.offsetLeft + item.offsetWidth / 2));
+
+          const STATUS_MESSAGES = [
+            "Loading fonts & styles…",
+            "Loading 3D assets & textures…",
+            "Mounting WebGL canvases…",
+            "Compiling shaders & materials…",
+            "Rendering 3D engine…",
+            "All systems ready"
+          ];
+
+          // Trigger background components mounting right away
+          document.documentElement.dataset.startBackgroundRender = "true";
+          window.dispatchEvent(new Event("portfolio:start-background-render"));
+
+          let currentStep = -1;
+          let targetMilestone = -1;
+          let isStepAnimating = false;
+          let portalRevealed = false;
+          let pacerInterval: ReturnType<typeof setInterval> | undefined;
+          let fallbackTimer: ReturnType<typeof setTimeout> | undefined;
+
+          const isLanyardReady = () => document.documentElement.dataset.lanyardReady === "true";
+          const isSkillsReady = () => {
+            const status = document.documentElement.dataset.skillsWarmup;
+            return status === "ready" || status === "failed";
+          };
+
+          const animateStep = (index: number) => {
+            const step = stepItems[index];
+            const stepTL = gsap.timeline({
+              defaults: { ease: easeOut },
+              onComplete: () => {
+                currentStep = index;
+                isStepAnimating = false;
+                if (currentStep === 5) {
+                  revealPortal();
+                } else {
+                  drainQueue();
+                }
+              }
+            });
+
+            if (index > 0) {
+              const line = step.querySelector<HTMLElement>(".opening-line-fill");
+              if (line) {
+                stepTL.to(line, { scaleX: 1, duration: 0.14, ease: "none" });
+              }
+            }
+
+            const fill = step.querySelector<HTMLElement>(".opening-dot-fill");
+            const outline = step.querySelector<HTMLElement>(".opening-dot-outline");
+            const check = step.querySelector<HTMLElement>(".opening-check");
+            const glow = step.querySelector<HTMLElement>(".opening-dot-glow");
+
+            if (fill) stepTL.to(fill, { scale: 1, duration: 0.16 }, index > 0 ? ">-0.03" : 0);
+            if (outline) stepTL.to(outline, { opacity: 0, duration: 0.1 }, "<");
+            if (check) stepTL.to(check, { strokeDashoffset: 0, duration: 0.14 }, ">-0.03");
+            if (glow) stepTL.to(glow, { opacity: 0.6, duration: 0.08, yoyo: true, repeat: 1 }, "<");
+
+            if (statusLabel && index < STATUS_MESSAGES.length) {
+              stepTL.to(statusLabel, {
+                opacity: 0,
+                y: -2,
+                duration: 0.06,
+                onComplete: () => {
+                  statusLabel.textContent = STATUS_MESSAGES[index];
+                }
+              }, 0)
+              .to(statusLabel, {
+                opacity: 1,
+                y: 0,
+                duration: 0.12,
+                ease: "power2.out"
+              }, ">");
+            }
+
+            activeTimelines.push(stepTL);
+            return stepTL;
+          };
+
+          const drainQueue = () => {
+            if (isStepAnimating || disposed || curtainFinished) return;
+            if (currentStep < targetMilestone && currentStep < 5) {
+              isStepAnimating = true;
+              animateStep(currentStep + 1);
+            }
+          };
+
+          const advanceMilestone = (m: number) => {
+            if (m > targetMilestone) {
+              targetMilestone = m;
+              drainQueue();
+            }
+          };
+
+          const revealPortal = () => {
+            if (portalRevealed || disposed || curtainFinished) return;
+            portalRevealed = true;
+            if (pacerInterval) clearInterval(pacerInterval);
+            if (fallbackTimer) clearTimeout(fallbackTimer);
+            cleanHoldListeners();
+
+            const portalTL = gsap.timeline({ defaults: { ease: easeOut } });
+            const rect = last.getBoundingClientRect();
+            portalTL.set(portal, {
+              left: rect.left + rect.width / 2,
+              top: rect.top + rect.height / 2,
+              xPercent: -50,
+              yPercent: -50,
+              opacity: 1
+            })
+            .set(introNav, { opacity: 0 })
+            .to(portal, {
+              scale: Math.ceil(Math.hypot(innerWidth, innerHeight) * 2 / 18),
+              duration: 0.65,
+              ease: "power2.in"
+            })
+            .to(screen, { opacity: 0, duration: 0.25, ease: "power2.in" }, ">-0.2")
+            .call(finishCurtain);
+
+            portalTL.fromTo(navItems, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.55, stagger: STAGGER.nav, clearProps: "opacity,transform" }, "+=0.1");
+            portalTL.fromTo(socialIcons, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.55, stagger: STAGGER.nav, clearProps: "opacity,transform" }, "<");
+            if (label) portalTL.fromTo(label, { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.8, clearProps: "opacity,transform" }, "<");
+            portalTL.call(cueHeadline, [], "+=0.2");
+
+            activeTimelines.push(portalTL);
+          };
+
+          const checkComponentProgress = () => {
+            if (disposed || curtainFinished) return;
+            const lanyard = isLanyardReady();
+            const skills = isSkillsReady();
+
+            if (lanyard && skills) {
+              advanceMilestone(5);
+            } else if (lanyard || skills) {
+              advanceMilestone(4);
+            }
+          };
+
+          cleanHoldListeners = () => {
+            window.removeEventListener("portfolio:lanyard-ready", checkComponentProgress);
+            window.removeEventListener("portfolio:skills-warmup", checkComponentProgress);
+            if (pacerInterval) clearInterval(pacerInterval);
+            if (fallbackTimer) clearTimeout(fallbackTimer);
+          };
+
+          window.addEventListener("portfolio:lanyard-ready", checkComponentProgress);
+          window.addEventListener("portfolio:skills-warmup", checkComponentProgress);
+
+          // Pacer interval checks real component readiness regularly
+          pacerInterval = setInterval(checkComponentProgress, 100);
+
+          // Initial entrance: Brand slides in from 0.44s to ~1.0s
           timeline.set(introNav, { opacity: 1 })
             .set(brand, { x: brandOffset })
             .to(brand, { x: 0, duration: 0.65 }, 0.44)
             .fromTo(background, { opacity: 0 }, { opacity: 1, duration: 0.55 }, 0.44)
             .fromTo(steps, { opacity: 0 }, { opacity: 1, duration: 0.08 }, 0.44)
             .fromTo(stepItems, { x: index => stepOffsets[index] }, { x: 0, duration: 0.65, force3D: true }, 0.44);
-          SECTION_IDS.forEach((_, index) => {
-            const at = 1.12 + index * 0.13;
-            const step = stepItems[index];
-            timeline!.to(step.querySelector(".opening-dot-fill"), { scale: 1, duration: 0.18 }, at)
-              .to(step.querySelector(".opening-dot-outline"), { opacity: 0, duration: 0.12 }, at)
-              .to(step.querySelector(".opening-check"), { strokeDashoffset: 0, duration: 0.16 }, at + 0.06)
-              .to(step.querySelector(".opening-dot-glow"), { opacity: 0.6, duration: 0.1, yoyo: true, repeat: 1 }, at);
-            if (index > 0) timeline!.to(step.querySelector(".opening-line-fill"), { scaleX: 1, duration: 0.13, ease: "none" }, at - 0.08);
-          });
 
-          const holdAtLastTick = () => {
-            if (disposed || curtainFinished) return;
-
-            // Signal background rendering of ID card and skills section
-            document.documentElement.dataset.startBackgroundRender = "true";
-            window.dispatchEvent(new Event("portfolio:start-background-render"));
-
-            const isLanyardReady = () => document.documentElement.dataset.lanyardReady === "true";
-            const isSkillsReady = () => {
-              const status = document.documentElement.dataset.skillsWarmup;
-              return status === "ready" || status === "failed";
-            };
-
-            if (isLanyardReady() && isSkillsReady()) {
-              return;
-            }
-
-            // Pause timeline statically at the last ticked circle
-            timeline?.pause();
-            isHoldingForComponents = true;
-
-            let resumed = false;
-            const tryResume = () => {
-              if (resumed || disposed || curtainFinished) return;
-              if (isLanyardReady() && isSkillsReady()) {
-                resumed = true;
-                isHoldingForComponents = false;
-                if (holdSafetyTimer) clearTimeout(holdSafetyTimer);
-                cleanHoldListeners();
-                timeline?.play();
-              }
-            };
-
-            cleanHoldListeners = () => {
-              window.removeEventListener("portfolio:lanyard-ready", tryResume);
-              window.removeEventListener("portfolio:skills-warmup", tryResume);
-            };
-
-            window.addEventListener("portfolio:lanyard-ready", tryResume);
-            window.addEventListener("portfolio:skills-warmup", tryResume);
-
-            // Safety fallback so visitor is never trapped if WebGL or asset stall occurs
-            holdSafetyTimer = setTimeout(() => {
-              if (resumed || disposed || curtainFinished) return;
-              resumed = true;
-              isHoldingForComponents = false;
-              cleanHoldListeners();
-              timeline?.play();
-            }, 10000);
-          };
-
-          timeline.call(holdAtLastTick, [], atLastTick);
+          if (statusEl) {
+            timeline.fromTo(statusEl, { opacity: 0, y: 6 }, { opacity: 1, y: 0, duration: 0.4 }, 0.55);
+          }
 
           timeline.call(() => {
-              const rect = last.getBoundingClientRect();
-              gsap.set(portal, { left: rect.left + rect.width / 2, top: rect.top + rect.height / 2, xPercent: -50, yPercent: -50, opacity: 1 });
-            }, [], portalStart)
-            .set(introNav, { opacity: 0 }, portalStart)
-            .to(portal, { scale: Math.ceil(Math.hypot(innerWidth, innerHeight) * 2 / 18), duration: portalDuration, ease: "power2.in" }, portalStart)
-            .to(screen, { opacity: 0, duration: screenFadeDuration, ease: "power2.in" }, portalStart + portalDuration)
-            .call(finishCurtain, [], curtainFinishAt);
+              // Brand settled in position: Milestone 0 (System Init)
+              advanceMilestone(0);
+              checkComponentProgress();
+            }, [], 1.0)
+            .call(() => {
+              // Milestone 1 (Asset Preload Active)
+              advanceMilestone(1);
+              checkComponentProgress();
+            }, [], 1.18)
+            .call(() => {
+              // Milestone 2 (3D Canvases Mounted)
+              advanceMilestone(2);
+              checkComponentProgress();
+            }, [], 1.34)
+            .call(() => {
+              // Milestone 3 (Shaders & Geometries Active)
+              advanceMilestone(3);
+              checkComponentProgress();
+            }, [], 1.50);
+
+          // Safety guard: if something is delayed or fails on a low-end phone, advance after 6s
+          fallbackTimer = setTimeout(() => {
+            if (!curtainFinished && !disposed) {
+              advanceMilestone(5);
+            }
+          }, 6000);
         } else {
           gsap.set(screen, { display: "none" });
           timeline.call(finishCurtain, [], 0);
         }
-        timeline.fromTo(navItems, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.55, stagger: STAGGER.nav, clearProps: "opacity,transform" }, revealStart + 0.2);
-        timeline.fromTo(socialIcons, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.55, stagger: STAGGER.nav, clearProps: "opacity,transform" }, revealStart + 0.2);
-        if (label) timeline.fromTo(label, { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.8, clearProps: "opacity,transform" }, revealStart + 0.2);
-        timeline.call(cueHeadline, [], revealStart + 0.4);
         heroTimeline = gsap.timeline({ paused: true, defaults: { ease: easeOut } });
         if (subtitleWords.length) heroTimeline.fromTo(subtitleWords, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.65, stagger: 0.025, clearProps: "opacity,transform" }, 0.72);
         heroTimeline.fromTo(buttons, { opacity: 0, y: 12, scale: 0.97 }, { opacity: 1, y: 0, scale: 1, duration: 0.65, stagger: 0.12, clearProps: "opacity,transform" }, 1.2)
@@ -233,8 +340,8 @@ export function OpeningSequence({ children }: { children: ReactNode }) {
       disposed = true;
       cancelReadyWait();
       if (readinessTimeout) clearTimeout(readinessTimeout);
-      if (holdSafetyTimer) clearTimeout(holdSafetyTimer);
       cleanHoldListeners();
+      activeTimelines.forEach(t => t.kill());
       context.revert();
       document.body.style.overflow = originalOverflow;
       delete document.documentElement.dataset.heroCue;
@@ -257,6 +364,10 @@ export function OpeningSequence({ children }: { children: ReactNode }) {
           {i > 0 && <span className="opening-line"><span className="opening-line-fill" /></span>}
           <span className={`opening-dot ${i === 5 ? "opening-dot--last" : ""}`}><span className="opening-dot-outline" /><span className="opening-dot-glow" /><span className="opening-dot-fill" /><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path className="opening-check" pathLength="1" d="M2.5 6.2 5 8.5l4.5-5" /></svg></span>
         </div>)}</div>
+        <div className="opening-status" aria-live="polite">
+          <span className="opening-status-dot" />
+          <span className="opening-status-label">Initializing workspace…</span>
+        </div>
       </div>
       <div className="opening-portal" aria-hidden="true" />
       <button type="button" className="opening-skip" onClick={() => skipRef.current()}>Skip intro</button>
