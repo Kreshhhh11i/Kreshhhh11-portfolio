@@ -19,6 +19,7 @@ const Lanyard = dynamic(() => import("@/components/Lanyard/Lanyard"), {
 
 export function HeroLanyard() {
   const introFinished = useIntroFinished();
+  const [shouldRender, setShouldRender] = useState(false);
   const [environmentReady, setEnvironmentReady] = useState(false);
 
   useEffect(() => {
@@ -31,11 +32,28 @@ export function HeroLanyard() {
   }, []);
 
   useEffect(() => {
-    if (!introFinished) return;
+    const handleStart = () => setShouldRender(true);
+    if (
+      document.documentElement.dataset.startBackgroundRender === "true" ||
+      document.documentElement.dataset.introComplete === "true"
+    ) {
+      setShouldRender(true);
+      return;
+    }
+    window.addEventListener("portfolio:start-background-render", handleStart, { once: true });
+    window.addEventListener("portfolio:intro-complete", handleStart, { once: true });
+    return () => {
+      window.removeEventListener("portfolio:start-background-render", handleStart);
+      window.removeEventListener("portfolio:intro-complete", handleStart);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!shouldRender) return;
     let active = true;
     void preloadEnvironment().finally(() => { if (active) setEnvironmentReady(true); });
     return () => { active = false; };
-  }, [introFinished]);
+  }, [shouldRender]);
   const containerRef = useRef<HTMLDivElement>(null);
   // Keep the first client render identical to the server-rendered markup.
   // The effect below measures the viewport and updates both values afterwards.

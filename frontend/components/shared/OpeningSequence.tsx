@@ -23,6 +23,9 @@ export function OpeningSequence({ children }: { children: ReactNode }) {
     let headlineStarted = false;
     let cancelReadyWait = () => {};
     let readinessTimeout: ReturnType<typeof setTimeout> | undefined;
+    let isHoldingForComponents = false;
+    let holdSafetyTimer: ReturnType<typeof setTimeout> | undefined;
+    let cleanHoldListeners = () => {};
     const preference = window.matchMedia("(prefers-reduced-motion: reduce)");
     const originalOverflow = document.body.style.overflow;
     const showCurtain = !preference.matches;
@@ -41,6 +44,8 @@ export function OpeningSequence({ children }: { children: ReactNode }) {
       if (curtainFinished || disposed) return;
       curtainFinished = true;
       if (readinessTimeout) clearTimeout(readinessTimeout);
+      if (holdSafetyTimer) clearTimeout(holdSafetyTimer);
+      cleanHoldListeners();
       document.body.style.overflow = originalOverflow;
       document.documentElement.dataset.introComplete = "true";
       setCurtainDone(true);
@@ -48,6 +53,8 @@ export function OpeningSequence({ children }: { children: ReactNode }) {
     };
     const skip = () => {
       if (disposed) return;
+      if (holdSafetyTimer) clearTimeout(holdSafetyTimer);
+      cleanHoldListeners();
       timeline?.kill();
       heroTimeline?.kill();
       context.revert();
@@ -58,8 +65,13 @@ export function OpeningSequence({ children }: { children: ReactNode }) {
     skipRef.current = skip;
 
     const onVisibility = () => {
-      if (document.hidden) { timeline?.pause(); heroTimeline?.pause(); }
-      else { timeline?.resume(); if (headlineStarted) heroTimeline?.resume(); }
+      if (document.hidden) {
+        timeline?.pause();
+        heroTimeline?.pause();
+      } else {
+        if (!isHoldingForComponents) timeline?.resume();
+        if (headlineStarted) heroTimeline?.resume();
+      }
     };
     const onHeadlineStart = () => {
       headlineStarted = true;
@@ -73,7 +85,7 @@ export function OpeningSequence({ children }: { children: ReactNode }) {
 
     const prepare = async () => {
       // A failed hydration must never trap a visitor behind the opening screen.
-      readinessTimeout = setTimeout(() => { if (!curtainFinished) skip(); }, 8000);
+      readinessTimeout = setTimeout(() => { if (!curtainFinished) skip(); }, 12000);
       const componentsReady = new Promise<void>(resolve => {
         const check = () => {
           if (document.documentElement.dataset.heroMotionReady === "true" && document.documentElement.dataset.navMotionReady === "true") {
@@ -94,7 +106,12 @@ export function OpeningSequence({ children }: { children: ReactNode }) {
       const label = document.querySelector<HTMLElement>("[data-hero-label]");
       const buttons = gsap.utils.toArray<HTMLElement>("[data-hero-actions] > a");
       const easeOut = cubicBezier(...EASE_OUT);
-      const revealStart = showCurtain ? 2.88 : 0;
+      const atLastTick = 2.0;
+      const portalStart = 2.05;
+      const portalDuration = 0.65;
+      const screenFadeDuration = 0.25;
+      const curtainFinishAt = portalStart + 0.9;
+      const revealStart = showCurtain ? curtainFinishAt : 0;
 
       context.add(() => {
         // Translate/opacity only: layout and interactive hero artwork stay untouched.
@@ -135,14 +152,68 @@ export function OpeningSequence({ children }: { children: ReactNode }) {
               .to(step.querySelector(".opening-dot-glow"), { opacity: 0.6, duration: 0.1, yoyo: true, repeat: 1 }, at);
             if (index > 0) timeline!.to(step.querySelector(".opening-line-fill"), { scaleX: 1, duration: 0.13, ease: "none" }, at - 0.08);
           });
+
+          const holdAtLastTick = () => {
+            if (disposed || curtainFinished) return;
+
+            // Signal background rendering of ID card and skills section
+            document.documentElement.dataset.startBackgroundRender = "true";
+            window.dispatchEvent(new Event("portfolio:start-background-render"));
+
+            const isLanyardReady = () => document.documentElement.dataset.lanyardReady === "true";
+            const isSkillsReady = () => {
+              const status = document.documentElement.dataset.skillsWarmup;
+              return status === "ready" || status === "failed";
+            };
+
+            if (isLanyardReady() && isSkillsReady()) {
+              return;
+            }
+
+            // Pause timeline statically at the last ticked circle
+            timeline?.pause();
+            isHoldingForComponents = true;
+
+            let resumed = false;
+            const tryResume = () => {
+              if (resumed || disposed || curtainFinished) return;
+              if (isLanyardReady() && isSkillsReady()) {
+                resumed = true;
+                isHoldingForComponents = false;
+                if (holdSafetyTimer) clearTimeout(holdSafetyTimer);
+                cleanHoldListeners();
+                timeline?.play();
+              }
+            };
+
+            cleanHoldListeners = () => {
+              window.removeEventListener("portfolio:lanyard-ready", tryResume);
+              window.removeEventListener("portfolio:skills-warmup", tryResume);
+            };
+
+            window.addEventListener("portfolio:lanyard-ready", tryResume);
+            window.addEventListener("portfolio:skills-warmup", tryResume);
+
+            // Safety fallback so visitor is never trapped if WebGL or asset stall occurs
+            holdSafetyTimer = setTimeout(() => {
+              if (resumed || disposed || curtainFinished) return;
+              resumed = true;
+              isHoldingForComponents = false;
+              cleanHoldListeners();
+              timeline?.play();
+            }, 10000);
+          };
+
+          timeline.call(holdAtLastTick, [], atLastTick);
+
           timeline.call(() => {
               const rect = last.getBoundingClientRect();
               gsap.set(portal, { left: rect.left + rect.width / 2, top: rect.top + rect.height / 2, xPercent: -50, yPercent: -50, opacity: 1 });
-            }, [], 1.98)
-            .set(introNav, { opacity: 0 }, 1.98)
-            .to(portal, { scale: Math.ceil(Math.hypot(innerWidth, innerHeight) * 2 / 18), duration: 0.65, ease: "power2.in" }, 1.98)
-            .to(screen, { opacity: 0, duration: 0.25, ease: "power2.in" }, 2.63)
-            .call(finishCurtain, [], revealStart);
+            }, [], portalStart)
+            .set(introNav, { opacity: 0 }, portalStart)
+            .to(portal, { scale: Math.ceil(Math.hypot(innerWidth, innerHeight) * 2 / 18), duration: portalDuration, ease: "power2.in" }, portalStart)
+            .to(screen, { opacity: 0, duration: screenFadeDuration, ease: "power2.in" }, portalStart + portalDuration)
+            .call(finishCurtain, [], curtainFinishAt);
         } else {
           gsap.set(screen, { display: "none" });
           timeline.call(finishCurtain, [], 0);
@@ -162,11 +233,14 @@ export function OpeningSequence({ children }: { children: ReactNode }) {
       disposed = true;
       cancelReadyWait();
       if (readinessTimeout) clearTimeout(readinessTimeout);
+      if (holdSafetyTimer) clearTimeout(holdSafetyTimer);
+      cleanHoldListeners();
       context.revert();
       document.body.style.overflow = originalOverflow;
       delete document.documentElement.dataset.heroCue;
       delete document.documentElement.dataset.heroSettled;
       delete document.documentElement.dataset.introComplete;
+      delete document.documentElement.dataset.startBackgroundRender;
       document.removeEventListener("visibilitychange", onVisibility);
       window.removeEventListener("portfolio:hero-headline-start", onHeadlineStart);
       preference.removeEventListener("change", onPreferenceChange);

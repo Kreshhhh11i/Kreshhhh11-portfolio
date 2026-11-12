@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import dynamic from 'next/dynamic';
-import { useHeroSettled } from '@/components/shared/useHeroSettled';
 import { useIntroFinished } from '@/components/shared/useIntroFinished';
 import './SkillsRoad.css';
 import {
@@ -63,34 +62,30 @@ function CategoryIcon({ category }: { category: SkillCategory | 'All' }) {
 }
 
 export function SkillsRoad() {
-  const heroSettled = useHeroSettled();
   const introFinished = useIntroFinished();
-  const [cardReady, setCardReady] = useState(false);
+  const [boardMounted, setBoardMounted] = useState(false);
+
   useEffect(() => {
-    if (!introFinished || !heroSettled) return;
-    const ready = () => setCardReady(true);
-    if (document.documentElement.dataset.lanyardSettled === 'true') {
-      ready();
+    // Preload Scene chunk in background while intro plays so it is cached when the last circle ticks
+    void import('./Scene');
+  }, []);
+
+  useEffect(() => {
+    const mount = () => setBoardMounted(true);
+    if (
+      document.documentElement.dataset.startBackgroundRender === "true" ||
+      document.documentElement.dataset.introComplete === "true"
+    ) {
+      setBoardMounted(true);
       return;
     }
-    window.addEventListener('portfolio:lanyard-settled', ready);
-    const onLanyardReady = () => {
-      // Allow the ID card to smoothly swing and settle before mounting the skill board
-      window.setTimeout(ready, 2200);
-    };
-    if (document.documentElement.dataset.lanyardReady === 'true') {
-      onLanyardReady();
-    } else {
-      window.addEventListener('portfolio:lanyard-ready', onLanyardReady, { once: true });
-    }
-    // A failed WebGL context or image must not prevent the board from loading.
-    const timeout = window.setTimeout(ready, 6000);
+    window.addEventListener("portfolio:start-background-render", mount, { once: true });
+    window.addEventListener("portfolio:intro-complete", mount, { once: true });
     return () => {
-      window.removeEventListener('portfolio:lanyard-settled', ready);
-      window.removeEventListener('portfolio:lanyard-ready', onLanyardReady);
-      window.clearTimeout(timeout);
+      window.removeEventListener("portfolio:start-background-render", mount);
+      window.removeEventListener("portfolio:intro-complete", mount);
     };
-  }, [introFinished, heroSettled]);
+  }, []);
   const containerRef = useRef<HTMLDivElement>(null);
   const diceIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const categoryMenuRef = useRef<HTMLDivElement>(null);
@@ -168,7 +163,7 @@ export function SkillsRoad() {
     window.dispatchEvent(new Event('portfolio:skills-warmup'));
   }, []);
   const handleBoardError = useCallback(() => {
-    setBoardReady(false);
+    setBoardReady(true);
     document.documentElement.dataset.skillsWarmup = 'failed';
     window.dispatchEvent(new Event('portfolio:skills-warmup'));
   }, []);
@@ -444,7 +439,7 @@ export function SkillsRoad() {
 
       {/* 3D CANVAS VIEWPORT (Clean container without corner edges or hover glow) */}
       <div className="content-frame w-full h-[390px] sm:h-[520px] md:h-[620px] bg-[#0a0a0a] overflow-hidden">
-        {introFinished && heroSettled && cardReady && <SceneErrorBoundary onError={handleBoardError}><Scene
+        {boardMounted && <SceneErrorBoundary onError={handleBoardError}><Scene
           skills={SKILLS_ROAD_DATA}
           layoutPoints={currentLayoutPoints}
           currentIndex={currentIndex}
@@ -466,7 +461,7 @@ export function SkillsRoad() {
         /></SceneErrorBoundary>}
 
         <div className={`skills-board-loading${boardLoading ? '' : ' is-ready'}`} role="status" aria-live="polite" aria-hidden={!boardLoading}>
-          {boardLoading && 'Loading 3D engine…'}
+          <span className="sr-only">Loading skills board…</span>
         </div>
 
         <div

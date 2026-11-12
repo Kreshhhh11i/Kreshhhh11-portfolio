@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useState, useEffect, useMemo } from 'react';
+import React, { useRef, useState, useEffect, useMemo, useCallback } from 'react';
 import * as THREE from 'three';
 import { Canvas, useThree, useFrame } from '@react-three/fiber';
 import { OrbitControls, Environment, PerformanceMonitor, AdaptiveDpr } from '@react-three/drei';
@@ -76,13 +76,15 @@ interface SceneProps {
 // Signal only after the canvas has had an opportunity to draw its first frame.
 function FirstFrame({ onReady }: { onReady: () => void }) {
   const reported = useRef(false);
-  const frame = useRef(0);
+  const invalidate = useThree(state => state.invalidate);
+  useEffect(() => {
+    invalidate();
+  }, [invalidate]);
   useFrame(() => {
     if (reported.current) return;
     reported.current = true;
-    frame.current = requestAnimationFrame(onReady);
+    onReady();
   });
-  useEffect(() => () => cancelAnimationFrame(frame.current), []);
   return null;
 }
 
@@ -321,10 +323,15 @@ export default function Scene({
   onReady,
 }: SceneProps) {
   const [dpr, setDpr] = useState(1.25);
+  const [firstDrawn, setFirstDrawn] = useState(false);
+  const handleReady = useCallback(() => {
+    setFirstDrawn(true);
+    onReady();
+  }, [onReady]);
 
   return (
     <Canvas
-      frameloop={isInView ? 'demand' : 'never'}
+      frameloop={isInView || !firstDrawn ? 'demand' : 'never'}
       dpr={dpr}
       gl={{
         antialias: true,
@@ -341,7 +348,7 @@ export default function Scene({
       className={`w-full h-full ${isFlatView ? 'cursor-default' : 'cursor-grab active:cursor-grabbing'}`}
       style={{ touchAction: 'pan-y' }}
     >
-      <FirstFrame onReady={onReady} />
+      <FirstFrame onReady={handleReady} />
       <AnimateOnChange values={[layoutPoints, currentIndex, targetIndex, activeCategory, isFlatView, hoveredTileId, introStarted, isInView]} />
       <PerformanceMonitor onIncline={() => setDpr(1.25)} onDecline={() => setDpr(1)} />
       <AdaptiveDpr />
