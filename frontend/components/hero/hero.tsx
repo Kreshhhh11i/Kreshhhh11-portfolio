@@ -215,6 +215,7 @@ export function Hero() {
 
           {/* Action Buttons */}
           <div data-hero-actions className="flex flex-wrap justify-center lg:justify-start items-center gap-3 sm:gap-4 pt-1 z-20">
+            <span className="inline-flex">
             <a
               href="#projects"
               className="group w-[clamp(120px,38vw,160px)] h-12 rounded-full border border-[var(--primary-text)] bg-[var(--primary-text)] text-[var(--background)] font-mono text-[11px] min-[360px]:text-xs uppercase tracking-wider font-semibold whitespace-nowrap hover:opacity-90 transition-opacity flex items-center justify-center gap-2 shadow-md cursor-pointer"
@@ -225,6 +226,8 @@ export function Hero() {
                 <polyline points="7 7 17 7 17 17"></polyline>
               </svg>
             </a>
+            </span>
+            <span className="inline-flex">
             <a
               href="#contact"
               className="group w-[clamp(120px,38vw,160px)] h-12 rounded-full bg-transparent border border-[var(--dashed-borders)] text-[var(--primary-text)] font-mono text-[11px] min-[360px]:text-xs uppercase tracking-wider font-semibold whitespace-nowrap hover:bg-[var(--card-tint)] transition-colors flex items-center justify-center gap-2 cursor-pointer"
@@ -235,6 +238,7 @@ export function Hero() {
                 <polyline points="7 7 17 7 17 17"></polyline>
               </svg>
             </a>
+            </span>
           </div>
         </div>
 

@@ -104,7 +104,8 @@ export function OpeningSequence({ children }: { children: ReactNode }) {
       const subtitle = document.querySelector<HTMLElement>("[data-hero-subtitle]");
       const subtitleWords = gsap.utils.toArray<HTMLElement>("[data-hero-subtitle] [data-hero-word]");
       const label = document.querySelector<HTMLElement>("[data-hero-label]");
-      const buttons = gsap.utils.toArray<HTMLElement>("[data-hero-actions] > a");
+      // Animate wrappers so the links' hover transitions cannot compete with GSAP's opacity.
+      const buttons = gsap.utils.toArray<HTMLElement>("[data-hero-actions] > span");
       const easeOut = cubicBezier(...EASE_OUT);
 
       context.add(() => {
@@ -266,7 +267,8 @@ export function OpeningSequence({ children }: { children: ReactNode }) {
             portalTL.fromTo(navItems, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.55, stagger: STAGGER.nav, clearProps: "opacity,transform" }, "+=0.1");
             portalTL.fromTo(socialIcons, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.55, stagger: STAGGER.nav, clearProps: "opacity,transform" }, "<");
             if (label) portalTL.fromTo(label, { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.8, clearProps: "opacity,transform" }, "<");
-            portalTL.call(cueHeadline, [], "+=0.2");
+            // Start the headline alongside the navigation and hero label.
+            portalTL.call(cueHeadline, [], "<");
 
             activeTimelines.push(portalTL);
           };
