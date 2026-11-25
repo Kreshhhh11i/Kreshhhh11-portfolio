@@ -1764,11 +1764,11 @@ const Lanyard = ({
         window.dispatchEvent(new Event('portfolio:lanyard-settled'));
       }
       const resting = sim.calm > 1.2 && !sim.grab && current.breeze === 0 && !isShaking && !isButtonHovered && !isArrowAnimating;
-      if ((visible || sim.grab) && !resting) raf = requestAnimationFrame(tick);
+      if (!document.hidden && (visible || sim.grab) && !resting) raf = requestAnimationFrame(tick);
     };
 
     const start = () => {
-      if (raf || (!visible && !sim.grab) || !alive || !introComplete || !placed || !shadersReady || !facesReady) return;
+      if (raf || document.hidden || (!visible && !sim.grab) || !alive || !introComplete || !placed || !shadersReady || !facesReady) return;
       if (!introStarted) {
         introStarted = true;
         introStartedAt = performance.now();
@@ -1976,9 +1976,12 @@ const Lanyard = ({
     const resize = () => {
       view.width = Math.max(1, container.clientWidth);
       view.height = Math.max(1, container.clientHeight);
-      // A modest oversampling floor keeps small card details legible on 1x
-      // displays; limit the buffer size so large screens remain responsive.
-      const desiredRatio = Math.min(Math.max(window.devicePixelRatio || 1, 1.5), 2);
+      // Mobile canvases cover the full hero: a 2x buffer uses over twice as
+      // many pixels as 1.25x and competes with scrolling on phone GPUs.
+      const mobile = window.matchMedia('(max-width: 767px) and (pointer: coarse)').matches;
+      const desiredRatio = mobile
+        ? Math.min(window.devicePixelRatio || 1, 1.25)
+        : Math.min(Math.max(window.devicePixelRatio || 1, 1.5), 2);
       const maxBufferRatio = Math.sqrt(6000000 / (view.width * view.height));
       renderer.setPixelRatio(Math.min(desiredRatio, Math.max(1, maxBufferRatio)));
       renderer.setSize(view.width, view.height, false);

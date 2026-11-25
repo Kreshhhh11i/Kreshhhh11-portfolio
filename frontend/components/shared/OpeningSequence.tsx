@@ -245,21 +245,18 @@ export function OpeningSequence({ children }: { children: ReactNode }) {
 
             const portalTL = gsap.timeline({ defaults: { ease: easeOut } });
             const rect = last.getBoundingClientRect();
+            const x = rect.left + rect.width / 2;
+            const y = rect.top + rect.height / 2;
+            const radius = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
             portalTL.set(portal, {
-              left: rect.left + rect.width / 2,
-              top: rect.top + rect.height / 2,
-              xPercent: -50,
-              yPercent: -50,
+              clipPath: `circle(9px at ${x}px ${y}px)`,
               opacity: 1,
-              scale: 1,
-              force3D: true
             })
             .to(introNav, { opacity: 0, duration: 0.2, ease: "power2.out" }, 0)
             .to(portal, {
-              scale: Math.ceil(Math.hypot(innerWidth, innerHeight) * 2 / 18),
+              clipPath: `circle(${Math.ceil(radius)}px at ${x}px ${y}px)`,
               duration: 0.52,
               ease: "power2.in",
-              force3D: true
             }, 0.03)
             .to(screen, { opacity: 0, duration: 0.2, ease: "power2.in" }, ">-0.16")
             .call(finishCurtain);

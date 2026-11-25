@@ -17,6 +17,6 @@
 .opening-status-dot { width: 5px; height: 5px; flex-shrink: 0; border-radius: 50%; background: var(--accent); box-shadow: 0 0 8px var(--glow); opacity: 0.9; animation: openingPulse 1.4s ease-in-out infinite; }
 .opening-status-label { display: inline-block; text-align: center; will-change: opacity; }
 @keyframes openingPulse { 0%, 100% { opacity: 0.4; transform: scale(0.85); } 50% { opacity: 1; transform: scale(1.15); } }
-.opening-portal { position: fixed; width: 18px; height: 18px; border-radius: 50%; background: var(--accent); opacity: 0; pointer-events: none; will-change: transform, opacity; transform: translateZ(0); transform-origin: center center; }
+.opening-portal { position: fixed; inset: 0; background: var(--accent); opacity: 0; pointer-events: none; }
 .opening-skip { position: fixed; bottom: 24px; right: 24px; border: 1px solid var(--line); border-radius: 999px; background: var(--nav-bg); color: var(--ink); padding: 8px 14px; font: inherit; font-size: 12px; cursor: pointer; }
 .opening-skip:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }

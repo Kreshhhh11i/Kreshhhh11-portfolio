@@ -21,7 +21,7 @@ const getLevelColor = (level: ContributionLevel): string => {
       return "bg-[#f5643e]";
     case "NONE":
     default:
-      return "bg-[#1b1a18] opacity-30 border border-[rgba(255,255,255,0.04)] [html[data-theme='light']_&]:border-transparent [html[data-theme='light']_&]:bg-[#e7dece] [html[data-theme='light']_&]:opacity-35 [html.light_&]:border-transparent [html.light_&]:bg-[#e7dece] [html.light_&]:opacity-35";
+      return "bg-[#1b1a18] opacity-30 border border-[rgba(255,255,255,0.04)] [html[data-theme='light']_&]:border-transparent [html[data-theme='light']_&]:bg-[#d0bfa2] [html[data-theme='light']_&]:opacity-100 [html.light_&]:border-transparent [html.light_&]:bg-[#d0bfa2] [html.light_&]:opacity-100";
   }
 };
 
@@ -43,7 +43,7 @@ const ExternalLinkIcon = () => (
 );
 
 const GITHUB_STYLE_BOXES = [
-  "bg-[#1b1a18] border border-[rgba(255,255,255,0.12)] [html.light_&]:bg-[#e7dece] [html.light_&]:border-transparent",
+  "bg-[#1b1a18] border border-[rgba(255,255,255,0.12)] [html.light_&]:bg-[#d0bfa2] [html.light_&]:border-transparent",
   "bg-[#4c2318] [html.light_&]:bg-[#f6c7b0]",
   "bg-[#8c3c26] [html.light_&]:bg-[#f5a285]",
   "bg-[#c65233] [html.light_&]:bg-[#f5755e]",
