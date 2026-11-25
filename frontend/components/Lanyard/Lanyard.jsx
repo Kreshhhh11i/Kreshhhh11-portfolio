@@ -1792,7 +1792,8 @@ const Lanyard = ({
       document.body.appendChild(canvas);
       Object.assign(canvas.style, {
         position: 'fixed', left: '0', top: '0', width: '100vw',
-        height: '100dvh', zIndex: '10001', pointerEvents: 'auto'
+        // Above the page content, but below the fixed navigation (z-index 50).
+        height: '100dvh', zIndex: '49', pointerEvents: 'auto'
       });
       const width = document.documentElement.clientWidth;
       const height = document.documentElement.clientHeight;

@@ -9,6 +9,7 @@ import { SkillItem } from './data';
 import { TileLayoutPoint } from './layouts';
 
 interface TokenProps {
+  lightTheme: boolean;
   currentIndex: number;
   targetIndex: number;
   moveMode: 'step' | 'jump';
@@ -19,6 +20,7 @@ interface TokenProps {
 }
 
 export function Token({
+  lightTheme,
   currentIndex,
   targetIndex,
   moveMode,
@@ -256,8 +258,8 @@ export function Token({
         {/* Ambient Warm Accent Point Light */}
         <pointLight
           position={[0, 0.08, 0]}
-          color="#f5643e"
-          intensity={2.0}
+          color={lightTheme ? '#f4e7cb' : '#f5643e'}
+          intensity={lightTheme ? 0.8 : 2.0}
           distance={2.4}
           decay={2}
         />

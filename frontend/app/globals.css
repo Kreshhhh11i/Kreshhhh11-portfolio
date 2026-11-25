@@ -40,7 +40,15 @@
 
 ::view-transition-new(root) {
   z-index: 99999;
-  will-change: clip-path;
+}
+
+/* Capture the final theme colours, rather than a frame partway through a
+   component's hover/colour transition, before revealing the new snapshot. */
+:root.theme-switching *,
+:root.theme-switching *::before,
+:root.theme-switching *::after {
+  transition-duration: 0s !important;
+  transition-delay: 0s !important;
 }
 
 :root {

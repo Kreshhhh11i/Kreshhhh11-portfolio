@@ -93,6 +93,12 @@
   box-sizing: border-box;
 }
 
+/* Match the project section's warm light-mode surface on both cards. */
+:root[data-theme="light"] .exp-card,
+html.light .exp-card {
+  background: radial-gradient(ellipse at 70% 40%, rgba(191, 58, 18, 0.045), transparent 60%) #efe3cb;
+}
+
 @media (min-width: 1024px) {
   .work-experience-section,
   .work-experience-section .exp-timeline-wrapper,

@@ -187,11 +187,12 @@ export function Navbar() {
     }
 
     // Scroll calculation logic
+    let maxScroll = 0;
     const measureTops = () => {
       const currentScrollY = window.scrollY || document.documentElement.scrollTop || 0;
       const innerHeight = window.innerHeight;
       const scrollHeight = document.documentElement.scrollHeight;
-      const maxScroll = Math.max(0, scrollHeight - innerHeight);
+      maxScroll = Math.max(0, scrollHeight - innerHeight);
       const offset = 96;
 
       const rawTops = NAV.map((item) => {
@@ -215,9 +216,6 @@ export function Navbar() {
 
     const updateScroll = () => {
       const scrollY = window.scrollY || document.documentElement.scrollTop || 0;
-      const innerHeight = window.innerHeight;
-      const scrollHeight = document.documentElement.scrollHeight;
-      const maxScroll = Math.max(0, scrollHeight - innerHeight);
       const targets = targetsRef.current;
 
       // Guard against frame lag before scroll restoration or before ready
@@ -239,10 +237,6 @@ export function Navbar() {
           setIsHoverExpanded(false);
         }
       }
-
-      try {
-        sessionStorage.setItem("nav:scrollY", String(Math.round(scrollY)));
-      } catch {}
 
       if (!targets.length) return;
 
@@ -435,6 +429,7 @@ export function Navbar() {
 
     try {
       const transition = document.startViewTransition(() => {
+        document.documentElement.classList.add("theme-switching");
         flushSync(updateDOM);
       });
       await transition.ready;
@@ -452,10 +447,12 @@ export function Navbar() {
         }
       );
       await anim.finished;
+      await transition.finished;
     } catch {
       // Keep the toggle usable if a browser cannot start a view transition.
       if (document.documentElement.dataset.theme !== nextTheme) updateDOM();
     } finally {
+      document.documentElement.classList.remove("theme-switching");
       setTimeout(() => {
         isThemeTransitioningRef.current = false;
         window.dispatchEvent(new Event("portfolio:theme-settled"));

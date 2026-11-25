@@ -323,6 +323,15 @@ export default function Scene({
   onReady,
 }: SceneProps) {
   const [dpr, setDpr] = useState(1.25);
+  const [lightTheme, setLightTheme] = useState(false);
+  useEffect(() => {
+    const root = document.documentElement;
+    const syncTheme = () => setLightTheme(root.dataset.theme === 'light');
+    syncTheme();
+    const observer = new MutationObserver(syncTheme);
+    observer.observe(root, { attributes: true, attributeFilter: ['data-theme'] });
+    return () => observer.disconnect();
+  }, []);
   const [firstDrawn, setFirstDrawn] = useState(false);
   const handleReady = useCallback(() => {
     setFirstDrawn(true);
@@ -372,7 +381,7 @@ export default function Scene({
       />
 
       {/* Warm accent rim light */}
-      <directionalLight position={[-10, 10, -10]} intensity={0.7} color="#f5643e" />
+      <directionalLight position={[-10, 10, -10]} intensity={0.7} color={lightTheme ? '#f4e7cb' : '#f5643e'} />
 
       {/* Subtle fill light */}
       <directionalLight position={[0, -10, 10]} intensity={0.2} color="#ffffff" />
@@ -424,6 +433,7 @@ export default function Scene({
 
       {/* Interactive Hopping Token */}
       <Token
+        lightTheme={lightTheme}
         currentIndex={currentIndex}
         targetIndex={targetIndex}
         moveMode={moveMode}

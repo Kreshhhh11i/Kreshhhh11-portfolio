@@ -477,12 +477,16 @@ export function SigningBox() {
         }
         :root[data-theme="light"] .signing-box,
         html.light .signing-box {
+          background: transparent;
           --sb-bg: #f6eddc;
           --sb-surface: #fbf6ea;
           --sb-ink: #1b1712;
           --sb-muted: #6f6556;
           --sb-line: #d9ccb3;
           --sb-accent: #e0522c;
+        }
+        :root[data-theme="light"] .signing-pad {
+          background: radial-gradient(ellipse at 70% 40%, rgba(191, 58, 18, 0.045), transparent 60%) #efe3cb;
         }
         @keyframes sbSlideUp {
           from { opacity: 0; transform: translateY(10px); }
@@ -589,7 +593,7 @@ export function SigningBox() {
       {/* Signing Pad */}
       <div
         ref={padRef}
-        className="relative w-full rounded-[12px] bg-[var(--sb-bg)] border border-solid border-[var(--sb-line)] overflow-hidden touch-none select-none h-[clamp(300px,48vh,380px)]"
+        className="signing-pad relative w-full rounded-[12px] bg-[var(--sb-bg)] border border-solid border-[var(--sb-line)] overflow-hidden touch-none select-none h-[clamp(300px,48vh,380px)]"
       >
         <div
           className={`absolute inset-0 flex items-center justify-center font-mono text-xs text-[var(--sb-muted)] tracking-wider pointer-events-none select-none transition-opacity duration-300 ${

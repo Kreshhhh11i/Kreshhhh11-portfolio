@@ -1,3 +1,43 @@
+/* The section surface adapts to the page theme; project mockups keep their own colors. */
+.project-showcase {
+  background: radial-gradient(ellipse at 70% 40%, rgba(245, 100, 62, 0.09), transparent 60%) #0c0c0c;
+}
+
+:root[data-theme="light"] .project-showcase {
+  background: radial-gradient(ellipse at 70% 40%, rgba(191, 58, 18, 0.045), transparent 60%) #efe3cb;
+}
+
+:root[data-theme="light"] .project-showcase .project-counter,
+:root[data-theme="light"] .project-showcase .project-description,
+:root[data-theme="light"] .project-showcase .project-stack-dropdown {
+  color: #6f6550;
+}
+
+:root[data-theme="light"] .project-showcase .project-name,
+:root[data-theme="light"] .project-showcase .project-action-btn-secondary {
+  color: #1a1712;
+}
+
+:root[data-theme="light"] .project-showcase .project-stack-desktop > span,
+:root[data-theme="light"] .project-showcase .project-stack-tags span {
+  color: #1a1712;
+  border-color: #d8c9a8;
+  background: #f9f3e8;
+}
+
+:root[data-theme="light"] .project-showcase .project-status-active { color: #a73719; }
+:root[data-theme="light"] .project-showcase .project-status-shipped { color: #096544; }
+:root[data-theme="light"] .project-showcase .project-status-building { color: #795a14; }
+
+:root[data-theme="light"] .project-showcase .project-action-btn-primary {
+  box-shadow: 0 4px 12px rgba(26, 23, 18, 0.12);
+}
+
+:root[data-theme="light"] .project-showcase .project-action-btn-secondary:hover {
+  background: rgba(26, 23, 18, 0.05);
+  border-color: var(--line);
+}
+
 /* Scoped overrides for React Bits CardSwap inside projects section */
 .projects-swap,
 .projects-swap .card-swap-stage {

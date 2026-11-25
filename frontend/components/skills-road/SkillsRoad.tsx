@@ -431,7 +431,7 @@ export function SkillsRoad() {
       </div>
 
       {/* 3D CANVAS VIEWPORT (Clean container without corner edges or hover glow) */}
-      <div className="content-frame w-full h-[390px] sm:h-[520px] md:h-[620px] bg-[#0a0a0a] overflow-hidden touch-none">
+      <div className="skills-board content-frame w-full h-[390px] sm:h-[520px] md:h-[620px] overflow-hidden touch-none">
         {boardMounted && <SceneErrorBoundary onError={handleBoardError}><Scene
           skills={SKILLS_ROAD_DATA}
           layoutPoints={currentLayoutPoints}
@@ -491,10 +491,10 @@ export function SkillsRoad() {
 
         <div
           aria-hidden="true"
-          className={`pointer-events-none absolute left-4 top-4 z-10 flex max-w-[58%] items-center gap-2.5 rounded-full border border-white/10 bg-[#171613]/95 px-3.5 py-2 shadow-md transition-opacity duration-200 motion-reduce:transition-none ${hoveredSkill ? 'opacity-100' : 'opacity-0'}`}
+          className={`skills-tooltip pointer-events-none absolute left-4 top-4 z-10 flex max-w-[58%] items-center gap-2.5 rounded-full border px-3.5 py-2 shadow-md transition-opacity duration-200 motion-reduce:transition-none ${hoveredSkill ? 'opacity-100' : 'opacity-0'}`}
         >
           <span aria-hidden="true" className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#f5643e]" />
-          <p className="text-sm font-medium leading-snug text-[#f6eddc]">{hoveredSkill?.name}</p>
+          <p className="text-sm font-medium leading-snug">{hoveredSkill?.name}</p>
         </div>
 
         {/* In-Canvas Floating Interactive Controls (Bottom Left) */}

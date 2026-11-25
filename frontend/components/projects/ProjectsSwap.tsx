@@ -248,10 +248,8 @@ export default function ProjectsSwap() {
   return (
     <div
       ref={containerRef}
-      className="content-frame w-full overflow-hidden flex flex-col"
+      className="project-showcase content-frame w-full overflow-hidden flex flex-col"
       style={{
-        background:
-          "radial-gradient(ellipse at 70% 40%, rgba(245,100,62,0.09), transparent 60%) #0c0c0c",
         padding: "clamp(20px, 3.2vw, 48px)",
       }}
     >
@@ -266,10 +264,10 @@ export default function ProjectsSwap() {
             aria-atomic="true"
           >
             {/* 1. Counter row */}
-            <div className="font-mono text-[12px] sm:text-[13px] tracking-[0.1em] text-[#8a857b]">
+            <div className="project-counter font-mono text-[12px] sm:text-[13px] tracking-[0.1em] text-[#8a857b]">
               <span aria-label={`Project ${active + 1} of ${projects.length}`}>
                 <span aria-hidden="true">
-                  {String(projects.length).padStart(2, "0")} / <b style={{ color: "#f5643e" }}>{String(active + 1).padStart(2, "0")}</b>
+                  {String(projects.length).padStart(2, "0")} / <b style={{ color: "var(--accent)" }}>{String(active + 1).padStart(2, "0")}</b>
                 </span>
               </span>&nbsp;&nbsp;·&nbsp;&nbsp;
               {currentProject.kind}
@@ -277,13 +275,13 @@ export default function ProjectsSwap() {
 
             {/* Project title and status */}
             <div className="project-title-row">
-              <h3 className="font-ivyora italic font-normal text-[clamp(36px,4vw,58px)] leading-tight text-[#f6eddc] m-0 break-words max-w-full">
+              <h3 className="project-name font-ivyora italic font-normal text-[clamp(36px,4vw,58px)] leading-tight text-[#f6eddc] m-0 break-words max-w-full">
                 {currentProject.name}
               </h3>
               <span className={`project-status project-status-${currentProject.status.toLowerCase()}`}>{currentProject.status}</span>
             </div>
 
-            <p className="mt-2 mb-3 max-w-md text-sm sm:text-base leading-relaxed text-[#b9b2a2]">
+            <p className="project-description mt-2 mb-3 max-w-md text-sm sm:text-base leading-relaxed text-[#b9b2a2]">
               <ScrollLineReveal text={currentProject.description} />
             </p>
 
